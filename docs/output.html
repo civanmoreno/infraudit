@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Output &amp; Reports — infraudit</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>infraudit</h1>
+            <span class="version">v0.1.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="getting-started.html">Getting Started</a></li>
+            <li><a href="architecture.html">Architecture</a></li>
+            <li><a href="checks.html">Checks Reference</a></li>
+            <li><a href="configuration.html">Configuration</a></li>
+            <li><a href="output.html" class="active">Output &amp; Reports</a></li>
+            <li><a href="roadmap.html">Roadmap</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://github.com/ivan/infraudit">GitHub</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1>Output &amp; Reports</h1>
+        <p>infraudit supports multiple output formats for different workflows.</p>
+
+        <h2>Console Output</h2>
+        <p>Default output with colors and severity badges:</p>
+        <pre><code>$ sudo infraudit audit
+
+  infraudit v0.1.0 — Server Security Audit
+  ══════════════════════════════════════════
+
+  AUTH — Users &amp; Authentication
+  ─────────────────────────────
+  <span style="color:#f85149">✗ CRITICAL</span>  AUTH-001  SSH root login is enabled
+                        → Set PermitRootLogin no in /etc/ssh/sshd_config
+  <span style="color:#3fb950">✓ PASS</span>      AUTH-002  SSH password authentication disabled
+  <span style="color:#3fb950">✓ PASS</span>      AUTH-003  No extra UID 0 accounts
+  <span style="color:#d29922">! WARN</span>      AUTH-006  3 sudoers entries use NOPASSWD
+                        → Review /etc/sudoers.d/ and limit NOPASSWD usage
+
+  NET — Network &amp; Firewall
+  ────────────────────────
+  <span style="color:#3fb950">✓ PASS</span>      NET-001   Firewall is active (ufw)
+  <span style="color:#f85149">✗ HIGH</span>      NET-002   Ports 3306, 6379 open and not in whitelist
+                        → Add to allowed_ports config or close with firewall
+
+  ══════════════════════════════════════════
+  Summary: 87 checks | 71 passed | 12 warnings | 4 failures
+  Exit code: 2 (failures found)</code></pre>
+
+        <h2>JSON Output</h2>
+        <p>Machine-readable format for CI/CD pipelines and integrations:</p>
+        <pre><code>$ sudo infraudit audit --format json</code></pre>
+        <pre><code>{
+  "version": "0.1.0",
+  "timestamp": "2026-03-20T14:30:00Z",
+  "hostname": "web-prod-01",
+  "summary": {
+    "total": 87,
+    "pass": 71,
+    "warn": 12,
+    "fail": 4,
+    "error": 0
+  },
+  "results": [
+    {
+      "id": "AUTH-001",
+      "name": "SSH root login disabled",
+      "category": "auth",
+      "severity": "CRITICAL",
+      "status": "FAIL",
+      "message": "PermitRootLogin is set to 'yes' in /etc/ssh/sshd_config",
+      "remediation": "Set PermitRootLogin no in /etc/ssh/sshd_config and restart sshd",
+      "details": [
+        "Current value: PermitRootLogin yes",
+        "File: /etc/ssh/sshd_config:42"
+      ]
+    },
+    {
+      "id": "AUTH-002",
+      "name": "SSH password authentication disabled",
+      "category": "auth",
+      "severity": "HIGH",
+      "status": "PASS",
+      "message": "PasswordAuthentication is set to 'no'",
+      "remediation": "",
+      "details": []
+    }
+  ]
+}</code></pre>
+
+        <h2>YAML Output</h2>
+        <pre><code>$ sudo infraudit audit --format yaml --output report.yaml</code></pre>
+        <pre><code>version: "0.1.0"
+timestamp: "2026-03-20T14:30:00Z"
+hostname: web-prod-01
+summary:
+  total: 87
+  pass: 71
+  warn: 12
+  fail: 4
+  error: 0
+results:
+  - id: AUTH-001
+    name: SSH root login disabled
+    category: auth
+    severity: CRITICAL
+    status: FAIL
+    message: "PermitRootLogin is set to 'yes' in /etc/ssh/sshd_config"
+    remediation: "Set PermitRootLogin no in /etc/ssh/sshd_config and restart sshd"</code></pre>
+
+        <h2>Filtering Output</h2>
+        <pre><code><span class="comment"># Only show failures (no PASS results)</span>
+sudo infraudit audit --quiet
+
+<span class="comment"># Verbose — include all details for every check</span>
+sudo infraudit audit --verbose
+
+<span class="comment"># Combine: JSON failures only, save to file</span>
+sudo infraudit audit --format json --quiet --output failures.json</code></pre>
+
+        <h2>Exit Codes</h2>
+        <p>For scripting and CI/CD integration:</p>
+        <pre><code><span class="comment"># Use in CI pipeline</span>
+sudo infraudit audit --format json --output report.json
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "All checks passed"
+elif [ $EXIT_CODE -eq 1 ]; then
+    echo "Warnings found — review recommended"
+elif [ $EXIT_CODE -eq 2 ]; then
+    echo "Failures found — action required"
+    exit 1
+fi</code></pre>
+    </main>
+</body>
+</html>

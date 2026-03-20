@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture — infraudit</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>infraudit</h1>
+            <span class="version">v0.1.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="getting-started.html">Getting Started</a></li>
+            <li><a href="architecture.html" class="active">Architecture</a></li>
+            <li><a href="checks.html">Checks Reference</a></li>
+            <li><a href="configuration.html">Configuration</a></li>
+            <li><a href="output.html">Output &amp; Reports</a></li>
+            <li><a href="roadmap.html">Roadmap</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://github.com/ivan/infraudit">GitHub</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1>Architecture</h1>
+        <p>How infraudit is designed internally.</p>
+
+        <h2>Overview</h2>
+        <p>infraudit follows a modular architecture where each security check is a self-contained unit that implements a common interface. The CLI layer (cobra) handles user interaction, while the check engine handles discovery, execution, and result collection.</p>
+
+        <pre><code>main.go → cmd.Execute() → cobra routing → check engine → individual checks
+                                                ↓
+                                          report formatter → console / JSON / YAML</code></pre>
+
+        <h2>Project Structure</h2>
+        <pre><code>infraudit/
+├── cmd/
+│   ├── root.go             <span class="comment"># Root command, flags, version</span>
+│   ├── audit.go            <span class="comment"># audit subcommand — runs checks</span>
+│   └── list.go             <span class="comment"># list subcommand — shows available checks</span>
+├── internal/
+│   ├── version/            <span class="comment"># Version constants</span>
+│   ├── check/              <span class="comment"># Check interface, Result, Registry</span>
+│   ├── checks/
+│   │   ├── auth/           <span class="comment"># SSH, users, sudoers, UIDs</span>
+│   │   ├── pam/            <span class="comment"># Password quality, lockout, PAM config</span>
+│   │   ├── network/        <span class="comment"># Firewall, ports, DNS, SNMP</span>
+│   │   ├── services/       <span class="comment"># Daemons, NTP, MTA, desktop</span>
+│   │   ├── filesystem/     <span class="comment"># SUID, permissions, partitions, /tmp</span>
+│   │   ├── logging/        <span class="comment"># Syslog, auditd, AIDE, log rotation</span>
+│   │   ├── packages/       <span class="comment"># Updates, repos, kernel</span>
+│   │   ├── hardening/      <span class="comment"># Kernel params, modules, ASLR</span>
+│   │   ├── boot/           <span class="comment"># GRUB, Secure Boot, SELinux/AppArmor</span>
+│   │   ├── cron/           <span class="comment"># Cron/at permissions, job review</span>
+│   │   ├── crypto/         <span class="comment"># TLS, certificates, ciphers, FIPS</span>
+│   │   ├── secrets/        <span class="comment"># Exposed credentials, history</span>
+│   │   ├── container/      <span class="comment"># Docker/Podman security</span>
+│   │   ├── rlimit/         <span class="comment"># Resource limits, disk, inodes</span>
+│   │   ├── nfs/            <span class="comment"># NFS exports, Samba, rpcbind</span>
+│   │   ├── malware/        <span class="comment"># Rootkit detection, antimalware</span>
+│   │   └── backup/         <span class="comment"># Backup schedule, encryption</span>
+│   └── report/             <span class="comment"># Output formatting (console, JSON, YAML)</span>
+└── main.go                 <span class="comment"># Entry point</span></code></pre>
+
+        <h2>Check Interface</h2>
+        <p>Every check implements the <code>Check</code> interface:</p>
+        <pre><code>type Check interface {
+    ID()          string      <span class="comment">// e.g. "AUTH-001"</span>
+    Name()        string      <span class="comment">// e.g. "SSH root login disabled"</span>
+    Category()    string      <span class="comment">// e.g. "auth"</span>
+    Severity()    Severity    <span class="comment">// CRITICAL, HIGH, MEDIUM, LOW, INFO</span>
+    Description() string      <span class="comment">// What this check validates</span>
+    Run()         Result      <span class="comment">// Execute and return result</span>
+}</code></pre>
+
+        <h2>Result Model</h2>
+        <pre><code>type Result struct {
+    Status      Status   <span class="comment">// PASS, WARN, FAIL, ERROR</span>
+    Message     string   <span class="comment">// What was found</span>
+    Remediation string   <span class="comment">// How to fix it</span>
+    Details     []string <span class="comment">// Additional context lines</span>
+}</code></pre>
+
+        <h2>Check Registry</h2>
+        <p>Checks self-register via <code>init()</code> functions. The registry supports:</p>
+        <ul class="check-list">
+            <li>Auto-discovery of all registered checks</li>
+            <li>Filtering by category</li>
+            <li>Filtering by severity</li>
+            <li>Skip list from configuration</li>
+            <li>Profile-based selection</li>
+        </ul>
+
+        <h2>Execution Flow</h2>
+        <pre><code>1. User runs: sudo infraudit audit --category auth,network
+2. Cobra parses flags, calls audit handler
+3. Registry filters checks by requested categories
+4. Engine runs each check, collects Results
+5. Reporter formats output (console/JSON/YAML)
+6. Exit code set based on highest severity found</code></pre>
+
+        <h2>Dependencies</h2>
+        <table>
+            <thead>
+                <tr><th>Package</th><th>Purpose</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>github.com/spf13/cobra</code></td><td>CLI framework</td></tr>
+                <tr><td><code>github.com/spf13/viper</code></td><td>Configuration (planned)</td></tr>
+            </tbody>
+        </table>
+        <p>infraudit deliberately minimizes dependencies. Checks use only the Go standard library to read files, parse configs, and execute system commands.</p>
+    </main>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration — infraudit</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>infraudit</h1>
+            <span class="version">v0.1.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="getting-started.html">Getting Started</a></li>
+            <li><a href="architecture.html">Architecture</a></li>
+            <li><a href="checks.html">Checks Reference</a></li>
+            <li><a href="configuration.html" class="active">Configuration</a></li>
+            <li><a href="output.html">Output &amp; Reports</a></li>
+            <li><a href="roadmap.html">Roadmap</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://github.com/ivan/infraudit">GitHub</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1>Configuration</h1>
+        <p>Customize infraudit behavior with config files and CLI flags.</p>
+
+        <h2>Config File Locations</h2>
+        <p>infraudit looks for configuration in this order:</p>
+        <pre><code>1. /etc/infraudit/config.yaml      <span class="comment"># System-wide</span>
+2. ~/.infraudit.yaml               <span class="comment"># User-level</span>
+3. ./infraudit.yaml                <span class="comment"># Current directory</span>
+4. CLI flags                       <span class="comment"># Highest priority</span></code></pre>
+
+        <h2>Example Configuration</h2>
+        <pre><code><span class="comment"># infraudit.yaml</span>
+
+<span class="comment"># Server profile (web-server, db-server, container-host, minimal)</span>
+profile: web-server
+
+<span class="comment"># Output format (console, json, yaml)</span>
+format: console
+
+<span class="comment"># Skip specific checks by ID</span>
+skip:
+  - HARD-007    <span class="comment"># Swap check — this server uses unencrypted swap by design</span>
+  - NET-008     <span class="comment"># IPv6 — we use IPv6 in this environment</span>
+  - SVC-012     <span class="comment"># Desktop env — this is a jump box with GUI</span>
+
+<span class="comment"># Skip entire categories</span>
+skip_categories:
+  - container   <span class="comment"># No Docker on this server</span>
+  - nfs         <span class="comment"># No NFS in use</span>
+
+<span class="comment"># Network: allowed open ports</span>
+network:
+  allowed_ports:
+    - 22        <span class="comment"># SSH</span>
+    - 80        <span class="comment"># HTTP</span>
+    - 443       <span class="comment"># HTTPS</span>
+
+<span class="comment"># Services: processes allowed to run as root</span>
+services:
+  root_allowed:
+    - sshd
+    - nginx
+    - fail2ban
+
+<span class="comment"># Resource limits thresholds</span>
+rlimit:
+  disk_warn_percent: 85
+  inode_warn_percent: 90</code></pre>
+
+        <h2>Server Profiles</h2>
+        <p>Profiles pre-select relevant checks for common server roles:</p>
+
+        <table>
+            <thead>
+                <tr><th>Profile</th><th>Description</th><th>Includes</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>minimal</code></td>
+                    <td>Only critical security checks</td>
+                    <td>CRITICAL and HIGH severity only</td>
+                </tr>
+                <tr>
+                    <td><code>web-server</code></td>
+                    <td>Nginx/Apache web servers</td>
+                    <td>All + TLS/certificate focus, port 80/443 whitelisted</td>
+                </tr>
+                <tr>
+                    <td><code>db-server</code></td>
+                    <td>Database servers (PostgreSQL, MySQL)</td>
+                    <td>All + credential file checks, network binding focus</td>
+                </tr>
+                <tr>
+                    <td><code>container-host</code></td>
+                    <td>Docker/Podman hosts</td>
+                    <td>All + container category enabled</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>CLI Flags</h2>
+        <table>
+            <thead>
+                <tr><th>Flag</th><th>Short</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>--version</code></td><td><code>-v</code></td><td>Print version</td></tr>
+                <tr><td><code>--category</code></td><td><code>-c</code></td><td>Run checks for specific categories (comma-separated)</td></tr>
+                <tr><td><code>--profile</code></td><td><code>-p</code></td><td>Use a server profile</td></tr>
+                <tr><td><code>--format</code></td><td><code>-f</code></td><td>Output format: console, json, yaml</td></tr>
+                <tr><td><code>--output</code></td><td><code>-o</code></td><td>Write report to file</td></tr>
+                <tr><td><code>--skip</code></td><td></td><td>Skip specific check IDs (comma-separated)</td></tr>
+                <tr><td><code>--verbose</code></td><td></td><td>Show detailed output for each check</td></tr>
+                <tr><td><code>--quiet</code></td><td><code>-q</code></td><td>Only show failures</td></tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

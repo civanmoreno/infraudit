@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started — infraudit</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>infraudit</h1>
+            <span class="version">v0.1.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="getting-started.html" class="active">Getting Started</a></li>
+            <li><a href="architecture.html">Architecture</a></li>
+            <li><a href="checks.html">Checks Reference</a></li>
+            <li><a href="configuration.html">Configuration</a></li>
+            <li><a href="output.html">Output &amp; Reports</a></li>
+            <li><a href="roadmap.html">Roadmap</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://github.com/ivan/infraudit">GitHub</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1>Getting Started</h1>
+        <p>Get infraudit running on your server in under a minute.</p>
+
+        <h2>Installation</h2>
+
+        <h3>Option 1: Download binary</h3>
+        <pre><code>curl -sL https://github.com/ivan/infraudit/releases/latest/download/infraudit-linux-amd64 -o infraudit
+chmod +x infraudit
+sudo mv infraudit /usr/local/bin/</code></pre>
+
+        <h3>Option 2: Build from source</h3>
+        <pre><code>git clone https://github.com/ivan/infraudit.git
+cd infraudit
+go build -o infraudit .
+sudo mv infraudit /usr/local/bin/</code></pre>
+
+        <h2>Basic Usage</h2>
+
+        <h3>Run a full audit</h3>
+        <p>Most checks require root to read system configurations:</p>
+        <pre><code>sudo infraudit audit</code></pre>
+
+        <h3>Audit a specific category</h3>
+        <pre><code><span class="comment"># Only authentication checks</span>
+sudo infraudit audit --category auth
+
+<span class="comment"># Only network and firewall checks</span>
+sudo infraudit audit --category network
+
+<span class="comment"># Multiple categories</span>
+sudo infraudit audit --category auth,network,filesystem</code></pre>
+
+        <h3>List available checks</h3>
+        <pre><code>infraudit list
+
+<span class="comment"># Filter by category</span>
+infraudit list --category crypto</code></pre>
+
+        <h3>Export results</h3>
+        <pre><code><span class="comment"># JSON for CI/CD pipelines</span>
+sudo infraudit audit --format json --output report.json
+
+<span class="comment"># YAML for config management</span>
+sudo infraudit audit --format yaml --output report.yaml</code></pre>
+
+        <h2>Server Profiles</h2>
+        <p>Use profiles to run checks relevant to your server role:</p>
+        <pre><code><span class="comment"># Web server profile (Nginx/Apache focused)</span>
+sudo infraudit audit --profile web-server
+
+<span class="comment"># Database server profile</span>
+sudo infraudit audit --profile db-server
+
+<span class="comment"># Container host profile (includes Docker checks)</span>
+sudo infraudit audit --profile container-host
+
+<span class="comment"># Minimal — only critical security checks</span>
+sudo infraudit audit --profile minimal</code></pre>
+
+        <h2>Exit Codes</h2>
+        <p>Useful for scripting and CI/CD integration:</p>
+        <table>
+            <thead>
+                <tr><th>Code</th><th>Meaning</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>0</code></td><td>All checks passed</td></tr>
+                <tr><td><code>1</code></td><td>Warnings found (LOW/MEDIUM severity)</td></tr>
+                <tr><td><code>2</code></td><td>Failures found (HIGH/CRITICAL severity)</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Permissions</h2>
+        <p>infraudit reads system files like <code>/etc/shadow</code>, <code>/etc/ssh/sshd_config</code>, and kernel parameters. Most checks require <strong>root</strong> access. Checks that cannot run without proper permissions will report as <code>ERROR</code> with a clear message.</p>
+        <p>infraudit is <strong>read-only</strong> — it never modifies your system. It only inspects configurations and reports findings.</p>
+    </main>
+</body>
+</html>

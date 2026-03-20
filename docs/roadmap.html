@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap — infraudit</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>infraudit</h1>
+            <span class="version">v0.1.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="getting-started.html">Getting Started</a></li>
+            <li><a href="architecture.html">Architecture</a></li>
+            <li><a href="checks.html">Checks Reference</a></li>
+            <li><a href="configuration.html">Configuration</a></li>
+            <li><a href="output.html">Output &amp; Reports</a></li>
+            <li><a href="roadmap.html" class="active">Roadmap</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://github.com/ivan/infraudit">GitHub</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1>Roadmap</h1>
+        <p>Development plan for infraudit, organized by phases.</p>
+
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 1: Scaffold</h2>
+                <span class="phase-status done">DONE</span>
+            </div>
+            <ul class="check-list">
+                <li>Go module initialized with cobra</li>
+                <li>Root command with --help and --version</li>
+                <li>Version info package</li>
+                <li>Project structure established</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 2: Audit Engine</h2>
+                <span class="phase-status next">NEXT</span>
+            </div>
+            <ul class="check-list">
+                <li>Check interface (ID, Name, Category, Severity, Run)</li>
+                <li>Result model (PASS / WARN / FAIL / ERROR + remediation)</li>
+                <li>Check registry with auto-discovery</li>
+                <li><code>infraudit audit</code> command with category filtering</li>
+                <li><code>infraudit list</code> command</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 3–5: Core Checks</h2>
+                <span class="phase-status planned">PLANNED</span>
+            </div>
+            <ul class="check-list">
+                <li>AUTH — Users, SSH, sudoers (8 checks)</li>
+                <li>PAM — Password policies, lockout (5 checks)</li>
+                <li>NET — Firewall, ports, DNS, SNMP (11 checks)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 6–9: System Checks</h2>
+                <span class="phase-status planned">PLANNED</span>
+            </div>
+            <ul class="check-list">
+                <li>SVC — Services, NTP, MTA (13 checks)</li>
+                <li>FS — Filesystem, permissions, partitions (12 checks)</li>
+                <li>LOG — Logging, auditd, AIDE (9 checks)</li>
+                <li>PKG — Packages, updates, kernel (4 checks)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 10–12: Hardening Checks</h2>
+                <span class="phase-status planned">PLANNED</span>
+            </div>
+            <ul class="check-list">
+                <li>HARD — Kernel params, modules, ASLR (12 checks)</li>
+                <li>BOOT — GRUB, Secure Boot, SELinux/AppArmor (8 checks)</li>
+                <li>CRON — Cron/at permissions, job review (7 checks)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 13–15: Advanced Checks</h2>
+                <span class="phase-status planned">PLANNED</span>
+            </div>
+            <ul class="check-list">
+                <li>CRYPTO — TLS, certificates, ciphers, FIPS (9 checks)</li>
+                <li>SEC — Exposed secrets, credentials (4 checks)</li>
+                <li>CTR — Docker/Podman security (11 checks)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 16–19: Extended Checks</h2>
+                <span class="phase-status planned">PLANNED</span>
+            </div>
+            <ul class="check-list">
+                <li>RLIM — Resource limits, disk, inodes (7 checks)</li>
+                <li>NFS — Network filesystems, Samba (4 checks)</li>
+                <li>MAL — Rootkits, antimalware (4 checks)</li>
+                <li>BAK — Backups, encryption (4 checks)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 20–21: Output &amp; Configuration</h2>
+                <span class="phase-status planned">PLANNED</span>
+            </div>
+            <ul class="check-list">
+                <li>Console output with colors and severity</li>
+                <li>JSON and YAML export</li>
+                <li>File output and exit codes</li>
+                <li>YAML config files with profiles</li>
+                <li>Whitelists, skip lists, server profiles</li>
+            </ul>
+        </div>
+
+        <h2>Standards Coverage</h2>
+        <table>
+            <thead>
+                <tr><th>Standard</th><th>Coverage</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>CIS Benchmark Level 1</td><td>~90% of applicable controls</td></tr>
+                <tr><td>CIS Benchmark Level 2</td><td>~70% of applicable controls</td></tr>
+                <tr><td>DISA STIG</td><td>Key findings covered</td></tr>
+                <tr><td>Lynis categories</td><td>All major categories mapped</td></tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

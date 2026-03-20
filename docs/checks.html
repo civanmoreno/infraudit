@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checks Reference — infraudit</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>infraudit</h1>
+            <span class="version">v0.1.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="getting-started.html">Getting Started</a></li>
+            <li><a href="architecture.html">Architecture</a></li>
+            <li><a href="checks.html" class="active">Checks Reference</a></li>
+            <li><a href="configuration.html">Configuration</a></li>
+            <li><a href="output.html">Output &amp; Reports</a></li>
+            <li><a href="roadmap.html">Roadmap</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://github.com/ivan/infraudit">GitHub</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1>Checks Reference</h1>
+        <p>Complete reference of all 120+ security checks organized by category.</p>
+
+        <!-- AUTH -->
+        <h2 id="auth">AUTH — Users &amp; Authentication</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>AUTH-001</code></td><td>SSH root login disabled (<code>PermitRootLogin no</code>)</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>AUTH-002</code></td><td>SSH password authentication disabled</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>AUTH-003</code></td><td>No users with UID 0 besides root</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>AUTH-004</code></td><td>No users with empty password</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>AUTH-005</code></td><td>System accounts have <code>/nologin</code> or <code>/false</code> shell</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>AUTH-006</code></td><td>Sudoers NOPASSWD usage is limited</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>AUTH-007</code></td><td>Permissions on <code>/etc/passwd</code> (644), <code>/etc/shadow</code> (640), <code>/etc/group</code> (644)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>AUTH-008</code></td><td>Access to <code>su</code> restricted via <code>pam_wheel.so</code></td><td><span class="badge medium">MEDIUM</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- PAM -->
+        <h2 id="pam">PAM — Password Policies</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>PAM-001</code></td><td>Password quality enforced via <code>pam_pwquality</code> (minlen, complexity)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>PAM-002</code></td><td>Password reuse prevention (<code>pam_pwhistory remember &ge; 5</code>)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>PAM-003</code></td><td>Account lockout after failed attempts (<code>pam_faillock</code>)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>PAM-004</code></td><td>PAM module ordering correct (faillock before pam_unix)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>PAM-005</code></td><td>Password expiration configured (maxdays, mindays, warndays)</td><td><span class="badge low">LOW</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- NET -->
+        <h2 id="network">NET — Network &amp; Firewall</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>NET-001</code></td><td>Firewall is active (iptables/nftables/ufw)</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>NET-002</code></td><td>No unnecessary open ports</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>NET-003</code></td><td>IP forwarding disabled (if not gateway)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>NET-004</code></td><td>Services not bound to 0.0.0.0 unnecessarily</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>NET-005</code></td><td>DNS resolvers configured</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>NET-006</code></td><td>DNSSEC validation enabled</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>NET-007</code></td><td>DNS over TLS/HTTPS configured</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>NET-008</code></td><td>IPv6 disabled or properly configured</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>NET-009</code></td><td>SNMP v1/v2c disabled (SNMPv3 only)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>NET-010</code></td><td>Default SNMP community strings removed</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>NET-011</code></td><td>SNMP removed if unused</td><td><span class="badge low">LOW</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- SVC -->
+        <h2 id="services">SVC — Services &amp; Processes</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>SVC-001</code></td><td>No insecure services running (telnet, rsh, rlogin, xinetd)</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>SVC-002</code></td><td>SSH protocol version, ciphers, and timeouts hardened</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>SVC-003</code></td><td>NTP/chrony running and synchronized</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>SVC-004</code></td><td>NTP daemon not running as root</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>SVC-005</code></td><td>NTS (Network Time Security) enabled</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>SVC-006</code></td><td>Time sources are trusted/authoritative</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>SVC-007</code></td><td>Critical services active (sshd, fail2ban/crowdsec)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>SVC-008</code></td><td>No unnecessary processes running as root</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>SVC-009</code></td><td>MTA is local-only (<code>inet_interfaces = loopback-only</code>)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>SVC-010</code></td><td>MTA is not an open relay</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>SVC-011</code></td><td>Root mail forwarded to monitored account</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>SVC-012</code></td><td>No desktop environment installed on server</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>SVC-013</code></td><td>Automount (autofs) disabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- FS -->
+        <h2 id="filesystem">FS — Filesystem &amp; Permissions</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>FS-001</code></td><td>No unnecessary SUID/SGID files</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>FS-002</code></td><td>No world-writable files outside /tmp</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>FS-003</code></td><td>Sticky bit set on /tmp and /var/tmp</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>FS-004</code></td><td>Sensitive partitions mounted with noexec, nosuid, nodev</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>FS-005</code></td><td><code>/dev/shm</code> mounted with nodev, nosuid, noexec</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>FS-006</code></td><td>Home directories not world-readable</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>FS-007</code></td><td>No orphaned files (files without owner)</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>FS-008</code></td><td>Separate partitions for /tmp, /var, /var/log, /var/log/audit, /home</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>FS-009</code></td><td><code>/tmp</code> on separate partition/tmpfs with nodev, nosuid, noexec</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>FS-010</code></td><td><code>/var/tmp</code> mounted with nodev, nosuid, noexec</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>FS-011</code></td><td>systemd <code>tmp.mount</code> enabled</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>FS-012</code></td><td>Temporary file cleanup configured</td><td><span class="badge low">LOW</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- LOG -->
+        <h2 id="logging">LOG — Logging &amp; Auditing</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>LOG-001</code></td><td>Syslog or journald active and configured</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>LOG-002</code></td><td>auditd installed and running</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>LOG-003</code></td><td>Audit rules for sensitive files (/etc/passwd, /etc/shadow, sudoers)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>LOG-004</code></td><td>Log rotation configured (logrotate)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>LOG-005</code></td><td>Log files not world-readable</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>LOG-006</code></td><td>AIDE or file integrity tool installed</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>LOG-007</code></td><td>AIDE database initialized</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>LOG-008</code></td><td>AIDE checks scheduled via cron</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>LOG-009</code></td><td>AIDE covers critical paths (/bin, /sbin, /lib, /etc, /boot)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- PKG -->
+        <h2 id="packages">PKG — Packages &amp; Updates</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>PKG-001</code></td><td>No pending security updates</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>PKG-002</code></td><td>Package repositories use HTTPS</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>PKG-003</code></td><td>Kernel is up to date</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>PKG-004</code></td><td>Automatic security updates enabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- HARD -->
+        <h2 id="hardening">HARD — Kernel Hardening</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>HARD-001</code></td><td>Login banner configured (/etc/issue, /etc/issue.net)</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>HARD-002</code></td><td>Core dumps disabled (sysctl + limits.conf)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>HARD-003</code></td><td>ASLR enabled (<code>kernel.randomize_va_space = 2</code>)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>HARD-004</code></td><td>dmesg restricted (<code>kernel.dmesg_restrict = 1</code>)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>HARD-005</code></td><td>ptrace restricted (<code>kernel.yama.ptrace_scope &ge; 1</code>)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>HARD-006</code></td><td>/proc hardened</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>HARD-007</code></td><td>Swap encrypted or absent</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>HARD-008</code></td><td>Unused filesystem kernel modules blacklisted (cramfs, hfs, etc.)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>HARD-009</code></td><td>USB storage module disabled if not needed</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>HARD-010</code></td><td>Wireless modules disabled if not needed</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>HARD-011</code></td><td>Firewire/Thunderbolt DMA modules disabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>HARD-012</code></td><td>Bluetooth disabled if not needed</td><td><span class="badge low">LOW</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- BOOT -->
+        <h2 id="boot">BOOT — Boot Security &amp; MAC</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>BOOT-001</code></td><td>GRUB bootloader password set</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>BOOT-002</code></td><td>Bootloader config permissions (grub.cfg 0600 root:root)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>BOOT-003</code></td><td>UEFI Secure Boot enabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>BOOT-004</code></td><td>Single-user mode requires authentication</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>BOOT-005</code></td><td>SELinux or AppArmor installed and enabled</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>BOOT-006</code></td><td>SELinux Enforcing / AppArmor enforce mode</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>BOOT-007</code></td><td>No unconfined processes/profiles</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>BOOT-008</code></td><td>No SELinux/AppArmor denials in logs</td><td><span class="badge low">LOW</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- CRON -->
+        <h2 id="cron">CRON — Scheduled Jobs</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>CRON-001</code></td><td>Cron daemon enabled and running</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>CRON-002</code></td><td><code>/etc/crontab</code> permissions 0600 root:root</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CRON-003</code></td><td>Cron directories permissions 0700</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CRON-004</code></td><td><code>cron.allow</code> exists, <code>cron.deny</code> removed</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CRON-005</code></td><td><code>at.allow</code> exists, <code>at.deny</code> removed</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CRON-006</code></td><td>No suspicious cron jobs (network downloads, writable scripts)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>CRON-007</code></td><td>User crontabs reviewed</td><td><span class="badge low">LOW</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- CRYPTO -->
+        <h2 id="crypto">CRYPTO — TLS/SSL &amp; Cryptography</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>CRYPTO-001</code></td><td>System crypto policy is not LEGACY</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>CRYPTO-002</code></td><td>No expired or soon-to-expire certificates</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>CRYPTO-003</code></td><td>No self-signed certificates in production</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CRYPTO-004</code></td><td>TLS 1.0 and 1.1 disabled system-wide</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>CRYPTO-005</code></td><td>No weak cipher suites (RC4, DES, 3DES, NULL)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>CRYPTO-006</code></td><td>Certificate chains complete</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CRYPTO-007</code></td><td>Private key file permissions (0600 or 0400)</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>CRYPTO-008</code></td><td>FIPS mode enabled if required</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CRYPTO-009</code></td><td>No MD5/SHA1 in authentication or signing</td><td><span class="badge high">HIGH</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- SEC -->
+        <h2 id="secrets">SEC — Secrets &amp; Credentials</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>SEC-001</code></td><td>No secrets in environment variables</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>SEC-002</code></td><td>No passwords in shell history</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>SEC-003</code></td><td>No credentials in world-readable files</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>SEC-004</code></td><td>Credential files permissions correct (.pgpass, .my.cnf, .netrc = 0600)</td><td><span class="badge high">HIGH</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- CTR -->
+        <h2 id="container">CTR — Container Security</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>CTR-001</code></td><td>Docker/Podman detected</td><td><span class="badge info">INFO</span></td></tr>
+                <tr><td><code>CTR-002</code></td><td>Docker daemon configuration reviewed</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CTR-003</code></td><td>Docker socket permissions restricted</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>CTR-004</code></td><td>No containers running as root</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>CTR-005</code></td><td>No privileged containers</td><td><span class="badge critical">CRITICAL</span></td></tr>
+                <tr><td><code>CTR-006</code></td><td>Container resource limits set (CPU, memory)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CTR-007</code></td><td>Docker content trust enabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CTR-008</code></td><td>Inter-container communication restricted</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>CTR-009</code></td><td>Read-only root filesystem in containers</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>CTR-010</code></td><td>Docker logging driver configured</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>CTR-011</code></td><td>Images from trusted registries only</td><td><span class="badge medium">MEDIUM</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- RLIM -->
+        <h2 id="rlimit">RLIM — Resource Limits</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>RLIM-001</code></td><td>Open files limit is reasonable</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>RLIM-002</code></td><td>Max user processes (nproc) limit set</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>RLIM-003</code></td><td>Stack size limits configured</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>RLIM-004</code></td><td>No wildcard unlimited entries in limits.conf</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>RLIM-005</code></td><td>Root filesystem space below 85%</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>RLIM-006</code></td><td>/var, /var/log, /tmp have sufficient space</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>RLIM-007</code></td><td>Inode usage is not exhausted</td><td><span class="badge high">HIGH</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- NFS -->
+        <h2 id="nfs">NFS — Network Filesystems</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>NFS-001</code></td><td>NFS exports reviewed (no world-export, root_squash enabled)</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>NFS-002</code></td><td>NFSv3 disabled if NFSv4 available</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>NFS-003</code></td><td>Samba config reviewed (no guest access)</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>NFS-004</code></td><td>rpcbind disabled if NFS not in use</td><td><span class="badge medium">MEDIUM</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- MAL -->
+        <h2 id="malware">MAL — Rootkits &amp; Malware</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>MAL-001</code></td><td>rkhunter or chkrootkit installed</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>MAL-002</code></td><td>Rootkit scans scheduled</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>MAL-003</code></td><td>ClamAV installed if server handles uploads/mail</td><td><span class="badge low">LOW</span></td></tr>
+                <tr><td><code>MAL-004</code></td><td>Antimalware definitions up to date</td><td><span class="badge medium">MEDIUM</span></td></tr>
+            </tbody>
+        </table>
+
+        <!-- BAK -->
+        <h2 id="backup">BAK — Backups</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
+            <tbody>
+                <tr><td><code>BAK-001</code></td><td>Backup schedule exists and ran recently</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>BAK-002</code></td><td>Backups are encrypted</td><td><span class="badge medium">MEDIUM</span></td></tr>
+                <tr><td><code>BAK-003</code></td><td>Backup files not world-readable</td><td><span class="badge high">HIGH</span></td></tr>
+                <tr><td><code>BAK-004</code></td><td>Off-site/off-host backup exists</td><td><span class="badge medium">MEDIUM</span></td></tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>
