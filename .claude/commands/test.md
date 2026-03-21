@@ -1,8 +1,8 @@
-Ejecutar los tests del proyecto infraudit.
+Run the infraudit project tests.
 
-Ejecutá:
+Run:
 1. `export PATH=/home/ivan/.local/go/bin:$PATH`
-2. `go test ./...` en el directorio del proyecto
-3. Reportá los resultados: tests pasados, fallidos, y cobertura si está disponible.
+2. `go test ./...` in the project directory
+3. Report results: passed, failed, and coverage if available.
 
-Si hay tests fallidos, analizá la causa y sugerí correcciones.
+If there are test failures, analyze the cause and suggest fixes.

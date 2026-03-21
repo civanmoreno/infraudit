@@ -1,8 +1,8 @@
-Agregar un nuevo skill (subcomando) a infraudit.
+Add a new skill (subcommand) to infraudit.
 
-Pedí al usuario el nombre del skill y qué debe hacer. Luego:
+Ask the user for the skill name and what it should do. Then:
 
-1. Creá `cmd/<nombre>.go` con el subcomando cobra registrado en `rootCmd`
-2. Si la lógica es compleja, creá `internal/skills/<nombre>/` con la implementación
-3. Actualizá `PLAN.md` marcando el skill como implementado o en progreso
-4. Compilá con `go build -o infraudit .` y verificá con `./infraudit <nombre> --help`
+1. Create `cmd/<name>.go` with the cobra subcommand registered in `rootCmd`
+2. If the logic is complex, create `internal/skills/<name>/` with the implementation
+3. Update `PLAN.md` marking the skill as implemented or in progress
+4. Build with `go build -o infraudit .` and verify with `./infraudit <name> --help`

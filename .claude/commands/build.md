@@ -1,8 +1,8 @@
-Compilar el proyecto infraudit.
+Build the infraudit project.
 
-Ejecutá:
+Run:
 1. `export PATH=/home/ivan/.local/go/bin:$PATH`
-2. `go build -o infraudit .` en el directorio del proyecto
-3. Verificá que el binario se creó correctamente con `./infraudit --version`
+2. `go build -o infraudit .` in the project directory
+3. Verify the binary was created with `./infraudit --version`
 
-Si hay errores de compilación, corregílos antes de continuar.
+If there are compilation errors, fix them before continuing.

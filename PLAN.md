@@ -1,283 +1,285 @@
-# infraudit — Plan de desarrollo
+# infraudit — Development Plan
 
-## Visión
+## Vision
 
-CLI en Go que se ejecuta directamente en un servidor Linux para auditar su seguridad y organización. Valida configuraciones, permisos, servicios, red, usuarios y buenas prácticas de hardening según CIS Benchmarks, STIG y estándares de la industria. Genera un reporte con hallazgos categorizados por severidad.
+Go CLI that runs directly on a Linux server to audit its security posture. Validates configurations, permissions, services, network, users, and hardening best practices according to CIS Benchmarks, STIG, and industry standards. Generates a report with findings categorized by severity.
 
-## Referencias
+## References
 
 - CIS Benchmarks (Ubuntu 24.04, RHEL 9, Debian 12)
-- DISA STIG para Linux
-- Lynis (categorías de auditoría)
+- DISA STIG for Linux
+- Lynis (audit categories)
 - OWASP Docker Security Cheat Sheet
 
-## Fases
+## Phases
 
-### Fase 1: Scaffold inicial ✅
+### Phase 1: Initial Scaffold ✅
 
-- [x] Inicializar módulo Go (`go mod init`)
-- [x] Dependencia cobra para CLI
+- [x] Initialize Go module (`go mod init`)
+- [x] Cobra dependency for CLI
 - [x] `main.go` — entry point
-- [x] `cmd/root.go` — comando raíz con `--help`, `--version`
-- [x] `internal/version/version.go` — constantes de versión (v0.1.0)
+- [x] `cmd/root.go` — root command with `--help`, `--version`
+- [x] `internal/version/version.go` — version constants
 
-### Fase 2: Motor de auditoría y modelo de checks ✅
+### Phase 2: Audit Engine and Check Model ✅
 
-- [x] Definir interfaz `Check` (nombre, categoría, severidad, `Run() Result`)
-- [x] Registry de checks con autodiscovery
-- [x] Modelo de resultado: PASS / WARN / FAIL / ERROR con mensaje y remediación
-- [x] `infraudit audit` — ejecuta todos los checks registrados
-- [x] `infraudit audit --category <cat>` — filtra por categoría
-- [x] `infraudit list` — lista todos los checks disponibles
+- [x] Define `Check` interface (name, category, severity, `Run() Result`)
+- [x] Check registry with autodiscovery
+- [x] Result model: PASS / WARN / FAIL / ERROR with message and remediation
+- [x] `infraudit audit` — runs all registered checks
+- [x] `infraudit audit --category <cat>` — filter by category
+- [x] `infraudit list` — list all available checks
 
-### Fase 3: Checks de usuarios y autenticación (AUTH) ✅
+### Phase 3: User and Authentication Checks (AUTH) ✅
 
-- [x] Root login por SSH deshabilitado (`PermitRootLogin no`)
-- [x] Autenticación por password SSH deshabilitada (`PasswordAuthentication no`)
-- [x] Usuarios con UID 0 (solo root debe tenerlo)
-- [x] Usuarios sin password o con password vacío
-- [x] Cuentas del sistema con shell de login (deben tener `/nologin` o `/false`)
-- [x] Archivo sudoers: uso de `NOPASSWD` excesivo
-- [x] Permisos de `/etc/passwd`, `/etc/shadow`, `/etc/group`
-- [x] Restricción de `su` vía `pam_wheel.so` (solo grupo autorizado)
+- [x] SSH root login disabled (`PermitRootLogin no`)
+- [x] SSH password authentication disabled (`PasswordAuthentication no`)
+- [x] Users with UID 0 (only root should have it)
+- [x] Users without password or with empty password
+- [x] System accounts with login shell (should have `/nologin` or `/false`)
+- [x] Sudoers: excessive `NOPASSWD` usage
+- [x] Permissions on `/etc/passwd`, `/etc/shadow`, `/etc/group`
+- [x] `su` restriction via `pam_wheel.so` (authorized group only)
 
-### Fase 4: Checks de PAM y políticas de contraseñas (PAM) ✅
+### Phase 4: PAM and Password Policy Checks (PAM) ✅
 
-- [x] Calidad de passwords vía `pam_pwquality` (minlen, dcredit, ucredit, lcredit, ocredit, minclass)
-- [x] Prevención de reutilización de passwords (`pam_pwhistory`, `remember >= 5`)
-- [x] Bloqueo de cuenta por intentos fallidos (`pam_faillock`: deny, unlock_time, fail_interval)
-- [x] Orden correcto de módulos PAM (faillock antes de pam_unix)
-- [x] Expiración de passwords configurada (maxdays, mindays, warndays)
+- [x] Password quality via `pam_pwquality` (minlen, dcredit, ucredit, lcredit, ocredit, minclass)
+- [x] Password reuse prevention (`pam_pwhistory`, `remember >= 5`)
+- [x] Account lockout on failed attempts (`pam_faillock`: deny, unlock_time, fail_interval)
+- [x] Correct PAM module ordering (faillock before pam_unix)
+- [x] Password expiration configured (maxdays, mindays, warndays)
 
-### Fase 5: Checks de red y firewall (NET) ✅
+### Phase 5: Network and Firewall Checks (NET) ✅
 
-- [x] Firewall activo (iptables/nftables/ufw)
-- [x] Puertos abiertos innecesarios (comparar contra whitelist configurable)
-- [x] IP forwarding deshabilitado (si no es router/gateway)
-- [x] Servicios escuchando en 0.0.0.0 vs localhost
-- [x] DNS resolvers configurados
-- [x] DNSSEC validación habilitada (si corre resolver)
+- [x] Firewall active (iptables/nftables/ufw)
+- [x] Unnecessary open ports (compare against configurable whitelist)
+- [x] IP forwarding disabled (if not a router/gateway)
+- [x] Services listening on 0.0.0.0 vs localhost
+- [x] DNS resolvers configured
+- [x] DNSSEC validation enabled (if running resolver)
 - [x] DNS over TLS/HTTPS (systemd-resolved, unbound)
-- [x] IPv6 — deshabilitado o correctamente configurado
-- [x] SNMP v1/v2c deshabilitado (solo SNMPv3 si es necesario)
-- [x] Community strings default removidos (no `public`/`private`)
-- [x] SNMP removido si no se usa
+- [x] IPv6 — disabled or properly configured
+- [x] SNMP v1/v2c disabled (SNMPv3 only if needed)
+- [x] Default community strings removed (no `public`/`private`)
+- [x] SNMP removed if unused
 
-### Fase 6: Checks de servicios y procesos (SVC) ✅
+### Phase 6: Services and Process Checks (SVC) ✅
 
-- [x] Servicios innecesarios corriendo (telnet, rsh, rlogin, xinetd, etc.)
-- [x] SSH: versión de protocolo, ciphers débiles, timeout configurado
-- [x] NTP/chrony sincronizado y configurado (no solo corriendo)
-- [x] NTP daemon no corriendo como root (user `_chrony` o `chrony`)
-- [x] NTS (Network Time Security) habilitado si es posible
-- [x] Fuentes de tiempo son confiables/autoritativas
-- [x] Servicios críticos activos (sshd, fail2ban/crowdsec, logging)
-- [x] Procesos corriendo como root que no deberían
-- [x] MTA configurado como local-only (Postfix: `inet_interfaces = loopback-only`)
-- [x] MTA no es open relay
-- [x] Mail aliases para root (forward a cuenta monitoreada)
-- [x] GDM/desktop environment no instalado en servidores
-- [x] Automount deshabilitado (autofs)
+- [x] Insecure services running (telnet, rsh, rlogin, xinetd, etc.)
+- [x] SSH: protocol version, weak ciphers, timeout configured
+- [x] NTP/chrony synchronized and configured (not just running)
+- [x] NTP daemon not running as root (user `_chrony` or `chrony`)
+- [x] NTS (Network Time Security) enabled if possible
+- [x] Time sources are trusted/authoritative
+- [x] Critical services active (sshd, fail2ban/crowdsec, logging)
+- [x] Processes running as root that shouldn't be
+- [x] MTA configured as local-only (Postfix: `inet_interfaces = loopback-only`)
+- [x] MTA is not an open relay
+- [x] Mail aliases for root (forward to monitored account)
+- [x] GDM/desktop environment not installed on servers
+- [x] Automount disabled (autofs)
 
-### Fase 7: Checks de filesystem y permisos (FS) ✅
+### Phase 7: Filesystem and Permission Checks (FS) ✅
 
-- [x] Archivos con SUID/SGID innecesarios
-- [x] Archivos world-writable fuera de /tmp
-- [x] Directorios sin sticky bit donde debería haber (/tmp, /var/tmp)
-- [x] Particiones sensibles montadas con `noexec`, `nosuid`, `nodev`
-- [x] `/dev/shm` montado con `nodev`, `nosuid`, `noexec`
-- [x] Permisos de home directories (no world-readable)
-- [x] Archivos sin dueño (orphaned files)
-- [x] Particiones separadas: `/tmp`, `/var`, `/var/log`, `/var/log/audit`, `/var/tmp`, `/home`
-- [x] `/tmp` en partición separada o tmpfs con `nodev`, `nosuid`, `noexec`
-- [x] `/var/tmp` con `nodev`, `nosuid`, `noexec`
-- [x] `tmp.mount` habilitado si usa systemd
-- [x] Limpieza de temporales configurada (`systemd-tmpfiles` o `tmpreaper`)
+- [x] Unnecessary SUID/SGID files
+- [x] World-writable files outside /tmp
+- [x] Missing sticky bit on directories that need it (/tmp, /var/tmp)
+- [x] Sensitive partitions mounted with `noexec`, `nosuid`, `nodev`
+- [x] `/dev/shm` mounted with `nodev`, `nosuid`, `noexec`
+- [x] Home directory permissions (not world-readable)
+- [x] Orphaned files (no owner)
+- [x] Separate partitions: `/tmp`, `/var`, `/var/log`, `/var/log/audit`, `/var/tmp`, `/home`
+- [x] `/tmp` on separate partition or tmpfs with `nodev`, `nosuid`, `noexec`
+- [x] `/var/tmp` with `nodev`, `nosuid`, `noexec`
+- [x] `tmp.mount` enabled if using systemd
+- [x] Temporary file cleanup configured (`systemd-tmpfiles` or `tmpreaper`)
 
-### Fase 8: Checks de logging y auditoría (LOG) ✅
+### Phase 8: Logging and Audit Checks (LOG) ✅
 
-- [x] Syslog/journald activo y configurado
-- [x] auditd instalado y corriendo
-- [x] Reglas de audit para archivos sensibles (/etc/passwd, /etc/shadow, sudoers)
-- [x] Rotación de logs configurada (logrotate)
-- [x] Logs no son world-readable
-- [x] AIDE o equivalente instalado (file integrity monitoring)
-- [x] Base de datos AIDE inicializada
-- [x] Checks de AIDE programados vía cron
-- [x] AIDE cubre rutas críticas (`/bin`, `/sbin`, `/lib`, `/etc`, `/boot`)
+- [x] Syslog/journald active and configured
+- [x] auditd installed and running
+- [x] Audit rules for sensitive files (/etc/passwd, /etc/shadow, sudoers)
+- [x] Log rotation configured (logrotate)
+- [x] Logs not world-readable
+- [x] AIDE or equivalent installed (file integrity monitoring)
+- [x] AIDE database initialized
+- [x] AIDE checks scheduled via cron
+- [x] AIDE covers critical paths (`/bin`, `/sbin`, `/lib`, `/etc`, `/boot`)
 
-### Fase 9: Checks de actualizaciones y paquetes (PKG) ✅
+### Phase 9: Package and Update Checks (PKG) ✅
 
-- [x] Paquetes con actualizaciones de seguridad pendientes
-- [x] Repos configurados correctamente (no repos inseguros/HTTP)
-- [x] Kernel actualizado
-- [x] Automatic security updates habilitado (unattended-upgrades / dnf-automatic)
+- [x] Pending security updates
+- [x] Repos configured correctly (no insecure/HTTP repos)
+- [x] Kernel up to date
+- [x] Automatic security updates enabled (unattended-upgrades / dnf-automatic)
 
-### Fase 10: Checks de hardening del kernel (HARD) ✅
+### Phase 10: Kernel Hardening Checks (HARD) ✅
 
-- [x] Banner de login configurado (`/etc/issue`, `/etc/issue.net`)
-- [x] Core dumps deshabilitados (sysctl + limits.conf `hard core 0`)
-- [x] ASLR habilitado (`kernel.randomize_va_space = 2`)
-- [x] Restricción de dmesg (`kernel.dmesg_restrict = 1`)
-- [x] Restricción de ptrace (`kernel.yama.ptrace_scope >= 1`)
+- [x] Login banner configured (`/etc/issue`, `/etc/issue.net`)
+- [x] Core dumps disabled (sysctl + limits.conf `hard core 0`)
+- [x] ASLR enabled (`kernel.randomize_va_space = 2`)
+- [x] dmesg restriction (`kernel.dmesg_restrict = 1`)
+- [x] ptrace restriction (`kernel.yama.ptrace_scope >= 1`)
 - [x] `/proc` hardening
-- [x] Swap cifrado o ausente si no es necesario
-- [x] Módulos de kernel innecesarios blacklisted (`cramfs`, `freevxfs`, `hfs`, `hfsplus`, `jffs2`, `squashfs`, `udf`)
-- [x] USB storage deshabilitado si no se necesita (`usb-storage` blacklisted)
-- [x] Módulos wireless deshabilitados si no se necesitan
-- [x] Firewire/Thunderbolt DMA deshabilitado (`firewire-core`, `thunderbolt`)
-- [x] Bluetooth deshabilitado si no se necesita
+- [x] Swap encrypted or absent if not needed
+- [x] Unnecessary kernel modules blacklisted (`cramfs`, `freevxfs`, `hfs`, `hfsplus`, `jffs2`, `squashfs`, `udf`)
+- [x] USB storage disabled if not needed (`usb-storage` blacklisted)
+- [x] Wireless modules disabled if not needed
+- [x] Firewire/Thunderbolt DMA disabled (`firewire-core`, `thunderbolt`)
+- [x] Bluetooth disabled if not needed
 
-### Fase 11: Checks de boot y MAC (BOOT) ✅
+### Phase 11: Boot and MAC Checks (BOOT) ✅
 
-- [x] Password de GRUB configurado
-- [x] Permisos de config del bootloader (`/boot/grub/grub.cfg` = `0600` root:root)
-- [x] Secure Boot habilitado si el hardware lo soporta
-- [x] Single-user mode requiere autenticación
-- [x] SELinux o AppArmor instalado y habilitado
-- [x] SELinux en modo `Enforcing` / AppArmor en modo `enforce`
-- [x] Sin perfiles/procesos unconfined
-- [x] Verificar denials en logs de SELinux/AppArmor
+- [x] GRUB password configured
+- [x] Bootloader config permissions (`/boot/grub/grub.cfg` = `0600` root:root)
+- [x] Secure Boot enabled if hardware supports it
+- [x] Single-user mode requires authentication
+- [x] SELinux or AppArmor installed and enabled
+- [x] SELinux in `Enforcing` mode / AppArmor in `enforce` mode
+- [x] No unconfined processes/profiles
+- [x] Check for denials in SELinux/AppArmor logs
 
-### Fase 12: Checks de cron y jobs programados (CRON) ✅
+### Phase 12: Cron and Scheduled Job Checks (CRON) ✅
 
-- [x] Cron daemon habilitado y corriendo
-- [x] Permisos de `/etc/crontab` = `0600` root:root
-- [x] Permisos de directorios cron (`/etc/cron.{hourly,daily,weekly,monthly}` = `0700`)
-- [x] `/etc/cron.allow` existe y `/etc/cron.deny` removido (whitelist)
-- [x] `/etc/at.allow` existe y `/etc/at.deny` removido (whitelist)
-- [x] Revisión de cron jobs sospechosos (descargas de red, scripts world-writable)
-- [x] Auditoría de crontabs de usuarios
+- [x] Cron daemon enabled and running
+- [x] `/etc/crontab` permissions = `0600` root:root
+- [x] Cron directory permissions (`/etc/cron.{hourly,daily,weekly,monthly}` = `0700`)
+- [x] `/etc/cron.allow` exists and `/etc/cron.deny` removed (whitelist)
+- [x] `/etc/at.allow` exists and `/etc/at.deny` removed (whitelist)
+- [x] Review suspicious cron jobs (network downloads, world-writable scripts)
+- [x] User crontab audit
 
-### Fase 13: Checks de TLS/SSL y criptografía (CRYPTO) ✅
+### Phase 13: TLS/SSL and Cryptography Checks (CRYPTO) ✅
 
-- [x] Política criptográfica del sistema (no `LEGACY` en RHEL/Fedora)
-- [x] Certificados expirados o próximos a expirar en `/etc/ssl/certs`, `/etc/pki`
-- [x] Certificados self-signed en producción
-- [x] TLS 1.0 y 1.1 deshabilitados system-wide
-- [x] Cipher suites débiles (RC4, DES, 3DES, NULL)
-- [x] Cadena de certificados completa
-- [x] Permisos de claves privadas (`0600` o `0400`, owned by root o service user)
-- [x] FIPS mode si es requerido
-- [x] No uso de MD5/SHA1 en contextos de autenticación o firma
+- [x] System crypto policy (not `LEGACY` on RHEL/Fedora)
+- [x] Expired or soon-to-expire certificates in `/etc/ssl/certs`, `/etc/pki`
+- [x] Self-signed certificates in production
+- [x] TLS 1.0 and 1.1 disabled system-wide
+- [x] Weak cipher suites (RC4, DES, 3DES, NULL)
+- [x] Complete certificate chain
+- [x] Private key permissions (`0600` or `0400`, owned by root or service user)
+- [x] FIPS mode if required
+- [x] No MD5/SHA1 in authentication or signing contexts
 
-### Fase 14: Checks de secretos y credenciales (SECRETS) ✅
+### Phase 14: Secrets and Credential Checks (SECRETS) ✅
 
-- [x] No secretos en variables de entorno (`/etc/environment`, `/etc/profile.d/`, `.bashrc`)
-- [x] No passwords en shell history (`.bash_history`)
-- [x] No credenciales en archivos world-readable
-- [x] Permisos de archivos de credenciales (`.pgpass`, `.my.cnf`, `.netrc` = `0600`)
+- [x] No secrets in environment variables (`/etc/environment`, `/etc/profile.d/`, `.bashrc`)
+- [x] No passwords in shell history (`.bash_history`)
+- [x] No credentials in world-readable files
+- [x] Credential file permissions (`.pgpass`, `.my.cnf`, `.netrc` = `0600`)
 
-### Fase 15: Checks de containers (CONTAINER) ✅
+### Phase 15: Container Checks (CONTAINER) ✅
 
-- [x] Detectar si Docker/Podman está instalado
-- [x] Config de Docker daemon (`/etc/docker/daemon.json`)
-- [x] Permisos de Docker socket (`/var/run/docker.sock`)
-- [x] Containers corriendo como root
-- [x] Containers privilegiados (`--privileged`)
-- [x] Límites de recursos en containers (CPU, memoria)
-- [x] Docker content trust habilitado
-- [x] ICC (Inter-container communication) deshabilitado si no se necesita
-- [x] Read-only root filesystem en containers
-- [x] Docker logging driver configurado
-- [x] Imágenes de registries confiables
+- [x] Detect if Docker/Podman is installed
+- [x] Docker daemon config (`/etc/docker/daemon.json`)
+- [x] Docker socket permissions (`/var/run/docker.sock`)
+- [x] Containers running as root
+- [x] Privileged containers (`--privileged`)
+- [x] Container resource limits (CPU, memory)
+- [x] Docker content trust enabled
+- [x] ICC (Inter-container communication) disabled if not needed
+- [x] Read-only root filesystem in containers
+- [x] Docker logging driver configured
+- [x] Images from trusted registries
 
-### Fase 16: Checks de resource limits (RLIMIT) ✅
+### Phase 16: Resource Limit Checks (RLIMIT) ✅
 
-- [x] Límite de archivos abiertos (open files) razonable
-- [x] Límite de procesos por usuario (`nproc`) contra fork bombs
-- [x] Límites de stack size
-- [x] `/etc/security/limits.conf` sin entradas wildcard unlimited
-- [x] Espacio en disco root filesystem (alerta >85%)
-- [x] Espacio en `/var`, `/var/log`, `/tmp`
-- [x] Inodes — verificar que no hay exhaustion
+- [x] Open files limit reasonable
+- [x] Per-user process limit (`nproc`) against fork bombs
+- [x] Stack size limits
+- [x] No wildcard unlimited entries in `/etc/security/limits.conf`
+- [x] Root filesystem disk space (alert >85%)
+- [x] Space in `/var`, `/var/log`, `/tmp`
+- [x] Inodes — verify no exhaustion
 
-### Fase 17: Checks de NFS/SMB y filesystems de red (NFS) ✅
+### Phase 17: NFS/SMB and Network Filesystem Checks (NFS) ✅
 
-- [x] NFS exports revisados (no world-exported, `root_squash` habilitado)
-- [x] NFSv3 deshabilitado si NFSv4 disponible
-- [x] Samba config revisada (no guest access)
-- [x] `rpcbind` deshabilitado si NFS no se usa
+- [x] NFS exports reviewed (no world-exported, `root_squash` enabled)
+- [x] NFSv3 disabled if NFSv4 available
+- [x] Samba config reviewed (no guest access)
+- [x] `rpcbind` disabled if NFS not in use
 
-### Fase 18: Checks de rootkits y malware (MALWARE) ✅
+### Phase 18: Rootkit and Malware Checks (MALWARE) ✅
 
-- [x] rkhunter o chkrootkit instalado
-- [x] Scans de rootkit programados vía cron
-- [x] ClamAV instalado si el servidor maneja uploads o mail
-- [x] Definiciones de antimalware actualizadas
+- [x] rkhunter or chkrootkit installed
+- [x] Rootkit scans scheduled via cron
+- [x] ClamAV installed if server handles uploads or mail
+- [x] Antimalware definitions up to date
 
-### Fase 19: Checks de backups (BACKUP) ✅
+### Phase 19: Backup Checks (BACKUP) ✅
 
-- [x] Schedule de backup existe y se ejecutó recientemente
-- [x] Backups cifrados
-- [x] Permisos de archivos de backup (no world-readable)
-- [x] Backup off-site/off-host (no solo en el mismo servidor)
+- [x] Backup schedule exists and ran recently
+- [x] Backups encrypted
+- [x] Backup file permissions (not world-readable)
+- [x] Off-site/off-host backup (not only on the same server)
 
-### Fase 20: Output y reportes ✅
+### Phase 20: Output and Reports ✅
 
-- [x] Output por consola con severidad
-- [x] Output por consola con colores ANSI
-- [x] `--format json` para integración con pipelines
+- [x] Console output with severity
+- [x] Console output with ANSI colors
+- [x] `--format json` for pipeline integration
 - [x] `--format yaml`
-- [x] `--output <file>` exportar a archivo
-- [x] Resumen final: total checks, pass, warn, fail
-- [x] Exit code basado en severidad (0 = todo OK, 1 = warnings, 2 = fails)
-- [x] Recomendaciones de remediación por cada check fallido
+- [x] `--output <file>` export to file
+- [x] Final summary: total checks, pass, warn, fail
+- [x] Exit code based on severity (0 = all OK, 1 = warnings, 2 = failures)
+- [x] Remediation recommendations for each failed check
 
-### Fase 21: Configuración ✅
+### Phase 21: Configuration ✅
 
-- [x] Config file (`/etc/infraudit/config.json` o `~/.infraudit.json`)
-- [x] Whitelist de puertos permitidos
-- [x] Whitelist de servicios permitidos como root
-- [x] Skip de checks individuales o categorías (`--skip`)
-- [x] Perfiles predefinidos: `web-server`, `db-server`, `minimal`, `container-host`
-- [x] `--profile <nombre>` para seleccionar perfil
+- [x] Config file (`/etc/infraudit/config.json` or `~/.infraudit.json`)
+- [x] Allowed ports whitelist
+- [x] Allowed root processes whitelist
+- [x] Skip individual checks or categories (`--skip`)
+- [x] Pre-built profiles: `web-server`, `db-server`, `minimal`, `container-host`
+- [x] `--profile <name>` to select profile
 
-## Categorías de checks
+## Check Categories
 
-| Categoría | Prefijo | Descripción |
-|-----------|---------|-------------|
-| `auth` | AUTH- | Usuarios, SSH, sudoers, passwords |
-| `pam` | PAM- | PAM, calidad de passwords, lockout |
-| `network` | NET- | Firewall, puertos, interfaces, DNS, SNMP |
-| `services` | SVC- | Servicios, procesos, daemons, NTP, MTA |
-| `filesystem` | FS- | Permisos, SUID, particiones, ownership, /tmp, /dev/shm |
-| `logging` | LOG- | Syslog, auditd, rotación, AIDE/integrity |
-| `packages` | PKG- | Actualizaciones, repos, kernel |
-| `hardening` | HARD- | Kernel params, ASLR, ptrace, core dumps, módulos |
+| Category | Prefix | Description |
+|----------|--------|-------------|
+| `auth` | AUTH- | Users, SSH, sudoers, passwords |
+| `pam` | PAM- | PAM, password quality, lockout |
+| `network` | NET- | Firewall, ports, interfaces, DNS, SNMP |
+| `services` | SVC- | Services, processes, daemons, NTP, MTA |
+| `filesystem` | FS- | Permissions, SUID, partitions, ownership, /tmp, /dev/shm |
+| `logging` | LOG- | Syslog, auditd, rotation, AIDE/integrity |
+| `packages` | PKG- | Updates, repos, kernel |
+| `hardening` | HARD- | Kernel params, ASLR, ptrace, core dumps, modules |
 | `boot` | BOOT- | GRUB, Secure Boot, SELinux/AppArmor |
-| `cron` | CRON- | Cron/at jobs, permisos, whitelist |
-| `crypto` | CRYPTO- | TLS/SSL, certificados, ciphers, FIPS |
-| `secrets` | SEC- | Credenciales expuestas, history, env vars |
-| `container` | CTR- | Docker/Podman, imágenes, runtime security |
-| `rlimit` | RLIM- | Resource limits, disco, inodes |
+| `cron` | CRON- | Cron/at jobs, permissions, whitelist |
+| `crypto` | CRYPTO- | TLS/SSL, certificates, ciphers, FIPS |
+| `secrets` | SEC- | Exposed credentials, history, env vars |
+| `container` | CTR- | Docker/Podman, images, runtime security |
+| `rlimit` | RLIM- | Resource limits, disk, inodes |
 | `nfs` | NFS- | NFS exports, Samba, rpcbind |
 | `malware` | MAL- | Rootkits, antimalware, integrity |
-| `backup` | BAK- | Backups, cifrado, off-site |
+| `backup` | BAK- | Backups, encryption, off-site |
 
-## Modelo de severidad
+## Severity Model
 
-| Nivel | Significado |
-|-------|-------------|
-| `CRITICAL` | Vulnerabilidad explotable, acción inmediata |
-| `HIGH` | Riesgo significativo, corregir pronto |
-| `MEDIUM` | Buena práctica no aplicada |
-| `LOW` | Mejora recomendada, bajo riesgo |
-| `INFO` | Informativo, sin acción necesaria |
+| Level | Meaning |
+|-------|---------|
+| `CRITICAL` | Exploitable vulnerability, immediate action |
+| `HIGH` | Significant risk, fix soon |
+| `MEDIUM` | Best practice not applied |
+| `LOW` | Recommended improvement, low risk |
+| `INFO` | Informational, no action needed |
 
-## Estructura del proyecto
+## Project Structure
 
 ```
 infraudit/
-├── .claude/commands/       # Skills de Claude Code
-├── docs/                   # Documentación
+├── .claude/commands/       # Claude Code skills
+├── .github/workflows/      # CI/CD
+├── docs/                   # Documentation (GitHub Pages)
 ├── cmd/
-│   ├── root.go             # Comando raíz
-│   ├── audit.go            # Subcomando audit
-│   └── list.go             # Subcomando list
+│   ├── root.go             # Root command
+│   ├── audit.go            # Audit subcommand
+│   └── list.go             # List subcommand
 ├── internal/
-│   ├── version/            # Info de versión
-│   ├── check/              # Interfaz Check, Result, Registry
+│   ├── version/            # Version info
+│   ├── check/              # Check interface, Result, Registry, helpers
+│   ├── config/             # Configuration and profiles
 │   ├── checks/
 │   │   ├── auth/           # AUTH- checks
 │   │   ├── pam/            # PAM- checks
@@ -296,9 +298,11 @@ infraudit/
 │   │   ├── nfs/            # NFS- checks
 │   │   ├── malware/        # MAL- checks
 │   │   └── backup/         # BAK- checks
-│   └── report/             # Formateo y output de reportes
+│   └── report/             # Report formatting and output
+├── install.sh              # Install script
 ├── main.go
 ├── go.mod / go.sum
 ├── PLAN.md
-└── README.md
+├── README.md
+└── LICENSE
 ```
