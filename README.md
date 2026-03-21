@@ -6,16 +6,15 @@ A single binary you drop on any Linux server to audit its security posture. Vali
 
 ## Install
 
-```bash
-# Automatic (detects architecture)
-curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh
+One command. Detects your server's architecture automatically:
 
-# Or download manually
-curl -sLO https://github.com/civanmoreno/infraudit/releases/latest/download/infraudit-linux-amd64
-chmod +x infraudit-linux-amd64 && sudo mv infraudit-linux-amd64 /usr/local/bin/infraudit
+```bash
+curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh
 ```
 
 ### Build from source
+
+Requires Go 1.24+:
 
 ```bash
 git clone https://github.com/civanmoreno/infraudit.git
