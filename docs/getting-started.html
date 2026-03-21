@@ -43,6 +43,17 @@ cd infraudit
 go build -o infraudit .
 sudo mv infraudit /usr/local/bin/</code></pre>
 
+        <h2>Commands</h2>
+        <p>infraudit has three main commands:</p>
+        <table>
+            <thead><tr><th>Command</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>infraudit audit</code></td><td>Run security checks and generate a report</td></tr>
+                <tr><td><code>infraudit list</code></td><td>Show all available checks in a table</td></tr>
+                <tr><td><code>infraudit completion</code></td><td>Generate shell autocompletion (bash, zsh, fish, powershell)</td></tr>
+            </tbody>
+        </table>
+
         <h2>Basic Usage</h2>
 
         <h3>Run a full audit</h3>
@@ -54,16 +65,18 @@ sudo mv infraudit /usr/local/bin/</code></pre>
 sudo infraudit audit --category auth
 
 <span class="comment"># Only network and firewall checks</span>
-sudo infraudit audit --category network
+sudo infraudit audit --category network</code></pre>
 
-<span class="comment"># Multiple categories</span>
-sudo infraudit audit --category auth,network,filesystem</code></pre>
-
-        <h3>List available checks</h3>
-        <pre><code>infraudit list
-
-<span class="comment"># Filter by category</span>
-infraudit list --category crypto</code></pre>
+        <h3>List all available checks</h3>
+        <pre><code>infraudit list</code></pre>
+        <p>Output:</p>
+        <pre><code>ID          CATEGORY    SEVERITY  NAME
+──          ────────    ────────  ────
+AUTH-001    auth        CRITICAL  SSH root login disabled
+AUTH-002    auth        HIGH      SSH password authentication disabled
+AUTH-003    auth        CRITICAL  Only root has UID 0
+...
+Total: 132 checks</code></pre>
 
         <h3>Export results</h3>
         <pre><code><span class="comment"># JSON for CI/CD pipelines</span>
@@ -72,36 +85,142 @@ sudo infraudit audit --format json --output report.json
 <span class="comment"># YAML for config management</span>
 sudo infraudit audit --format yaml --output report.yaml</code></pre>
 
+        <h3>Skip specific checks</h3>
+        <pre><code><span class="comment"># Skip checks you've accepted the risk for</span>
+sudo infraudit audit --skip HARD-007,SVC-012
+
+<span class="comment"># Combine skip with category filter</span>
+sudo infraudit audit --category auth --skip AUTH-008</code></pre>
+
         <h2>Server Profiles</h2>
-        <p>Use profiles to run checks relevant to your server role:</p>
-        <pre><code><span class="comment"># Web server profile (Nginx/Apache focused)</span>
+        <p>Profiles automatically skip categories not relevant to your server role and configure allowed ports:</p>
+        <pre><code><span class="comment"># Web server — skips container &amp; NFS, allows ports 22/80/443</span>
 sudo infraudit audit --profile web-server
 
-<span class="comment"># Database server profile</span>
+<span class="comment"># Database server — skips container &amp; NFS, allows DB ports</span>
 sudo infraudit audit --profile db-server
 
-<span class="comment"># Container host profile (includes Docker checks)</span>
+<span class="comment"># Container host — skips NFS, allows ports 22/80/443/2376</span>
 sudo infraudit audit --profile container-host
 
-<span class="comment"># Minimal — only critical security checks</span>
+<span class="comment"># Minimal — skips container, NFS, malware, backup categories</span>
 sudo infraudit audit --profile minimal</code></pre>
 
-        <h2>Exit Codes</h2>
-        <p>Useful for scripting and CI/CD integration:</p>
+        <h2>Complete CLI Reference</h2>
+
+        <h3><code>infraudit</code> (root command)</h3>
         <table>
-            <thead>
-                <tr><th>Code</th><th>Meaning</th></tr>
-            </thead>
+            <thead><tr><th>Flag</th><th>Description</th></tr></thead>
             <tbody>
-                <tr><td><code>0</code></td><td>All checks passed</td></tr>
-                <tr><td><code>1</code></td><td>Warnings found (LOW/MEDIUM severity)</td></tr>
-                <tr><td><code>2</code></td><td>Failures found (HIGH/CRITICAL severity)</td></tr>
+                <tr><td><code>-v, --version</code></td><td>Print version information (<code>infraudit v0.1.0</code>)</td></tr>
+                <tr><td><code>-h, --help</code></td><td>Show help for the root command</td></tr>
+            </tbody>
+        </table>
+
+        <h3><code>infraudit audit</code></h3>
+        <p>Execute security checks and generate a report.</p>
+        <table>
+            <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><code>--category &lt;name&gt;</code></td>
+                    <td><em>(all)</em></td>
+                    <td>Run checks for a single category only. Valid values: <code>auth</code>, <code>pam</code>, <code>network</code>, <code>services</code>, <code>filesystem</code>, <code>logging</code>, <code>packages</code>, <code>hardening</code>, <code>boot</code>, <code>cron</code>, <code>crypto</code>, <code>secrets</code>, <code>container</code>, <code>rlimit</code>, <code>nfs</code>, <code>malware</code>, <code>backup</code></td>
+                </tr>
+                <tr>
+                    <td><code>--format &lt;type&gt;</code></td>
+                    <td><code>console</code></td>
+                    <td>Output format. Values: <code>console</code> (colored table), <code>json</code> (machine-readable), <code>yaml</code> (structured text)</td>
+                </tr>
+                <tr>
+                    <td><code>--output &lt;file&gt;</code></td>
+                    <td><em>(stdout)</em></td>
+                    <td>Write report to a file instead of stdout</td>
+                </tr>
+                <tr>
+                    <td><code>--profile &lt;name&gt;</code></td>
+                    <td><em>(none)</em></td>
+                    <td>Apply a server profile. Values: <code>web-server</code>, <code>db-server</code>, <code>container-host</code>, <code>minimal</code></td>
+                </tr>
+                <tr>
+                    <td><code>--skip &lt;ids&gt;</code></td>
+                    <td><em>(none)</em></td>
+                    <td>Comma-separated list of check IDs to skip (e.g. <code>--skip HARD-007,NET-008</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>-h, --help</code></td>
+                    <td></td>
+                    <td>Show help for the audit command</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3><code>infraudit list</code></h3>
+        <p>Display all registered checks in a table with ID, category, severity, and name.</p>
+        <table>
+            <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>-h, --help</code></td><td>Show help for the list command</td></tr>
+            </tbody>
+        </table>
+
+        <h3><code>infraudit completion &lt;shell&gt;</code></h3>
+        <p>Generate autocompletion scripts for your shell:</p>
+        <pre><code><span class="comment"># Bash</span>
+infraudit completion bash > /etc/bash_completion.d/infraudit
+
+<span class="comment"># Zsh</span>
+infraudit completion zsh > "${fpath[1]}/_infraudit"
+
+<span class="comment"># Fish</span>
+infraudit completion fish > ~/.config/fish/completions/infraudit.fish</code></pre>
+
+        <h2>Available Categories</h2>
+        <table>
+            <thead><tr><th>Category</th><th>Prefix</th><th>Checks</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>auth</code></td><td>AUTH-</td><td>8</td><td>Users, SSH, sudoers, passwords</td></tr>
+                <tr><td><code>pam</code></td><td>PAM-</td><td>5</td><td>PAM, password quality, lockout</td></tr>
+                <tr><td><code>network</code></td><td>NET-</td><td>11</td><td>Firewall, ports, DNS, SNMP</td></tr>
+                <tr><td><code>services</code></td><td>SVC-</td><td>13</td><td>Daemons, NTP, MTA, desktop</td></tr>
+                <tr><td><code>filesystem</code></td><td>FS-</td><td>12</td><td>Permissions, SUID, partitions</td></tr>
+                <tr><td><code>logging</code></td><td>LOG-</td><td>9</td><td>Syslog, auditd, AIDE</td></tr>
+                <tr><td><code>packages</code></td><td>PKG-</td><td>4</td><td>Updates, repos, kernel</td></tr>
+                <tr><td><code>hardening</code></td><td>HARD-</td><td>12</td><td>Kernel params, ASLR, modules</td></tr>
+                <tr><td><code>boot</code></td><td>BOOT-</td><td>8</td><td>GRUB, Secure Boot, SELinux/AppArmor</td></tr>
+                <tr><td><code>cron</code></td><td>CRON-</td><td>7</td><td>Cron/at permissions, job review</td></tr>
+                <tr><td><code>crypto</code></td><td>CRYPTO-</td><td>9</td><td>TLS, certificates, ciphers</td></tr>
+                <tr><td><code>secrets</code></td><td>SEC-</td><td>4</td><td>Exposed credentials, history</td></tr>
+                <tr><td><code>container</code></td><td>CTR-</td><td>11</td><td>Docker/Podman security</td></tr>
+                <tr><td><code>rlimit</code></td><td>RLIM-</td><td>7</td><td>Resource limits, disk, inodes</td></tr>
+                <tr><td><code>nfs</code></td><td>NFS-</td><td>4</td><td>NFS exports, Samba, rpcbind</td></tr>
+                <tr><td><code>malware</code></td><td>MAL-</td><td>4</td><td>Rootkits, antimalware</td></tr>
+                <tr><td><code>backup</code></td><td>BAK-</td><td>4</td><td>Backups, encryption, off-site</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Exit Codes</h2>
+        <table>
+            <thead><tr><th>Code</th><th>Meaning</th><th>Action</th></tr></thead>
+            <tbody>
+                <tr><td><code>0</code></td><td>All checks passed</td><td>System meets security requirements</td></tr>
+                <tr><td><code>1</code></td><td>Warnings found (no failures)</td><td>Review recommended</td></tr>
+                <tr><td><code>2</code></td><td>Failures or errors found</td><td>Action required — fix critical issues</td></tr>
             </tbody>
         </table>
 
         <h2>Permissions</h2>
         <p>infraudit reads system files like <code>/etc/shadow</code>, <code>/etc/ssh/sshd_config</code>, and kernel parameters. Most checks require <strong>root</strong> access. Checks that cannot run without proper permissions will report as <code>ERROR</code> with a clear message.</p>
         <p>infraudit is <strong>read-only</strong> — it never modifies your system. It only inspects configurations and reports findings.</p>
+
+        <h2>Configuration File</h2>
+        <p>For persistent settings (skip lists, allowed ports), create a JSON config file. See <a href="configuration.html">Configuration</a> for details.</p>
+        <pre><code><span class="comment"># Example: ~/.infraudit.json</span>
+{
+  "skip": ["HARD-007", "SVC-012"],
+  "skip_categories": ["container"],
+  "allowed_ports": [22, 80, 443]
+}</code></pre>
     </main>
 </body>
 </html>

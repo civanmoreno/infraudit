@@ -80,10 +80,10 @@
 
         <h2>Result Model</h2>
         <pre><code>type Result struct {
-    Status      Status   <span class="comment">// PASS, WARN, FAIL, ERROR</span>
-    Message     string   <span class="comment">// What was found</span>
-    Remediation string   <span class="comment">// How to fix it</span>
-    Details     []string <span class="comment">// Additional context lines</span>
+    Status      Status            <span class="comment">// PASS, WARN, FAIL, ERROR</span>
+    Message     string            <span class="comment">// What was found</span>
+    Remediation string            <span class="comment">// How to fix it</span>
+    Details     map[string]string <span class="comment">// Additional context</span>
 }</code></pre>
 
         <h2>Check Registry</h2>

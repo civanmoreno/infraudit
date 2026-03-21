@@ -28,101 +28,209 @@
 
     <main class="content">
         <h1>Configuration</h1>
-        <p>Customize infraudit behavior with config files and CLI flags.</p>
+        <p>infraudit can be configured via CLI flags (per-run) and JSON config files (persistent). CLI flags always take the highest priority.</p>
 
-        <h2>Config File Locations</h2>
-        <p>infraudit looks for configuration in this order:</p>
-        <pre><code>1. /etc/infraudit/config.yaml      <span class="comment"># System-wide</span>
-2. ~/.infraudit.yaml               <span class="comment"># User-level</span>
-3. ./infraudit.yaml                <span class="comment"># Current directory</span>
-4. CLI flags                       <span class="comment"># Highest priority</span></code></pre>
+        <h2>CLI Flags Reference</h2>
+        <p>Every flag available in infraudit, organized by command.</p>
 
-        <h2>Example Configuration</h2>
-        <pre><code><span class="comment"># infraudit.yaml</span>
-
-<span class="comment"># Server profile (web-server, db-server, container-host, minimal)</span>
-profile: web-server
-
-<span class="comment"># Output format (console, json, yaml)</span>
-format: console
-
-<span class="comment"># Skip specific checks by ID</span>
-skip:
-  - HARD-007    <span class="comment"># Swap check — this server uses unencrypted swap by design</span>
-  - NET-008     <span class="comment"># IPv6 — we use IPv6 in this environment</span>
-  - SVC-012     <span class="comment"># Desktop env — this is a jump box with GUI</span>
-
-<span class="comment"># Skip entire categories</span>
-skip_categories:
-  - container   <span class="comment"># No Docker on this server</span>
-  - nfs         <span class="comment"># No NFS in use</span>
-
-<span class="comment"># Network: allowed open ports</span>
-network:
-  allowed_ports:
-    - 22        <span class="comment"># SSH</span>
-    - 80        <span class="comment"># HTTP</span>
-    - 443       <span class="comment"># HTTPS</span>
-
-<span class="comment"># Services: processes allowed to run as root</span>
-services:
-  root_allowed:
-    - sshd
-    - nginx
-    - fail2ban
-
-<span class="comment"># Resource limits thresholds</span>
-rlimit:
-  disk_warn_percent: 85
-  inode_warn_percent: 90</code></pre>
-
-        <h2>Server Profiles</h2>
-        <p>Profiles pre-select relevant checks for common server roles:</p>
-
+        <h3><code>infraudit</code></h3>
         <table>
-            <thead>
-                <tr><th>Profile</th><th>Description</th><th>Includes</th></tr>
-            </thead>
+            <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>-v, --version</code></td><td>Print version (<code>infraudit v0.1.0</code>)</td></tr>
+                <tr><td><code>-h, --help</code></td><td>Show help</td></tr>
+            </tbody>
+        </table>
+
+        <h3><code>infraudit audit</code></h3>
+        <table>
+            <thead><tr><th>Flag</th><th>Default</th><th>Description</th><th>Example</th></tr></thead>
             <tbody>
                 <tr>
-                    <td><code>minimal</code></td>
-                    <td>Only critical security checks</td>
-                    <td>CRITICAL and HIGH severity only</td>
+                    <td><code>--category</code></td>
+                    <td><em>(all)</em></td>
+                    <td>Run checks for a single category</td>
+                    <td><code>--category auth</code></td>
                 </tr>
+                <tr>
+                    <td><code>--format</code></td>
+                    <td><code>console</code></td>
+                    <td>Output format: <code>console</code>, <code>json</code>, <code>yaml</code></td>
+                    <td><code>--format json</code></td>
+                </tr>
+                <tr>
+                    <td><code>--output</code></td>
+                    <td><em>(stdout)</em></td>
+                    <td>Write report to file</td>
+                    <td><code>--output report.json</code></td>
+                </tr>
+                <tr>
+                    <td><code>--profile</code></td>
+                    <td><em>(none)</em></td>
+                    <td>Server profile to apply</td>
+                    <td><code>--profile web-server</code></td>
+                </tr>
+                <tr>
+                    <td><code>--skip</code></td>
+                    <td><em>(none)</em></td>
+                    <td>Comma-separated check IDs to skip</td>
+                    <td><code>--skip HARD-007,NET-008</code></td>
+                </tr>
+                <tr>
+                    <td><code>-h, --help</code></td>
+                    <td></td>
+                    <td>Show help for audit command</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3><code>infraudit list</code></h3>
+        <table>
+            <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>-h, --help</code></td><td>Show help for list command</td></tr>
+            </tbody>
+        </table>
+        <p>The <code>list</code> command shows all 132 registered checks with their ID, category, severity, and name. It does not accept filters — use it to discover check IDs for <code>--skip</code> or <code>--category</code>.</p>
+
+        <h3><code>infraudit completion &lt;shell&gt;</code></h3>
+        <p>Generates shell autocompletion scripts. Supported shells: <code>bash</code>, <code>zsh</code>, <code>fish</code>, <code>powershell</code>.</p>
+        <pre><code><span class="comment"># Bash — load in current session</span>
+source &lt;(infraudit completion bash)
+
+<span class="comment"># Bash — install permanently</span>
+infraudit completion bash &gt; /etc/bash_completion.d/infraudit
+
+<span class="comment"># Zsh</span>
+infraudit completion zsh &gt; "${fpath[1]}/_infraudit"
+
+<span class="comment"># Fish</span>
+infraudit completion fish &gt; ~/.config/fish/completions/infraudit.fish</code></pre>
+
+        <h2>Config File</h2>
+        <p>For persistent settings that apply on every run, create a JSON config file. infraudit checks these paths in order (first found wins):</p>
+        <table>
+            <thead><tr><th>Priority</th><th>Path</th><th>Scope</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td><code>/etc/infraudit/config.json</code></td><td>System-wide — applies to all users</td></tr>
+                <tr><td>2</td><td><code>~/.infraudit.json</code></td><td>User-level — applies to current user</td></tr>
+                <tr><td>3</td><td><code>./.infraudit.json</code></td><td>Directory-level — applies in current directory</td></tr>
+            </tbody>
+        </table>
+        <p>CLI flags (<code>--skip</code>, <code>--profile</code>) are merged with the config file — they don't replace it.</p>
+
+        <h3>Config File Fields</h3>
+        <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th><th>Example</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><code>skip</code></td>
+                    <td>string array</td>
+                    <td>Check IDs to skip on every run</td>
+                    <td><code>["HARD-007", "SVC-012"]</code></td>
+                </tr>
+                <tr>
+                    <td><code>skip_categories</code></td>
+                    <td>string array</td>
+                    <td>Entire categories to skip</td>
+                    <td><code>["container", "nfs"]</code></td>
+                </tr>
+                <tr>
+                    <td><code>allowed_ports</code></td>
+                    <td>int array</td>
+                    <td>Ports considered acceptable for NET-002</td>
+                    <td><code>[22, 80, 443]</code></td>
+                </tr>
+                <tr>
+                    <td><code>allowed_root_processes</code></td>
+                    <td>string array</td>
+                    <td>Process names allowed as root for SVC-008</td>
+                    <td><code>["sshd", "nginx"]</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Example Config File</h3>
+        <pre><code><span class="comment">// ~/.infraudit.json</span>
+{
+  "skip": [
+    "HARD-007",    <span class="comment">// Swap — unencrypted by design</span>
+    "NET-008",     <span class="comment">// IPv6 — used in this environment</span>
+    "SVC-012"      <span class="comment">// Desktop env — this is a jump box</span>
+  ],
+  "skip_categories": [
+    "container",   <span class="comment">// No Docker on this server</span>
+    "nfs"          <span class="comment">// No NFS in use</span>
+  ],
+  "allowed_ports": [22, 80, 443],
+  "allowed_root_processes": ["sshd", "nginx", "fail2ban"]
+}</code></pre>
+
+        <h2>Server Profiles</h2>
+        <p>Profiles are pre-built configurations for common server types. Use <code>--profile &lt;name&gt;</code> with <code>infraudit audit</code>. Profiles are merged with your config file — profile skips are added to any skips already defined.</p>
+
+        <table>
+            <thead><tr><th>Profile</th><th>Description</th><th>Skipped Categories</th><th>Allowed Ports</th></tr></thead>
+            <tbody>
                 <tr>
                     <td><code>web-server</code></td>
                     <td>Nginx/Apache web servers</td>
-                    <td>All + TLS/certificate focus, port 80/443 whitelisted</td>
+                    <td>container, nfs</td>
+                    <td>22, 80, 443</td>
                 </tr>
                 <tr>
                     <td><code>db-server</code></td>
-                    <td>Database servers (PostgreSQL, MySQL)</td>
-                    <td>All + credential file checks, network binding focus</td>
+                    <td>PostgreSQL, MySQL, Redis, MongoDB</td>
+                    <td>container, nfs</td>
+                    <td>22, 3306, 5432, 6379, 27017</td>
                 </tr>
                 <tr>
                     <td><code>container-host</code></td>
-                    <td>Docker/Podman hosts</td>
-                    <td>All + container category enabled</td>
+                    <td>Docker/Podman container hosts</td>
+                    <td>nfs</td>
+                    <td>22, 80, 443, 2376</td>
+                </tr>
+                <tr>
+                    <td><code>minimal</code></td>
+                    <td>Minimal server, core checks only</td>
+                    <td>container, nfs, malware, backup</td>
+                    <td>22</td>
                 </tr>
             </tbody>
         </table>
+        <pre><code><span class="comment"># Profile + custom skip + JSON output</span>
+sudo infraudit audit --profile web-server --skip AUTH-008 --format json --output report.json</code></pre>
 
-        <h2>CLI Flags</h2>
+        <h2>Exit Codes</h2>
         <table>
-            <thead>
-                <tr><th>Flag</th><th>Short</th><th>Description</th></tr>
-            </thead>
+            <thead><tr><th>Code</th><th>Meaning</th><th>CI/CD Action</th></tr></thead>
             <tbody>
-                <tr><td><code>--version</code></td><td><code>-v</code></td><td>Print version</td></tr>
-                <tr><td><code>--category</code></td><td><code>-c</code></td><td>Run checks for specific categories (comma-separated)</td></tr>
-                <tr><td><code>--profile</code></td><td><code>-p</code></td><td>Use a server profile</td></tr>
-                <tr><td><code>--format</code></td><td><code>-f</code></td><td>Output format: console, json, yaml</td></tr>
-                <tr><td><code>--output</code></td><td><code>-o</code></td><td>Write report to file</td></tr>
-                <tr><td><code>--skip</code></td><td></td><td>Skip specific check IDs (comma-separated)</td></tr>
-                <tr><td><code>--verbose</code></td><td></td><td>Show detailed output for each check</td></tr>
-                <tr><td><code>--quiet</code></td><td><code>-q</code></td><td>Only show failures</td></tr>
+                <tr><td><code>0</code></td><td>All checks passed</td><td>Proceed</td></tr>
+                <tr><td><code>1</code></td><td>Warnings found (no failures)</td><td>Review before production</td></tr>
+                <tr><td><code>2</code></td><td>Failures or errors found</td><td>Block — fix issues first</td></tr>
             </tbody>
         </table>
+
+        <h2>Common Examples</h2>
+        <pre><code><span class="comment"># Full audit as root</span>
+sudo infraudit audit
+
+<span class="comment"># Quick check of auth and network</span>
+sudo infraudit audit --category auth
+sudo infraudit audit --category network
+
+<span class="comment"># Web server audit to JSON file</span>
+sudo infraudit audit --profile web-server --format json --output /var/log/infraudit.json
+
+<span class="comment"># Skip accepted risks</span>
+sudo infraudit audit --skip HARD-007,NET-003,SVC-012
+
+<span class="comment"># See what checks are available</span>
+infraudit list
+
+<span class="comment"># Check version</span>
+infraudit --version</code></pre>
     </main>
 </body>
 </html>

@@ -28,118 +28,285 @@
 
     <main class="content">
         <h1>Output &amp; Reports</h1>
-        <p>infraudit supports multiple output formats for different workflows.</p>
+        <p>infraudit generates detailed security audit reports in three formats. Each report groups findings by category, sorts them by severity, and provides actionable remediation for every finding.</p>
 
-        <h2>Console Output</h2>
-        <p>Default output with colors and severity badges:</p>
-        <pre><code>$ sudo infraudit audit
+        <h2>Report Structure</h2>
+        <p>Every report — regardless of format — contains the same information:</p>
+        <table>
+            <thead><tr><th>Field</th><th>Description</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><code>id</code></td>
+                    <td>Unique check identifier (e.g. <code>AUTH-001</code>)</td>
+                    <td>Reference for skipping, filtering, and cross-referencing with compliance frameworks</td>
+                </tr>
+                <tr>
+                    <td><code>name</code></td>
+                    <td>Human-readable check name</td>
+                    <td>Quick understanding of what was tested</td>
+                </tr>
+                <tr>
+                    <td><code>category</code></td>
+                    <td>One of 17 audit categories (auth, pam, network, etc.)</td>
+                    <td>Grouping and filtering — assign findings to the right team</td>
+                </tr>
+                <tr>
+                    <td><code>severity</code></td>
+                    <td>CRITICAL, HIGH, MEDIUM, LOW, or INFO</td>
+                    <td>Prioritization — tells you which findings to fix first</td>
+                </tr>
+                <tr>
+                    <td><code>status</code></td>
+                    <td>PASS, WARN, FAIL, or ERROR</td>
+                    <td>Outcome — did the check pass or is action required?</td>
+                </tr>
+                <tr>
+                    <td><code>message</code></td>
+                    <td>Detailed finding description</td>
+                    <td>Explains exactly what was found and the current state</td>
+                </tr>
+                <tr>
+                    <td><code>remediation</code></td>
+                    <td>How to fix the finding (only for WARN/FAIL/ERROR)</td>
+                    <td>Actionable steps to resolve the issue — often a single command</td>
+                </tr>
+            </tbody>
+        </table>
 
-  infraudit v0.1.0 — Server Security Audit
-  ══════════════════════════════════════════
+        <h2>Status Levels</h2>
+        <p>Each check returns one of four status levels:</p>
+        <table>
+            <thead><tr><th>Status</th><th>Meaning</th><th>Action Required</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge pass">PASS</span></td>
+                    <td>The check passed — the system meets the security requirement</td>
+                    <td>None. This is the desired state.</td>
+                </tr>
+                <tr>
+                    <td><span class="badge medium">WARN</span></td>
+                    <td>A potential issue was found but it may be acceptable in context</td>
+                    <td>Review the finding. It may be a conscious risk acceptance, or it may need fixing. Warnings include items like informational ports open, non-default configurations, or best practices not fully implemented.</td>
+                </tr>
+                <tr>
+                    <td><span class="badge critical">FAIL</span></td>
+                    <td>The check failed — a security requirement is not met</td>
+                    <td>Fix this. A failed check means the system has a specific, known vulnerability or misconfiguration. The remediation field provides the exact steps to resolve it.</td>
+                </tr>
+                <tr>
+                    <td><span class="badge high">ERROR</span></td>
+                    <td>The check could not be executed (missing permissions, file not found)</td>
+                    <td>Investigate why the check couldn't run. Common causes: not running as root, missing packages, or non-standard system configuration. Run with <code>sudo</code> for full results.</td>
+                </tr>
+            </tbody>
+        </table>
 
-  AUTH — Users &amp; Authentication
-  ─────────────────────────────
-  <span style="color:#f85149">✗ CRITICAL</span>  AUTH-001  SSH root login is enabled
-                        → Set PermitRootLogin no in /etc/ssh/sshd_config
-  <span style="color:#3fb950">✓ PASS</span>      AUTH-002  SSH password authentication disabled
-  <span style="color:#3fb950">✓ PASS</span>      AUTH-003  No extra UID 0 accounts
-  <span style="color:#d29922">! WARN</span>      AUTH-006  3 sudoers entries use NOPASSWD
-                        → Review /etc/sudoers.d/ and limit NOPASSWD usage
+        <h2>Severity Levels</h2>
+        <p>Severity indicates the risk level of the finding, guiding prioritization:</p>
+        <table>
+            <thead><tr><th>Severity</th><th>Risk</th><th>Response Time</th><th>Examples</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge critical">CRITICAL</span></td>
+                    <td>Directly exploitable vulnerability. An attacker can gain unauthorized access or full system control.</td>
+                    <td>Immediate — fix within hours</td>
+                    <td>Root login via SSH, empty passwords, open relay, privileged containers, world-readable shadow file</td>
+                </tr>
+                <tr>
+                    <td><span class="badge high">HIGH</span></td>
+                    <td>Significant risk that requires prompt attention. May enable privilege escalation or data exposure.</td>
+                    <td>Urgent — fix within days</td>
+                    <td>Pending security updates, missing firewall, SSH password auth, no intrusion prevention, SUID abuse</td>
+                </tr>
+                <tr>
+                    <td><span class="badge medium">MEDIUM</span></td>
+                    <td>Security best practice not applied. Increases overall risk but not immediately exploitable.</td>
+                    <td>Planned — fix within weeks</td>
+                    <td>Missing mount options, IP forwarding enabled, no audit rules, no cron access control</td>
+                </tr>
+                <tr>
+                    <td><span class="badge low">LOW</span></td>
+                    <td>Recommended improvement with low direct risk. Defense-in-depth measure.</td>
+                    <td>Backlog — fix when convenient</td>
+                    <td>Missing login banner, NTS not enabled, wireless on server, Bluetooth active</td>
+                </tr>
+                <tr>
+                    <td><span class="badge info">INFO</span></td>
+                    <td>Informational finding. No action required, provided for context.</td>
+                    <td>None</td>
+                    <td>Container runtime detected, system configuration details</td>
+                </tr>
+            </tbody>
+        </table>
 
-  NET — Network &amp; Firewall
-  ────────────────────────
-  <span style="color:#3fb950">✓ PASS</span>      NET-001   Firewall is active (ufw)
-  <span style="color:#f85149">✗ HIGH</span>      NET-002   Ports 3306, 6379 open and not in whitelist
-                        → Add to allowed_ports config or close with firewall
+        <h2>Console Output (default)</h2>
+        <p>The console format is designed for interactive use. It groups checks by category, sorts failures first, uses ANSI colors for instant visual scanning, and includes a progress bar summary.</p>
+        <pre><code>$ sudo infraudit audit --category auth
 
-  ══════════════════════════════════════════
-  Summary: 87 checks | 71 passed | 12 warnings | 4 failures
-  Exit code: 2 (failures found)</code></pre>
+  <span style="color:#3fb950;font-weight:bold">infraudit v0.1.0 — Security Audit Report</span>
+  <span style="color:#8b949e">────────────────────────────────────────────────────</span>
+
+  <span style="color:#58a6ff;font-weight:bold">AUTH</span> — <span style="font-weight:bold">Users &amp; Authentication</span>   <span style="color:#3fb950">5 passed</span>  <span style="color:#d29922">2 warn</span>  <span style="color:#f85149">1 fail</span>
+  <span style="color:#8b949e">──────────────────────────────────────────────────────────────────</span>
+  <span style="color:#f85149">✗</span> <span style="color:#f85149;font-weight:bold"> FAIL  </span> <span style="color:#8b949e">AUTH-001</span>   <span style="color:#f85149;font-weight:bold">CRITICAL</span> PermitRootLogin is set to 'yes'
+         <span style="color:#8b949e">↳ Set 'PermitRootLogin no' in /etc/ssh/sshd_config</span>
+  <span style="color:#d29922">!</span> <span style="color:#d29922;font-weight:bold"> WARN  </span> <span style="color:#8b949e">AUTH-006</span>   <span style="color:#d29922">HIGH</span>     Found 2 NOPASSWD entries in sudoers
+         <span style="color:#8b949e">↳ Review NOPASSWD entries and remove unnecessary ones</span>
+  <span style="color:#d29922">!</span> <span style="color:#d29922;font-weight:bold"> WARN  </span> <span style="color:#8b949e">AUTH-008</span>   <span style="color:#58a6ff">MEDIUM</span>   su is not restricted via pam_wheel.so
+         <span style="color:#8b949e">↳ Uncomment 'auth required pam_wheel.so' in /etc/pam.d/su</span>
+  <span style="color:#3fb950">✓</span> <span style="color:#3fb950;font-weight:bold"> PASS  </span> <span style="color:#8b949e">AUTH-003</span>   <span style="color:#f85149;font-weight:bold">CRITICAL</span> Only root has UID 0
+  <span style="color:#3fb950">✓</span> <span style="color:#3fb950;font-weight:bold"> PASS  </span> <span style="color:#8b949e">AUTH-007</span>   <span style="color:#d29922">HIGH</span>     Permissions correct
+  <span style="color:#3fb950">✓</span> <span style="color:#3fb950;font-weight:bold"> PASS  </span> <span style="color:#8b949e">AUTH-005</span>   <span style="color:#d29922">HIGH</span>     All system accounts have nologin
+  <span style="color:#3fb950">✓</span> <span style="color:#3fb950;font-weight:bold"> PASS  </span> <span style="color:#8b949e">AUTH-002</span>   <span style="color:#d29922">HIGH</span>     PasswordAuthentication is 'no'
+  <span style="color:#3fb950">✓</span> <span style="color:#3fb950;font-weight:bold"> PASS  </span> <span style="color:#8b949e">AUTH-004</span>   <span style="color:#f85149;font-weight:bold">CRITICAL</span> No users have empty passwords
+
+  <span style="color:#8b949e">══════════════════════════════════════════════════════════════════</span>
+  <span style="font-weight:bold">SUMMARY</span>
+
+  <span style="color:#3fb950">█████████████████████████</span><span style="color:#d29922">██████████</span><span style="color:#f85149">█████</span>  <span style="font-weight:bold">5</span>/8 checks
+
+  <span style="color:#3fb950">✓ 5 Passed</span>    <span style="color:#d29922">! 2 Warnings</span>    <span style="color:#f85149">✗ 1 Failures</span>    0 Errors
+  <span style="color:#8b949e">══════════════════════════════════════════════════════════════════</span></code></pre>
+
+        <h3>Reading the console report</h3>
+        <ul class="check-list">
+            <li><strong>Category headers</strong> show pass/warn/fail counts per category at a glance</li>
+            <li><strong>Findings are sorted</strong>: FAIL first, then WARN, then PASS — so critical issues are always at the top</li>
+            <li><strong>Remediation lines</strong> (↳) appear only for non-passing checks and give you the exact command or config change</li>
+            <li><strong>Progress bar</strong> gives a visual ratio of passed vs. total checks</li>
+        </ul>
 
         <h2>JSON Output</h2>
-        <p>Machine-readable format for CI/CD pipelines and integrations:</p>
-        <pre><code>$ sudo infraudit audit --format json</code></pre>
+        <p>Machine-readable format for CI/CD pipelines, monitoring systems, and custom dashboards. Use <code>--format json</code> to enable.</p>
+        <pre><code>$ sudo infraudit audit --format json --output report.json</code></pre>
         <pre><code>{
-  "version": "0.1.0",
-  "timestamp": "2026-03-20T14:30:00Z",
-  "hostname": "web-prod-01",
-  "summary": {
-    "total": 87,
-    "pass": 71,
-    "warn": 12,
-    "fail": 4,
-    "error": 0
-  },
-  "results": [
+  "checks": [
     {
       "id": "AUTH-001",
       "name": "SSH root login disabled",
       "category": "auth",
       "severity": "CRITICAL",
       "status": "FAIL",
-      "message": "PermitRootLogin is set to 'yes' in /etc/ssh/sshd_config",
-      "remediation": "Set PermitRootLogin no in /etc/ssh/sshd_config and restart sshd",
-      "details": [
-        "Current value: PermitRootLogin yes",
-        "File: /etc/ssh/sshd_config:42"
-      ]
+      "message": "PermitRootLogin is set to 'yes'",
+      "remediation": "Set 'PermitRootLogin no' in /etc/ssh/sshd_config"
     },
     {
-      "id": "AUTH-002",
-      "name": "SSH password authentication disabled",
+      "id": "AUTH-003",
+      "name": "Only root has UID 0",
       "category": "auth",
-      "severity": "HIGH",
+      "severity": "CRITICAL",
       "status": "PASS",
-      "message": "PasswordAuthentication is set to 'no'",
-      "remediation": "",
-      "details": []
+      "message": "Only root has UID 0"
     }
-  ]
+  ],
+  "summary": {
+    "total": 132,
+    "passed": 98,
+    "warnings": 25,
+    "failures": 7,
+    "errors": 2
+  }
 }</code></pre>
+        <h3>JSON use cases</h3>
+        <ul class="check-list">
+            <li><strong>CI/CD gates:</strong> Parse the summary to block deployments with critical failures</li>
+            <li><strong>Monitoring:</strong> Feed results into Grafana, Datadog, or ELK for historical trending</li>
+            <li><strong>Automation:</strong> Use <code>jq</code> to extract specific findings: <code>jq '.checks[] | select(.status=="FAIL")'</code></li>
+            <li><strong>Compliance:</strong> Archive JSON reports as evidence of periodic security assessments</li>
+            <li><strong>Comparison:</strong> Diff two JSON reports to track remediation progress over time</li>
+        </ul>
 
         <h2>YAML Output</h2>
+        <p>Human-friendly structured format for integration with configuration management tools. Use <code>--format yaml</code>.</p>
         <pre><code>$ sudo infraudit audit --format yaml --output report.yaml</code></pre>
-        <pre><code>version: "0.1.0"
-timestamp: "2026-03-20T14:30:00Z"
-hostname: web-prod-01
-summary:
-  total: 87
-  pass: 71
-  warn: 12
-  fail: 4
-  error: 0
-results:
+        <pre><code>summary:
+  total: 132
+  passed: 98
+  warnings: 25
+  failures: 7
+  errors: 2
+checks:
   - id: AUTH-001
     name: SSH root login disabled
     category: auth
     severity: CRITICAL
     status: FAIL
-    message: "PermitRootLogin is set to 'yes' in /etc/ssh/sshd_config"
-    remediation: "Set PermitRootLogin no in /etc/ssh/sshd_config and restart sshd"</code></pre>
+    message: "PermitRootLogin is set to 'yes'"
+    remediation: "Set 'PermitRootLogin no' in /etc/ssh/sshd_config"
+  - id: AUTH-003
+    name: Only root has UID 0
+    category: auth
+    severity: CRITICAL
+    status: PASS
+    message: Only root has UID 0</code></pre>
+        <h3>YAML use cases</h3>
+        <ul class="check-list">
+            <li><strong>Ansible/Puppet:</strong> Parse YAML reports to generate remediation playbooks automatically</li>
+            <li><strong>Documentation:</strong> YAML is easy to include in wikis, tickets, and runbooks</li>
+            <li><strong>GitOps:</strong> Commit reports to a repository for change tracking and audit trails</li>
+        </ul>
 
-        <h2>Filtering Output</h2>
-        <pre><code><span class="comment"># Only show failures (no PASS results)</span>
-sudo infraudit audit --quiet
+        <h2>File Output</h2>
+        <p>Use <code>--output &lt;file&gt;</code> with any format to write the report to a file instead of stdout:</p>
+        <pre><code><span class="comment"># JSON report to file</span>
+sudo infraudit audit --format json --output /var/log/infraudit/audit-$(date +%F).json
 
-<span class="comment"># Verbose — include all details for every check</span>
-sudo infraudit audit --verbose
+<span class="comment"># YAML report to file</span>
+sudo infraudit audit --format yaml --output /tmp/report.yaml
 
-<span class="comment"># Combine: JSON failures only, save to file</span>
-sudo infraudit audit --format json --quiet --output failures.json</code></pre>
+<span class="comment"># Console report is still written to stdout when --output is used with console format</span>
+sudo infraudit audit --output /tmp/audit.txt</code></pre>
+
+        <h2>Filtering &amp; Profiles</h2>
+        <p>Control which checks run to focus on what matters:</p>
+        <pre><code><span class="comment"># Run only one category</span>
+sudo infraudit audit --category auth
+
+<span class="comment"># Skip specific checks you've accepted the risk for</span>
+sudo infraudit audit --skip HARD-007,SVC-012
+
+<span class="comment"># Use a server profile (skips irrelevant categories)</span>
+sudo infraudit audit --profile web-server
+
+<span class="comment"># Combine: web-server profile, JSON output, skip known exceptions</span>
+sudo infraudit audit --profile web-server --format json --skip NET-003 --output report.json</code></pre>
 
         <h2>Exit Codes</h2>
-        <p>For scripting and CI/CD integration:</p>
-        <pre><code><span class="comment"># Use in CI pipeline</span>
-sudo infraudit audit --format json --output report.json
+        <p>infraudit returns meaningful exit codes for scripting and CI/CD integration:</p>
+        <table>
+            <thead><tr><th>Code</th><th>Meaning</th><th>CI/CD Action</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><code>0</code></td>
+                    <td>All checks passed</td>
+                    <td>Proceed — system meets security requirements</td>
+                </tr>
+                <tr>
+                    <td><code>1</code></td>
+                    <td>Warnings found (no failures or errors)</td>
+                    <td>Review recommended — may proceed with caution</td>
+                </tr>
+                <tr>
+                    <td><code>2</code></td>
+                    <td>Failures or errors found</td>
+                    <td>Block deployment — security issues must be resolved</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>CI/CD Example</h3>
+        <pre><code><span class="comment"># GitHub Actions / GitLab CI example</span>
+sudo infraudit audit --format json --output report.json --profile web-server
 EXIT_CODE=$?
 
-if [ $EXIT_CODE -eq 0 ]; then
-    echo "All checks passed"
-elif [ $EXIT_CODE -eq 1 ]; then
-    echo "Warnings found — review recommended"
-elif [ $EXIT_CODE -eq 2 ]; then
-    echo "Failures found — action required"
+<span class="comment"># Upload report as artifact</span>
+<span class="comment"># Then gate on exit code</span>
+if [ $EXIT_CODE -eq 2 ]; then
+    echo "BLOCKED: Security failures found"
+    cat report.json | jq '.checks[] | select(.status=="FAIL") | .id + ": " + .message'
     exit 1
+elif [ $EXIT_CODE -eq 1 ]; then
+    echo "WARNING: Review findings before production"
 fi</code></pre>
     </main>
 </body>

@@ -5,6 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checks Reference — infraudit</title>
     <link rel="stylesheet" href="assets/style.css">
+    <style>
+        .risk-box {
+            background: var(--bg-tertiary);
+            border-left: 3px solid var(--border);
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .risk-box.critical { border-left-color: var(--red); }
+        .risk-box.high { border-left-color: var(--orange); }
+        .risk-box.medium { border-left-color: var(--yellow); }
+        .risk-box.low { border-left-color: var(--accent); }
+        .risk-box strong { color: var(--text); }
+        .check-detail { margin-bottom: 1.5rem; }
+        .check-detail h4 { margin-bottom: 0.25rem; }
+        .check-detail p { margin-bottom: 0.25rem; font-size: 0.9rem; }
+        .check-meta { display: flex; gap: 0.75rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+        .check-meta code { font-size: 0.8rem; }
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin: 1rem 0 2rem;
+        }
+        .toc-grid a {
+            display: block;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            transition: border-color 0.15s;
+        }
+        .toc-grid a:hover { border-color: var(--accent); text-decoration: none; }
+        .toc-grid .prefix { color: var(--green); font-family: var(--font-mono); font-size: 0.8rem; }
+        .toc-grid .count { color: var(--text-muted); font-size: 0.8rem; float: right; }
+    </style>
 </head>
 <body>
     <nav class="sidebar">
@@ -28,275 +66,1031 @@
 
     <main class="content">
         <h1>Checks Reference</h1>
-        <p>Complete reference of all 120+ security checks organized by category.</p>
+        <p>Complete reference of all 132 security checks. Each entry describes what is validated, why it matters, and the security consequences of a failed check.</p>
 
-        <!-- AUTH -->
+        <div class="toc-grid">
+            <a href="#auth"><span class="prefix">AUTH</span> Users &amp; Authentication <span class="count">8</span></a>
+            <a href="#pam"><span class="prefix">PAM</span> Password Policies <span class="count">5</span></a>
+            <a href="#network"><span class="prefix">NET</span> Network &amp; Firewall <span class="count">11</span></a>
+            <a href="#services"><span class="prefix">SVC</span> Services &amp; Processes <span class="count">13</span></a>
+            <a href="#filesystem"><span class="prefix">FS</span> Filesystem &amp; Permissions <span class="count">12</span></a>
+            <a href="#logging"><span class="prefix">LOG</span> Logging &amp; Auditing <span class="count">9</span></a>
+            <a href="#packages"><span class="prefix">PKG</span> Packages &amp; Updates <span class="count">4</span></a>
+            <a href="#hardening"><span class="prefix">HARD</span> Kernel Hardening <span class="count">12</span></a>
+            <a href="#boot"><span class="prefix">BOOT</span> Boot Security &amp; MAC <span class="count">8</span></a>
+            <a href="#cron"><span class="prefix">CRON</span> Scheduled Jobs <span class="count">7</span></a>
+            <a href="#crypto"><span class="prefix">CRYPTO</span> TLS/SSL &amp; Cryptography <span class="count">9</span></a>
+            <a href="#secrets"><span class="prefix">SEC</span> Secrets &amp; Credentials <span class="count">4</span></a>
+            <a href="#container"><span class="prefix">CTR</span> Container Security <span class="count">11</span></a>
+            <a href="#rlimit"><span class="prefix">RLIM</span> Resource Limits <span class="count">7</span></a>
+            <a href="#nfs"><span class="prefix">NFS</span> Network Filesystems <span class="count">4</span></a>
+            <a href="#malware"><span class="prefix">MAL</span> Rootkits &amp; Malware <span class="count">4</span></a>
+            <a href="#backup"><span class="prefix">BAK</span> Backups <span class="count">4</span></a>
+        </div>
+
+        <!-- ═══════════════════════════════════════ AUTH ═══════════════════════════════════════ -->
         <h2 id="auth">AUTH — Users &amp; Authentication</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>AUTH-001</code></td><td>SSH root login disabled (<code>PermitRootLogin no</code>)</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>AUTH-002</code></td><td>SSH password authentication disabled</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>AUTH-003</code></td><td>No users with UID 0 besides root</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>AUTH-004</code></td><td>No users with empty password</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>AUTH-005</code></td><td>System accounts have <code>/nologin</code> or <code>/false</code> shell</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>AUTH-006</code></td><td>Sudoers NOPASSWD usage is limited</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>AUTH-007</code></td><td>Permissions on <code>/etc/passwd</code> (644), <code>/etc/shadow</code> (640), <code>/etc/group</code> (644)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>AUTH-008</code></td><td>Access to <code>su</code> restricted via <code>pam_wheel.so</code></td><td><span class="badge medium">MEDIUM</span></td></tr>
-            </tbody>
-        </table>
+        <p>Validates user accounts, SSH configuration, sudo policies, and file permissions that control who can access the system and how they authenticate.</p>
 
-        <!-- PAM -->
+        <div class="check-detail">
+            <h4><code>AUTH-001</code> SSH root login disabled <span class="badge critical">CRITICAL</span></h4>
+            <p>Verifies that <code>PermitRootLogin</code> is set to <code>no</code> in <code>/etc/ssh/sshd_config</code> and drop-in configs.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> Direct root login via SSH allows attackers to brute-force the most privileged account on the system. A successful attack grants full control immediately — no privilege escalation needed. Disabling root login forces attackers to compromise a regular user first, then escalate, which is significantly harder and leaves more forensic evidence.<br>
+                <strong>References:</strong> CIS Benchmark 5.2.10, DISA STIG V-72247
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>AUTH-002</code> SSH password authentication disabled <span class="badge high">HIGH</span></h4>
+            <p>Checks that <code>PasswordAuthentication</code> is set to <code>no</code>, requiring key-based authentication only.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Password-based SSH authentication is vulnerable to brute-force and credential stuffing attacks. SSH keys provide cryptographically strong authentication that cannot be guessed. Even with fail2ban, password authentication exposes the server to large-scale automated attacks.<br>
+                <strong>References:</strong> CIS Benchmark 5.2.15
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>AUTH-003</code> Only root has UID 0 <span class="badge critical">CRITICAL</span></h4>
+            <p>Scans <code>/etc/passwd</code> for any account besides <code>root</code> with UID 0.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> Any account with UID 0 has unrestricted root privileges. A hidden UID 0 account is a common backdoor technique — an attacker creates a seemingly harmless user that secretly has full system control. This bypasses sudo logging and audit trails.<br>
+                <strong>References:</strong> CIS Benchmark 6.2.2
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>AUTH-004</code> No users with empty password <span class="badge critical">CRITICAL</span></h4>
+            <p>Reads <code>/etc/shadow</code> to find accounts with an empty password hash field.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> An account with an empty password can be accessed by anyone — locally, via SSH (if password auth is enabled), or through any PAM-based service. This is equivalent to leaving a door wide open. Attackers scan for these accounts as a trivial entry point.<br>
+                <strong>References:</strong> CIS Benchmark 6.2.1
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>AUTH-005</code> System accounts have nologin shell <span class="badge high">HIGH</span></h4>
+            <p>Verifies that system accounts (UID &lt; 1000) use <code>/sbin/nologin</code> or <code>/bin/false</code> as their shell.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> System accounts like <code>www-data</code>, <code>mysql</code>, or <code>nobody</code> exist to run services with limited privileges. If these accounts have a real login shell, an attacker who compromises a service can pivot to an interactive session, install tools, and establish persistence. Nologin shells prevent this lateral movement.<br>
+                <strong>References:</strong> CIS Benchmark 5.5.2
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>AUTH-006</code> No excessive NOPASSWD in sudoers <span class="badge high">HIGH</span></h4>
+            <p>Scans <code>/etc/sudoers</code> and <code>/etc/sudoers.d/</code> for <code>NOPASSWD</code> directives.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> <code>NOPASSWD</code> entries allow users to execute commands as root without re-authenticating. If an attacker compromises a user session (stolen SSH key, session hijacking), they inherit passwordless root access. Every NOPASSWD entry is a potential privilege escalation path that should be minimized and audited.<br>
+                <strong>References:</strong> CIS Benchmark 5.3.4
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>AUTH-007</code> Sensitive auth files have correct permissions <span class="badge high">HIGH</span></h4>
+            <p>Validates <code>/etc/passwd</code> (644), <code>/etc/shadow</code> (640), and <code>/etc/group</code> (644).</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> <code>/etc/shadow</code> contains password hashes — if world-readable, any user can copy the hashes and crack them offline at their leisure. Incorrect permissions on <code>/etc/passwd</code> could allow modification of user accounts. These files are the foundation of Linux authentication.<br>
+                <strong>References:</strong> CIS Benchmark 6.1.2–6.1.4
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>AUTH-008</code> su restricted via pam_wheel <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>/etc/pam.d/su</code> for an active <code>pam_wheel.so</code> requirement.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> Without <code>pam_wheel.so</code>, any user who knows root's password can use <code>su</code> to become root. Restricting <code>su</code> to the <code>wheel</code> group limits who can even attempt to escalate, adding a layer of defense even if root's password is leaked.<br>
+                <strong>References:</strong> CIS Benchmark 5.6
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ PAM ═══════════════════════════════════════ -->
         <h2 id="pam">PAM — Password Policies</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>PAM-001</code></td><td>Password quality enforced via <code>pam_pwquality</code> (minlen, complexity)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>PAM-002</code></td><td>Password reuse prevention (<code>pam_pwhistory remember &ge; 5</code>)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>PAM-003</code></td><td>Account lockout after failed attempts (<code>pam_faillock</code>)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>PAM-004</code></td><td>PAM module ordering correct (faillock before pam_unix)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>PAM-005</code></td><td>Password expiration configured (maxdays, mindays, warndays)</td><td><span class="badge low">LOW</span></td></tr>
-            </tbody>
-        </table>
+        <p>Validates PAM (Pluggable Authentication Modules) configuration for password strength, reuse prevention, and account lockout policies.</p>
 
-        <!-- NET -->
+        <div class="check-detail">
+            <h4><code>PAM-001</code> Password quality enforced via pam_pwquality <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies <code>pam_pwquality</code> is enabled and configured with <code>minlen &ge; 14</code> and <code>minclass &ge; 4</code>.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> Weak passwords are the #1 attack vector for credential-based attacks. Without enforced complexity, users will choose passwords like "password123" that fall in seconds to dictionary attacks. NIST SP 800-63B recommends minimum 14 characters with multiple character classes.<br>
+                <strong>References:</strong> CIS Benchmark 5.4.1
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>PAM-002</code> Password reuse prevention configured <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>pam_pwhistory</code> or <code>pam_unix</code> with <code>remember &ge; 5</code>.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> If users can reuse passwords, a previously compromised password remains valid indefinitely. Remembering the last 5+ passwords forces users to create genuinely new credentials after a breach, closing the window of exposure.<br>
+                <strong>References:</strong> CIS Benchmark 5.4.3
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>PAM-003</code> Account lockout after failed attempts <span class="badge high">HIGH</span></h4>
+            <p>Validates <code>pam_faillock</code> is configured with <code>deny &le; 5</code> and <code>unlock_time &ge; 900</code> seconds.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Without account lockout, an attacker can attempt unlimited password guesses against local accounts. Even with strong passwords, a sufficiently persistent attacker can eventually succeed. Lockout after 5 attempts with a 15-minute cooldown makes brute-force impractical while remaining usable.<br>
+                <strong>References:</strong> CIS Benchmark 5.4.2, DISA STIG V-71943
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>PAM-004</code> PAM module ordering correct <span class="badge medium">MEDIUM</span></h4>
+            <p>Ensures <code>pam_faillock</code> appears before <code>pam_unix</code> in the auth stack.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> If <code>pam_unix</code> processes the authentication attempt before <code>pam_faillock</code>, the lockout mechanism is bypassed entirely — failed attempts are never counted. This is a subtle misconfiguration that completely negates account lockout protection.<br>
+                <strong>References:</strong> CIS Benchmark 5.4.2
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>PAM-005</code> Password expiration configured <span class="badge low">LOW</span></h4>
+            <p>Validates <code>/etc/login.defs</code>: <code>PASS_MAX_DAYS &le; 365</code>, <code>PASS_MIN_DAYS &ge; 1</code>, <code>PASS_WARN_AGE &ge; 7</code>.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> Password aging ensures credentials don't remain valid indefinitely. While NIST 800-63B no longer recommends periodic rotation for strong passwords, many compliance frameworks (PCI DSS, HIPAA) still require it. <code>PASS_MIN_DAYS</code> prevents users from cycling through passwords to return to their favorite.<br>
+                <strong>References:</strong> CIS Benchmark 5.5.1
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ NET ═══════════════════════════════════════ -->
         <h2 id="network">NET — Network &amp; Firewall</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>NET-001</code></td><td>Firewall is active (iptables/nftables/ufw)</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>NET-002</code></td><td>No unnecessary open ports</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>NET-003</code></td><td>IP forwarding disabled (if not gateway)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>NET-004</code></td><td>Services not bound to 0.0.0.0 unnecessarily</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>NET-005</code></td><td>DNS resolvers configured</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>NET-006</code></td><td>DNSSEC validation enabled</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>NET-007</code></td><td>DNS over TLS/HTTPS configured</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>NET-008</code></td><td>IPv6 disabled or properly configured</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>NET-009</code></td><td>SNMP v1/v2c disabled (SNMPv3 only)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>NET-010</code></td><td>Default SNMP community strings removed</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>NET-011</code></td><td>SNMP removed if unused</td><td><span class="badge low">LOW</span></td></tr>
-            </tbody>
-        </table>
+        <p>Evaluates network security: firewall status, exposed ports, IP forwarding, DNS security, and SNMP configuration.</p>
 
-        <!-- SVC -->
+        <div class="check-detail">
+            <h4><code>NET-001</code> Firewall is active <span class="badge critical">CRITICAL</span></h4>
+            <p>Detects active firewall via <code>ufw</code>, <code>nftables</code>, or <code>iptables</code> with loaded rules.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> A server without a firewall exposes every listening service to the entire network. Any vulnerability in any service becomes directly exploitable. A firewall is the most fundamental network defense — without it, internal services (databases, admin panels, debug ports) are accessible to attackers.<br>
+                <strong>References:</strong> CIS Benchmark 3.5.1, DISA STIG V-72315
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-002</code> No unnecessary open ports <span class="badge high">HIGH</span></h4>
+            <p>Parses <code>/proc/net/tcp</code> and <code>/proc/net/tcp6</code> to list all listening TCP ports.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Every open port is an attack surface. Unnecessary services listening on the network increase the risk of exploitation. A forgotten debug server, an unused database port, or a test API can all be entry points. Regular port auditing ensures only intended services are exposed.<br>
+                <strong>References:</strong> CIS Benchmark 3.5.4
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-003</code> IP forwarding disabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>net.ipv4.ip_forward</code> and <code>net.ipv6.conf.all.forwarding</code> are 0.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> IP forwarding turns the server into a router, allowing it to pass traffic between networks. If enabled unintentionally, an attacker who compromises the server can use it to reach otherwise isolated networks, bypassing network segmentation and firewall rules.<br>
+                <strong>References:</strong> CIS Benchmark 3.2.1
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-004</code> Services not bound to 0.0.0.0 <span class="badge medium">MEDIUM</span></h4>
+            <p>Identifies services listening on all interfaces (0.0.0.0) instead of localhost or specific IPs.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> A service bound to 0.0.0.0 is accessible from every network interface. Internal services (monitoring, management, databases) should bind to localhost or a management interface only. Binding to all interfaces unnecessarily extends the attack surface to public networks.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-005</code> DNS resolvers configured <span class="badge low">LOW</span></h4>
+            <p>Verifies <code>nameserver</code> entries exist in <code>/etc/resolv.conf</code>.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> Without DNS resolvers, the system cannot resolve hostnames — breaking package updates, certificate validation (CRL/OCSP), and security tool connectivity. This is primarily an availability concern but can also prevent security updates from being fetched.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-006</code> DNSSEC validation enabled <span class="badge low">LOW</span></h4>
+            <p>Checks <code>DNSSEC=yes</code> in <code>systemd-resolved</code> or presence of Unbound resolver.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> Without DNSSEC, DNS responses can be forged (DNS spoofing/cache poisoning). An attacker can redirect the server to malicious IP addresses for package repositories, update servers, or API endpoints. DNSSEC cryptographically validates DNS responses to prevent tampering.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-007</code> DNS over TLS/HTTPS configured <span class="badge low">LOW</span></h4>
+            <p>Verifies <code>DNSOverTLS=yes</code> or <code>opportunistic</code> in <code>systemd-resolved</code>.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> Standard DNS queries are sent in cleartext, allowing anyone on the network path to see which domains the server resolves. DNS over TLS/HTTPS encrypts queries, preventing traffic analysis and DNS-based surveillance or interception.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-008</code> IPv6 disabled or properly configured <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks if IPv6 is disabled or, if enabled, that Router Advertisements are rejected (<code>accept_ra=0</code>).</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> If IPv6 is enabled but not managed, rogue Router Advertisements can redirect traffic through an attacker-controlled gateway (MITM). Many organizations don't monitor IPv6 traffic, making it an invisible attack channel. If IPv6 isn't needed, disabling it removes this entire attack surface.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-009</code> SNMP v1/v2c disabled <span class="badge high">HIGH</span></h4>
+            <p>Checks <code>/etc/snmp/snmpd.conf</code> for <code>rocommunity</code>/<code>rwcommunity</code> directives (v1/v2c).</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> SNMP v1/v2c transmits community strings (passwords) in cleartext and has no encryption. An attacker sniffing the network captures the community string and gains read or read-write access to the device's management data — including routing tables, interface configs, and system information. Only SNMPv3 with authentication and encryption is considered secure.<br>
+                <strong>References:</strong> CIS Benchmark 3.6
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-010</code> Default SNMP community strings removed <span class="badge critical">CRITICAL</span></h4>
+            <p>Checks for <code>public</code> and <code>private</code> community strings in snmpd.conf.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> "public" and "private" are the default SNMP community strings that attackers try first. Automated scanners and worms target these defaults. With <code>rwcommunity private</code>, an attacker can modify device configurations remotely. This is one of the most common and easily exploited misconfigurations in network devices.<br>
+                <strong>References:</strong> CVE-2002-0012, CVE-2002-0013
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NET-011</code> SNMP removed if unused <span class="badge low">LOW</span></h4>
+            <p>Verifies <code>snmpd</code> is not installed or not running when not needed.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> Unnecessary services increase attack surface. SNMP has a history of vulnerabilities and, if not actively used for monitoring, should be removed entirely rather than just disabled. Removing the package eliminates the risk of accidental re-enabling.
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ SVC ═══════════════════════════════════════ -->
         <h2 id="services">SVC — Services &amp; Processes</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>SVC-001</code></td><td>No insecure services running (telnet, rsh, rlogin, xinetd)</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>SVC-002</code></td><td>SSH protocol version, ciphers, and timeouts hardened</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>SVC-003</code></td><td>NTP/chrony running and synchronized</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>SVC-004</code></td><td>NTP daemon not running as root</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>SVC-005</code></td><td>NTS (Network Time Security) enabled</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>SVC-006</code></td><td>Time sources are trusted/authoritative</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>SVC-007</code></td><td>Critical services active (sshd, fail2ban/crowdsec)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>SVC-008</code></td><td>No unnecessary processes running as root</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>SVC-009</code></td><td>MTA is local-only (<code>inet_interfaces = loopback-only</code>)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>SVC-010</code></td><td>MTA is not an open relay</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>SVC-011</code></td><td>Root mail forwarded to monitored account</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>SVC-012</code></td><td>No desktop environment installed on server</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>SVC-013</code></td><td>Automount (autofs) disabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
-            </tbody>
-        </table>
+        <p>Audits running services and daemons — identifies insecure protocols, validates time synchronization, checks critical security services, and reviews mail server configuration.</p>
 
-        <!-- FS -->
+        <div class="check-detail">
+            <h4><code>SVC-001</code> No insecure services running <span class="badge critical">CRITICAL</span></h4>
+            <p>Detects telnet, rsh, rlogin, xinetd, tftp, and vsftpd services.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> These protocols transmit data (including credentials) in cleartext. Telnet, rsh, and rlogin are legacy remote access protocols that have been superseded by SSH for decades. Any of these running on a server is an immediate, exploitable vulnerability that allows credential interception.<br>
+                <strong>References:</strong> CIS Benchmark 2.2.x, DISA STIG V-72239
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-002</code> SSH ciphers and timeouts hardened <span class="badge high">HIGH</span></h4>
+            <p>Checks for weak ciphers (3DES, Blowfish, Arcfour), weak MACs (MD5, SHA1-96), and idle session timeouts.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Weak ciphers can be broken by well-resourced attackers, compromising SSH session confidentiality. Idle timeouts prevent abandoned sessions from being hijacked. An SSH session left open indefinitely is an invitation for anyone with physical or lateral access to use it.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-003</code> NTP/chrony synchronized <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies system clock is NTP synchronized via <code>timedatectl</code>.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> Accurate time is essential for log correlation, certificate validation, Kerberos authentication, and forensic investigation. A skewed clock can cause TLS certificates to appear invalid, authentication to fail, and incident timelines to be unreconstructable. Attackers can exploit time skew to replay expired tokens.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-004</code> NTP daemon not running as root <span class="badge low">LOW</span></h4>
+            <p>Checks that chrony/ntpd runs as a dedicated user, not root.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> If the NTP daemon has a vulnerability, running as root gives the attacker full system access. Running as a dedicated user (<code>_chrony</code>) limits the blast radius of a compromise to the NTP service only. This follows the principle of least privilege.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-005</code> NTS enabled <span class="badge low">LOW</span></h4>
+            <p>Checks chrony for Network Time Security (NTS) authentication.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> Standard NTP is unauthenticated — a network attacker (MITM) can feed false time to the server. NTS adds cryptographic authentication to NTP, preventing time manipulation attacks that could be used to replay expired credentials or invalidate security certificates.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-006</code> Time sources are trusted <span class="badge low">LOW</span></h4>
+            <p>Verifies NTP sources are reachable and selected via <code>chronyc sources</code>.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> Unreachable or untrusted NTP sources mean the system clock may drift without detection. An attacker who controls time sources can manipulate the server's notion of time, affecting logging, certificate validation, and scheduled security tasks.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-007</code> Critical services active <span class="badge high">HIGH</span></h4>
+            <p>Ensures <code>sshd</code> and intrusion prevention (<code>fail2ban</code>/<code>crowdsec</code>) are running.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Without fail2ban or CrowdSec, SSH brute-force attacks proceed unchecked — attackers can attempt thousands of passwords per minute. These tools automatically ban offending IPs after failed attempts, dramatically reducing the effectiveness of automated attacks.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-008</code> No unnecessary root processes <span class="badge medium">MEDIUM</span></h4>
+            <p>Lists processes running as UID 0 that are not in the expected set (systemd, sshd, cron, etc.).</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> Every process running as root is a potential privilege escalation target. If an unexpected application runs as root and has a vulnerability, the attacker immediately gets full system access. Services should run with the minimum privileges required.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-009</code> MTA configured as local-only <span class="badge high">HIGH</span></h4>
+            <p>Verifies Postfix <code>inet_interfaces = loopback-only</code>.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> A mail server listening on external interfaces can be exploited for spam relay, phishing campaigns, and as a pivot point for lateral movement. Most servers only need local mail delivery (cron notifications, system alerts) and should not accept mail from the network.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-010</code> MTA is not an open relay <span class="badge critical">CRITICAL</span></h4>
+            <p>Checks Postfix <code>mynetworks</code> does not include <code>0.0.0.0/0</code>.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> An open relay allows anyone on the internet to send email through your server. This will result in your server being blacklisted, used for spam/phishing campaigns, and potentially held legally responsible for the content relayed. Open relays are actively scanned for by spammers.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-011</code> Root mail forwarded <span class="badge low">LOW</span></h4>
+            <p>Verifies root mail alias in <code>/etc/aliases</code> forwards to a monitored account.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> System alerts, cron job errors, and security notifications are sent to root by default. If root mail is not forwarded, these critical alerts go unread, and security incidents or system failures are missed.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-012</code> No desktop environment installed <span class="badge medium">MEDIUM</span></h4>
+            <p>Detects GDM, LightDM, SDDM, or <code>graphical.target</code> as default.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> Desktop environments install hundreds of packages (browsers, media players, office suites) that massively increase the attack surface. GUI frameworks (X11, Wayland) have their own vulnerability history. Servers should run in multi-user (text) mode only.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SVC-013</code> Automount disabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks that <code>autofs</code> is not running.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> Autofs automatically mounts filesystems when accessed, which can be exploited to mount malicious NFS shares or USB devices. Disabling automount forces manual, auditable mounting of external filesystems.
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ FS ═══════════════════════════════════════ -->
         <h2 id="filesystem">FS — Filesystem &amp; Permissions</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>FS-001</code></td><td>No unnecessary SUID/SGID files</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>FS-002</code></td><td>No world-writable files outside /tmp</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>FS-003</code></td><td>Sticky bit set on /tmp and /var/tmp</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>FS-004</code></td><td>Sensitive partitions mounted with noexec, nosuid, nodev</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>FS-005</code></td><td><code>/dev/shm</code> mounted with nodev, nosuid, noexec</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>FS-006</code></td><td>Home directories not world-readable</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>FS-007</code></td><td>No orphaned files (files without owner)</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>FS-008</code></td><td>Separate partitions for /tmp, /var, /var/log, /var/log/audit, /home</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>FS-009</code></td><td><code>/tmp</code> on separate partition/tmpfs with nodev, nosuid, noexec</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>FS-010</code></td><td><code>/var/tmp</code> mounted with nodev, nosuid, noexec</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>FS-011</code></td><td>systemd <code>tmp.mount</code> enabled</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>FS-012</code></td><td>Temporary file cleanup configured</td><td><span class="badge low">LOW</span></td></tr>
-            </tbody>
-        </table>
+        <p>Validates filesystem permissions, SUID/SGID binaries, mount options, and partition layout to prevent privilege escalation and unauthorized access.</p>
 
-        <!-- LOG -->
+        <div class="check-detail">
+            <h4><code>FS-001</code> No unnecessary SUID/SGID files <span class="badge high">HIGH</span></h4>
+            <p>Finds SUID/SGID binaries not in the known-safe list (sudo, passwd, mount, etc.).</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> SUID binaries run with the file owner's privileges (usually root) regardless of who executes them. A vulnerability in any SUID binary is a direct path to root. Attackers specifically search for unusual SUID files as privilege escalation targets. Every SUID binary not strictly needed should have its bit removed.<br>
+                <strong>References:</strong> CIS Benchmark 6.1.13–6.1.14
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-002</code> No world-writable files outside /tmp <span class="badge high">HIGH</span></h4>
+            <p>Searches the filesystem for files with world-write permission (mode 0002) outside temporary directories.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> World-writable files can be modified by any user. If a script or configuration file is world-writable, an attacker with low-privilege access can inject malicious code that executes with higher privileges. This is a classic privilege escalation technique.<br>
+                <strong>References:</strong> CIS Benchmark 6.1.10
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-003</code> Sticky bit on /tmp and /var/tmp <span class="badge high">HIGH</span></h4>
+            <p>Verifies the sticky bit is set on world-writable directories.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Without the sticky bit, any user can delete or rename files created by other users in a shared directory. In <code>/tmp</code>, this enables symlink attacks — an attacker replaces a temporary file with a symlink to a critical system file, causing a privileged process to overwrite or corrupt it.<br>
+                <strong>References:</strong> CIS Benchmark 1.1.22
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-004</code> Sensitive partitions have restrictive mount options <span class="badge medium">MEDIUM</span></h4>
+            <p>Validates <code>nodev</code>, <code>nosuid</code>, <code>noexec</code> on <code>/tmp</code>, <code>/var/tmp</code>, <code>/home</code>.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> <code>noexec</code> prevents execution of binaries from the partition, blocking attackers from running downloaded malware. <code>nosuid</code> prevents SUID elevation from user-writable areas. <code>nodev</code> prevents creation of device files that could access hardware directly. Together, these mount options significantly limit post-exploitation capabilities.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-005</code> /dev/shm mounted with nodev,nosuid,noexec <span class="badge medium">MEDIUM</span></h4>
+            <p>Validates shared memory tmpfs mount options.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> <code>/dev/shm</code> is a world-writable tmpfs commonly used by attackers to stage and execute malware because it resides in RAM and leaves no disk trace. Adding <code>noexec</code> prevents direct execution from shared memory, forcing attackers to use more detectable techniques.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-006</code> Home directories not world-readable <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>/home/*</code> for world-readable/writable permissions.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> World-readable home directories expose SSH keys, shell history, configuration files, and potentially credentials to all users. A low-privilege attacker can harvest private keys, API tokens, and database passwords from other users' home directories.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-007</code> No orphaned files <span class="badge low">LOW</span></h4>
+            <p>Finds files without a valid owner or group in <code>/usr</code>, <code>/etc</code>, <code>/var</code>.</p>
+            <div class="risk-box low">
+                <strong>Why it matters:</strong> Orphaned files indicate deleted user accounts whose files remain. These files could contain sensitive data or be inherited by a new user assigned the same UID, inadvertently granting access to another user's files.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-008</code> Separate partitions for key directories <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies <code>/tmp</code>, <code>/var</code>, <code>/var/log</code>, <code>/var/log/audit</code>, <code>/var/tmp</code>, <code>/home</code> are separate mount points.</p>
+            <div class="risk-box medium">
+                <strong>Why it matters:</strong> Separate partitions prevent a disk-filling attack in one area (e.g., log flooding in <code>/var/log</code>) from consuming all space and crashing the entire system. They also enable per-partition mount options (noexec, nosuid) and quotas for fine-grained security control.<br>
+                <strong>References:</strong> CIS Benchmark 1.1.x
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-009</code> /tmp on separate partition or tmpfs <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks if <code>/tmp</code> is a dedicated mount point.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> A separate <code>/tmp</code> partition allows enforcing <code>noexec,nosuid,nodev</code> and prevents temporary file abuse from affecting the root filesystem. Using tmpfs also ensures temporary files are cleared on reboot.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-010</code> /var/tmp with nodev,nosuid,noexec <span class="badge medium">MEDIUM</span></h4>
+            <p>Validates <code>/var/tmp</code> mount options.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Unlike <code>/tmp</code>, <code>/var/tmp</code> persists across reboots. Attackers use it to stash tools and maintain persistence. Restrictive mount options limit what can be done from this location.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-011</code> systemd tmp.mount enabled <span class="badge low">LOW</span></h4>
+            <p>Checks if <code>tmp.mount</code> is active when <code>/tmp</code> is not a separate partition.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> <code>tmp.mount</code> creates a tmpfs for <code>/tmp</code>, ensuring temporary files are RAM-backed, size-limited, and cleared on reboot — even without a dedicated partition.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>FS-012</code> Temporary file cleanup configured <span class="badge low">LOW</span></h4>
+            <p>Verifies <code>systemd-tmpfiles-clean.timer</code> is active.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Without periodic cleanup, temporary directories accumulate files indefinitely. This wastes disk space and allows attackers to maintain staged tools or data in temporary locations for extended periods.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ LOG ═══════════════════════════════════════ -->
         <h2 id="logging">LOG — Logging &amp; Auditing</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>LOG-001</code></td><td>Syslog or journald active and configured</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>LOG-002</code></td><td>auditd installed and running</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>LOG-003</code></td><td>Audit rules for sensitive files (/etc/passwd, /etc/shadow, sudoers)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>LOG-004</code></td><td>Log rotation configured (logrotate)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>LOG-005</code></td><td>Log files not world-readable</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>LOG-006</code></td><td>AIDE or file integrity tool installed</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>LOG-007</code></td><td>AIDE database initialized</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>LOG-008</code></td><td>AIDE checks scheduled via cron</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>LOG-009</code></td><td>AIDE covers critical paths (/bin, /sbin, /lib, /etc, /boot)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-            </tbody>
-        </table>
+        <p>Validates that system logging, audit trails, and file integrity monitoring are properly configured. Logging is the foundation of incident detection and forensic investigation.</p>
 
-        <!-- PKG -->
+        <div class="check-detail">
+            <h4><code>LOG-001</code> Syslog/journald active <span class="badge critical">CRITICAL</span></h4>
+            <p>Verifies rsyslog, syslog-ng, or systemd-journald is running.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> Without logging, there is no record of what happened on the system. Security incidents go undetected, forensic investigation is impossible, and compliance requirements are violated. An attacker's first action is often to disable logging — if it's already off, they've already won.<br>
+                <strong>References:</strong> CIS Benchmark 4.2.1, DISA STIG V-72077
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>LOG-002</code> auditd installed and running <span class="badge high">HIGH</span></h4>
+            <p>Checks the <code>auditd</code> service is active.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> The Linux Audit System provides detailed logging of system calls, file access, and security events beyond what syslog captures. It's required by PCI DSS, HIPAA, and most compliance frameworks. Without auditd, you cannot track who accessed sensitive files or executed privileged commands.<br>
+                <strong>References:</strong> CIS Benchmark 4.1.1, DISA STIG V-72081
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>LOG-003</code> Audit rules for sensitive files <span class="badge high">HIGH</span></h4>
+            <p>Verifies audit rules watch <code>/etc/passwd</code>, <code>/etc/shadow</code>, and <code>/etc/sudoers</code>.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> These files control authentication and authorization. Audit rules create an alert trail when they are read or modified. Without these rules, an attacker can add users, change passwords, or grant sudo access without leaving audit evidence.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>LOG-004</code> Log rotation configured <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>/etc/logrotate.conf</code> exists.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Without log rotation, logs grow until they fill the disk — causing service outages and losing the oldest (potentially most important) log entries. Rotation ensures logs are compressed, archived, and old entries are preserved for the required retention period.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>LOG-005</code> Log files not world-readable <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies files in <code>/var/log</code> are not world-readable.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Logs can contain sensitive information: IP addresses, usernames, application errors with stack traces, and sometimes credentials. World-readable logs allow low-privilege users to harvest this intelligence.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>LOG-006</code> AIDE or file integrity tool installed <span class="badge high">HIGH</span></h4>
+            <p>Detects AIDE, Tripwire, Samhain, or OSSEC.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> File integrity monitoring (FIM) detects unauthorized changes to system binaries, libraries, and configuration files. Without FIM, a rootkit that replaces <code>/usr/bin/ssh</code> with a backdoored version goes undetected. FIM is required by PCI DSS Requirement 11.5 and most security frameworks.<br>
+                <strong>References:</strong> CIS Benchmark 1.3.1
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>LOG-007</code> AIDE database initialized <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks for <code>/var/lib/aide/aide.db</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> AIDE without an initialized database does nothing. The baseline database must be created on a known-good system so that future comparisons detect changes accurately.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>LOG-008</code> AIDE checks scheduled <span class="badge medium">MEDIUM</span></h4>
+            <p>Looks for AIDE cron jobs in <code>/etc/cron.daily</code> or <code>/etc/crontab</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> AIDE only detects changes when it runs. Without scheduled checks, unauthorized modifications accumulate undetected. Daily checks ensure changes are discovered within 24 hours.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>LOG-009</code> AIDE covers critical paths <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies AIDE config monitors <code>/bin</code>, <code>/sbin</code>, <code>/lib</code>, <code>/etc</code>, <code>/boot</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> If AIDE doesn't monitor critical system directories, an attacker can modify binaries and libraries without triggering alerts. The monitored paths should include all locations where executables and configuration files reside.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ PKG ═══════════════════════════════════════ -->
         <h2 id="packages">PKG — Packages &amp; Updates</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>PKG-001</code></td><td>No pending security updates</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>PKG-002</code></td><td>Package repositories use HTTPS</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>PKG-003</code></td><td>Kernel is up to date</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>PKG-004</code></td><td>Automatic security updates enabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
-            </tbody>
-        </table>
+        <p>Ensures the system is patched against known vulnerabilities and uses secure package repositories.</p>
 
-        <!-- HARD -->
+        <div class="check-detail">
+            <h4><code>PKG-001</code> No pending security updates <span class="badge high">HIGH</span></h4>
+            <p>Checks <code>apt</code> or <code>dnf</code> for pending security patches.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Unpatched vulnerabilities are the primary attack vector for server compromise. Exploit code for known CVEs is often publicly available within days of disclosure. Every day a security update is delayed increases the risk of exploitation. Automated scanning tools specifically target known, unpatched vulnerabilities.<br>
+                <strong>References:</strong> CIS Benchmark 1.9
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>PKG-002</code> Package repositories use HTTPS <span class="badge medium">MEDIUM</span></h4>
+            <p>Validates apt sources and yum repos use <code>https://</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> HTTP repositories are vulnerable to MITM attacks — a network attacker can serve malicious packages that appear legitimate. While GPG signatures provide package integrity, HTTPS adds transport-layer confidentiality and makes interception significantly harder.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>PKG-003</code> Kernel is up to date <span class="badge high">HIGH</span></h4>
+            <p>Checks for <code>/var/run/reboot-required</code> indicating a pending kernel update.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Kernel vulnerabilities (e.g., Dirty COW, StackRot, nf_tables exploits) allow local privilege escalation from any user to root. A kernel update that isn't applied until reboot leaves the system running vulnerable code despite the patch being available.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>PKG-004</code> Automatic security updates enabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies <code>unattended-upgrades</code> or <code>dnf-automatic</code> is active.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Manual patching is unreliable — critical updates get delayed by holidays, staff turnover, or oversight. Automatic security updates ensure patches are applied within hours of release, dramatically reducing the exposure window for known vulnerabilities.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ HARD ═══════════════════════════════════════ -->
         <h2 id="hardening">HARD — Kernel Hardening</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>HARD-001</code></td><td>Login banner configured (/etc/issue, /etc/issue.net)</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>HARD-002</code></td><td>Core dumps disabled (sysctl + limits.conf)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>HARD-003</code></td><td>ASLR enabled (<code>kernel.randomize_va_space = 2</code>)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>HARD-004</code></td><td>dmesg restricted (<code>kernel.dmesg_restrict = 1</code>)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>HARD-005</code></td><td>ptrace restricted (<code>kernel.yama.ptrace_scope &ge; 1</code>)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>HARD-006</code></td><td>/proc hardened</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>HARD-007</code></td><td>Swap encrypted or absent</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>HARD-008</code></td><td>Unused filesystem kernel modules blacklisted (cramfs, hfs, etc.)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>HARD-009</code></td><td>USB storage module disabled if not needed</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>HARD-010</code></td><td>Wireless modules disabled if not needed</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>HARD-011</code></td><td>Firewire/Thunderbolt DMA modules disabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>HARD-012</code></td><td>Bluetooth disabled if not needed</td><td><span class="badge low">LOW</span></td></tr>
-            </tbody>
-        </table>
+        <p>Validates kernel security parameters, module restrictions, and exploit mitigations that harden the system against common attack techniques.</p>
 
-        <!-- BOOT -->
+        <div class="check-detail">
+            <h4><code>HARD-001</code> Login banner configured <span class="badge low">LOW</span></h4>
+            <p>Checks <code>/etc/issue</code> and <code>/etc/issue.net</code> have warning content.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Legal banners establish the legal basis for prosecution of unauthorized access in many jurisdictions. Without a warning banner, courts may find that the attacker had no notice that access was restricted, weakening legal action.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-002</code> Core dumps disabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies core dumps are disabled via kernel configuration or <code>limits.conf</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Core dumps contain the complete memory contents of a crashed process — including passwords, encryption keys, session tokens, and private data. If core dumps are written to world-readable locations, any user can harvest this sensitive information.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-003</code> ASLR enabled <span class="badge high">HIGH</span></h4>
+            <p>Checks <code>kernel.randomize_va_space = 2</code> (full randomization).</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Address Space Layout Randomization (ASLR) randomizes memory addresses of processes, making exploit techniques like return-oriented programming (ROP) and buffer overflow attacks significantly harder. Disabling ASLR makes every memory corruption vulnerability trivially exploitable.<br>
+                <strong>References:</strong> CIS Benchmark 1.6.2
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-004</code> dmesg restricted <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies <code>kernel.dmesg_restrict = 1</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Kernel messages (dmesg) contain hardware addresses, loaded modules, and system configuration details that help attackers craft targeted exploits. Restricting dmesg to root prevents information leakage to unprivileged users.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-005</code> ptrace restricted <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>kernel.yama.ptrace_scope &ge; 1</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> <code>ptrace</code> allows a process to inspect and modify another process's memory. Without restrictions, any user can attach to other users' processes to steal credentials, inject code, or bypass security controls. Yama ptrace scope limits this to parent processes only.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-006</code> /proc hardened <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies <code>/proc</code> is mounted with <code>hidepid</code> option.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Without <code>hidepid</code>, any user can see every process running on the system — including command-line arguments that may contain passwords, API keys, or other secrets passed as arguments. <code>hidepid=2</code> hides processes owned by other users.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-007</code> Swap encrypted or absent <span class="badge low">LOW</span></h4>
+            <p>Checks if swap uses dm-crypt/LUKS encryption.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> The kernel swaps memory pages to disk when RAM is low. Unencrypted swap can contain passwords, encryption keys, and sensitive data from any process. An attacker with physical access or a disk image can extract this data from swap.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-008</code> Unused filesystem modules blacklisted <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies cramfs, freevxfs, hfs, hfsplus, jffs2, squashfs, udf are blocked.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Filesystem drivers parse complex data structures from potentially untrusted media. Vulnerabilities in rarely-used filesystem modules (cramfs, hfs, etc.) are common and can be triggered by inserting a malicious USB device or mounting a crafted disk image. Blacklisting prevents the kernel from loading these attack surfaces.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-009</code> USB storage disabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>usb-storage</code> module is blacklisted.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> USB storage devices are the primary vector for offline data exfiltration and malware delivery (BadUSB, Rubber Ducky). Blocking the usb-storage module prevents unauthorized data transfer via USB drives on servers that don't need removable media.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-010</code> Wireless modules disabled <span class="badge low">LOW</span></h4>
+            <p>Checks for wireless interfaces in <code>/sys/class/net/</code>.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Wireless interfaces on servers create an unmonitored network attack surface. An attacker within radio range can attempt to connect, bypassing all network-based firewalls and IDS. Servers should have no wireless capability.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-011</code> Firewire/Thunderbolt DMA disabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies <code>firewire-core</code> and <code>thunderbolt</code> modules are blacklisted.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> FireWire and Thunderbolt provide Direct Memory Access (DMA), allowing connected devices to read and write system RAM directly — bypassing all software security controls including full disk encryption. A physical attacker can extract encryption keys, inject rootkits, and read arbitrary memory using a DMA attack device.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>HARD-012</code> Bluetooth disabled <span class="badge low">LOW</span></h4>
+            <p>Checks bluetooth service is not active.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Bluetooth has a history of vulnerabilities (BlueBorne, BleedingTooth, KNOB) that allow remote code execution without user interaction. On servers, Bluetooth serves no purpose and adds unnecessary attack surface.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ BOOT ═══════════════════════════════════════ -->
         <h2 id="boot">BOOT — Boot Security &amp; MAC</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>BOOT-001</code></td><td>GRUB bootloader password set</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>BOOT-002</code></td><td>Bootloader config permissions (grub.cfg 0600 root:root)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>BOOT-003</code></td><td>UEFI Secure Boot enabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>BOOT-004</code></td><td>Single-user mode requires authentication</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>BOOT-005</code></td><td>SELinux or AppArmor installed and enabled</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>BOOT-006</code></td><td>SELinux Enforcing / AppArmor enforce mode</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>BOOT-007</code></td><td>No unconfined processes/profiles</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>BOOT-008</code></td><td>No SELinux/AppArmor denials in logs</td><td><span class="badge low">LOW</span></td></tr>
-            </tbody>
-        </table>
+        <p>Validates bootloader protection, Secure Boot, and mandatory access control (SELinux/AppArmor) that protect the system during startup and enforce security policies at runtime.</p>
 
-        <!-- CRON -->
+        <div class="check-detail">
+            <h4><code>BOOT-001</code> GRUB password set <span class="badge high">HIGH</span></h4>
+            <p>Checks grub.cfg for <code>password_pbkdf2</code> or <code>set superusers</code>.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Without a GRUB password, anyone with physical access can boot into single-user mode (root shell without authentication), edit kernel parameters to bypass security controls, or boot from a USB device to access the filesystem. A GRUB password prevents unauthorized boot modifications.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BOOT-002</code> Bootloader config permissions <span class="badge high">HIGH</span></h4>
+            <p>Verifies <code>grub.cfg</code> is mode 0600 owned by root.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> If <code>grub.cfg</code> is readable, users can see the GRUB password hash and attempt offline cracking. If writable, they can modify boot parameters to gain root access on next reboot.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BOOT-003</code> Secure Boot enabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks Secure Boot status via <code>mokutil</code> or EFI variables.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Secure Boot ensures only signed bootloaders and kernels are loaded, preventing bootkits — malware that loads before the OS and is invisible to all security tools. Without Secure Boot, an attacker with root access can install persistent bootloader-level malware that survives OS reinstallation.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BOOT-004</code> Single-user mode requires authentication <span class="badge high">HIGH</span></h4>
+            <p>Verifies root has a password set in <code>/etc/shadow</code>.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> If root has no password, single-user/rescue mode provides an unauthenticated root shell. An attacker with physical access (or GRUB access) can drop into a root shell and modify any system configuration.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BOOT-005</code> SELinux or AppArmor installed <span class="badge high">HIGH</span></h4>
+            <p>Detects AppArmor or SELinux availability.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Mandatory Access Control (MAC) systems enforce security policies beyond traditional Unix permissions. Even if an attacker gains root through a vulnerability, MAC policies can prevent them from accessing sensitive files, binding to ports, or executing certain binaries. MAC is a critical layer of defense-in-depth.<br>
+                <strong>References:</strong> CIS Benchmark 1.7.1, DISA STIG V-71989
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BOOT-006</code> MAC in enforcing mode <span class="badge high">HIGH</span></h4>
+            <p>Checks SELinux is <code>Enforcing</code> or AppArmor has profiles in enforce mode.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> A MAC system in permissive mode logs violations but doesn't block them — it provides zero protection. Enforcing mode is required for MAC to actually prevent unauthorized actions. Permissive mode is only appropriate during policy development.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BOOT-007</code> No unconfined processes <span class="badge medium">MEDIUM</span></h4>
+            <p>Runs <code>aa-unconfined</code> to find processes without MAC profiles.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Unconfined processes run without MAC restrictions, negating the protection for those specific services. Critical services (web servers, databases) should have profiles. An unconfined service is the weak link in an otherwise hardened system.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BOOT-008</code> No MAC denials in logs <span class="badge low">LOW</span></h4>
+            <p>Checks dmesg for AppArmor DENIED or SELinux AVC denial messages.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> MAC denials indicate either misconfigured policies (legitimate actions being blocked) or actual security violations. Unreviewed denials may mean services are malfunctioning or that an active attack is being partially blocked. Either case requires investigation.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ CRON ═══════════════════════════════════════ -->
         <h2 id="cron">CRON — Scheduled Jobs</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>CRON-001</code></td><td>Cron daemon enabled and running</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>CRON-002</code></td><td><code>/etc/crontab</code> permissions 0600 root:root</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CRON-003</code></td><td>Cron directories permissions 0700</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CRON-004</code></td><td><code>cron.allow</code> exists, <code>cron.deny</code> removed</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CRON-005</code></td><td><code>at.allow</code> exists, <code>at.deny</code> removed</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CRON-006</code></td><td>No suspicious cron jobs (network downloads, writable scripts)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>CRON-007</code></td><td>User crontabs reviewed</td><td><span class="badge low">LOW</span></td></tr>
-            </tbody>
-        </table>
+        <p>Audits cron and at job permissions, reviews scheduled tasks for suspicious activity, and ensures access control uses whitelists.</p>
 
-        <!-- CRYPTO -->
+        <div class="check-detail">
+            <h4><code>CRON-001</code> Cron daemon enabled <span class="badge low">LOW</span></h4>
+            <p>Verifies cron service is running.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Many security tasks (log rotation, AIDE scans, backup jobs, certificate renewal) depend on cron. If cron is not running, these critical maintenance tasks silently fail.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRON-002</code> /etc/crontab permissions <span class="badge medium">MEDIUM</span></h4>
+            <p>Validates <code>/etc/crontab</code> is mode 0600.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> If <code>/etc/crontab</code> is readable, attackers learn the schedule of security tasks (when AIDE runs, when backups happen) and can time their activities to avoid detection. If writable, they can add jobs that execute as root.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRON-003</code> Cron directories permissions <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>/etc/cron.{hourly,daily,weekly,monthly}</code> are mode 0700.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Cron directories with loose permissions allow unauthorized users to place scripts that execute with root privileges on a schedule. This is a common persistence mechanism for attackers.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRON-004</code> cron.allow exists, cron.deny removed <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies whitelist approach for cron access control.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> A deny-list approach (cron.deny) allows all users except those explicitly denied. A whitelist approach (cron.allow) denies all users except those explicitly permitted. Whitelisting is more secure because new users are denied by default.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRON-005</code> at.allow exists, at.deny removed <span class="badge medium">MEDIUM</span></h4>
+            <p>Same whitelist verification for the <code>at</code> scheduler.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> The <code>at</code> command schedules one-time jobs. Without access control, any user can schedule commands — potentially for malicious purposes like time-bomb attacks or delayed data exfiltration.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRON-006</code> No suspicious cron jobs <span class="badge high">HIGH</span></h4>
+            <p>Scans cron jobs for <code>curl</code>, <code>wget</code>, <code>nc</code>, <code>bash -i</code>, and similar patterns.</p>
+            <div class="risk-box high">
+                <strong>Why it matters:</strong> Attackers use cron jobs to maintain persistence — a cron job that downloads and executes a payload every hour ensures the attacker regains access even if their initial backdoor is removed. Network-fetching commands in cron jobs are a strong indicator of compromise or unauthorized activity.
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRON-007</code> User crontabs reviewed <span class="badge low">LOW</span></h4>
+            <p>Lists users with personal crontabs in <code>/var/spool/cron/</code>.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> User crontabs are often overlooked during security reviews. An attacker who compromises a user account can add a crontab for persistence without modifying system cron files, making detection harder.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ CRYPTO ═══════════════════════════════════════ -->
         <h2 id="crypto">CRYPTO — TLS/SSL &amp; Cryptography</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>CRYPTO-001</code></td><td>System crypto policy is not LEGACY</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>CRYPTO-002</code></td><td>No expired or soon-to-expire certificates</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>CRYPTO-003</code></td><td>No self-signed certificates in production</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CRYPTO-004</code></td><td>TLS 1.0 and 1.1 disabled system-wide</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>CRYPTO-005</code></td><td>No weak cipher suites (RC4, DES, 3DES, NULL)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>CRYPTO-006</code></td><td>Certificate chains complete</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CRYPTO-007</code></td><td>Private key file permissions (0600 or 0400)</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>CRYPTO-008</code></td><td>FIPS mode enabled if required</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CRYPTO-009</code></td><td>No MD5/SHA1 in authentication or signing</td><td><span class="badge high">HIGH</span></td></tr>
-            </tbody>
-        </table>
+        <p>Validates cryptographic configuration: certificates, TLS versions, cipher suites, private key protection, and hash algorithms.</p>
 
-        <!-- SEC -->
+        <div class="check-detail">
+            <h4><code>CRYPTO-001</code> System crypto policy is not LEGACY <span class="badge high">HIGH</span></h4>
+            <p>Checks RHEL/Fedora system-wide crypto policy via <code>update-crypto-policies</code>.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> The LEGACY crypto policy enables deprecated and weak algorithms (RC4, DES, SHA1) system-wide for all applications. This silently weakens every TLS connection, SSH session, and cryptographic operation on the server.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRYPTO-002</code> No expired or expiring certificates <span class="badge high">HIGH</span></h4>
+            <p>Scans PEM/CRT files in <code>/etc/ssl/certs</code> and <code>/etc/pki/tls/certs</code> for expiration.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Expired certificates cause service outages (clients reject expired certs) and security degradation (users learn to click through warnings). Certificates expiring within 30 days need immediate renewal planning to prevent both availability and security incidents.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRYPTO-003</code> No self-signed certificates <span class="badge medium">MEDIUM</span></h4>
+            <p>Detects snakeoil and localhost certificates.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Self-signed certificates provide encryption but no authentication — clients cannot verify the server's identity. This makes the connection vulnerable to MITM attacks. In production, certificates should be issued by a trusted CA.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRYPTO-004</code> TLS 1.0 and 1.1 disabled <span class="badge high">HIGH</span></h4>
+            <p>Checks OpenSSL <code>MinProtocol</code> in <code>/etc/ssl/openssl.cnf</code>.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> TLS 1.0 and 1.1 have known vulnerabilities (BEAST, POODLE, Lucky13) and have been deprecated by RFC 8996. All major browsers reject them. Continuing to support these versions exposes connections to downgrade attacks and known cryptographic weaknesses.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRYPTO-005</code> No weak cipher suites <span class="badge high">HIGH</span></h4>
+            <p>Lists OpenSSL ciphers and flags RC4, DES, 3DES, NULL, EXPORT, and anonymous suites.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Weak ciphers can be broken in real-time (NULL provides zero encryption, EXPORT uses intentionally weakened 40/56-bit keys, RC4 has statistical biases). An attacker can force a downgrade to a weak cipher via a MITM position and decrypt all traffic.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRYPTO-006</code> Certificate chains complete <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies CA certificates bundle is installed.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Without the CA certificates bundle, the system cannot validate TLS certificates of remote services — package repository connections, API calls, and HTTPS requests cannot be verified. This may lead applications to disable certificate verification entirely, creating MITM vulnerability.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRYPTO-007</code> Private key file permissions <span class="badge critical">CRITICAL</span></h4>
+            <p>Checks key files in <code>/etc/ssl/private</code> and <code>/etc/pki/tls/private</code> are mode &le; 0600.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> Private keys are the foundation of TLS security. A leaked private key allows an attacker to impersonate the server, decrypt all past and future traffic (if not using forward secrecy), and issue fraudulent certificates. Private keys must be readable only by root and the service that uses them.<br>
+                <strong>References:</strong> CIS Benchmark 1.8
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRYPTO-008</code> FIPS mode enabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>/proc/sys/crypto/fips_enabled</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> FIPS 140-2/140-3 compliance is required by US federal agencies and many regulated industries. FIPS mode restricts the system to validated cryptographic algorithms and implementations. If your compliance framework requires FIPS, this check ensures it's active.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CRYPTO-009</code> No MD5/SHA1 in authentication <span class="badge high">HIGH</span></h4>
+            <p>Scans <code>/etc/shadow</code> for <code>$1$</code> (MD5) password hashes.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> MD5 password hashes can be cracked at rates exceeding 10 billion guesses per second on modern GPUs. A password hashed with MD5 provides essentially no protection against offline cracking. Modern systems should use SHA-512 ($6$) or yescrypt which are designed to be computationally expensive.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ SEC ═══════════════════════════════════════ -->
         <h2 id="secrets">SEC — Secrets &amp; Credentials</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>SEC-001</code></td><td>No secrets in environment variables</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>SEC-002</code></td><td>No passwords in shell history</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>SEC-003</code></td><td>No credentials in world-readable files</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>SEC-004</code></td><td>Credential files permissions correct (.pgpass, .my.cnf, .netrc = 0600)</td><td><span class="badge high">HIGH</span></td></tr>
-            </tbody>
-        </table>
+        <p>Detects exposed credentials in environment files, shell history, and configuration files with insecure permissions.</p>
 
-        <!-- CTR -->
+        <div class="check-detail">
+            <h4><code>SEC-001</code> No secrets in environment variables <span class="badge high">HIGH</span></h4>
+            <p>Scans <code>/etc/environment</code> and <code>/etc/profile.d/</code> for <code>PASSWORD=</code>, <code>API_KEY=</code>, <code>SECRET=</code>, etc.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Environment variables set in system-wide profiles are visible to all users via <code>/proc/&lt;pid&gt;/environ</code>. Secrets stored this way are trivially extractable. Use a secrets manager (Vault, AWS SSM) or file-based secrets with restrictive permissions instead.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SEC-002</code> No passwords in shell history <span class="badge high">HIGH</span></h4>
+            <p>Checks <code>.bash_history</code> and <code>.zsh_history</code> for password-like commands.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Commands like <code>mysql -u root -pMyPassword</code> are recorded in shell history in cleartext. Anyone who gains access to the user's account (or their home directory) can read these credentials. History files should be regularly cleared and <code>HISTCONTROL=ignorespace</code> set so sensitive commands prefixed with a space are not recorded.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SEC-003</code> No credentials in world-readable files <span class="badge critical">CRITICAL</span></h4>
+            <p>Checks <code>/etc/shadow</code>, <code>/etc/gshadow</code>, <code>/etc/security/opasswd</code> permissions.</p>
+            <div class="risk-box critical"><strong>Why it matters:</strong> These files contain password hashes and authentication data. If world-readable, any user can copy the hashes and perform offline cracking at unlimited speed. A world-readable shadow file is equivalent to having no password protection at all.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>SEC-004</code> Credential file permissions correct <span class="badge high">HIGH</span></h4>
+            <p>Verifies <code>.pgpass</code>, <code>.my.cnf</code>, <code>.netrc</code>, <code>.aws/credentials</code> are mode &le; 0600.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> These files contain database passwords, FTP credentials, and cloud access keys in cleartext. If readable by other users, a single compromised account can cascade to database access, AWS account compromise, and lateral movement across the infrastructure.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ CTR ═══════════════════════════════════════ -->
         <h2 id="container">CTR — Container Security</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>CTR-001</code></td><td>Docker/Podman detected</td><td><span class="badge info">INFO</span></td></tr>
-                <tr><td><code>CTR-002</code></td><td>Docker daemon configuration reviewed</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CTR-003</code></td><td>Docker socket permissions restricted</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>CTR-004</code></td><td>No containers running as root</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>CTR-005</code></td><td>No privileged containers</td><td><span class="badge critical">CRITICAL</span></td></tr>
-                <tr><td><code>CTR-006</code></td><td>Container resource limits set (CPU, memory)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CTR-007</code></td><td>Docker content trust enabled</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CTR-008</code></td><td>Inter-container communication restricted</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>CTR-009</code></td><td>Read-only root filesystem in containers</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>CTR-010</code></td><td>Docker logging driver configured</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>CTR-011</code></td><td>Images from trusted registries only</td><td><span class="badge medium">MEDIUM</span></td></tr>
-            </tbody>
-        </table>
+        <p>Audits Docker/Podman configuration, running containers, and container runtime security settings.</p>
 
-        <!-- RLIM -->
+        <div class="check-detail">
+            <h4><code>CTR-001</code> Docker/Podman detected <span class="badge info">INFO</span></h4>
+            <p>Detects if a container runtime is installed.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Informational check that triggers the remaining container security checks. If no container runtime is installed, all CTR checks are automatically skipped.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-002</code> Docker daemon configuration <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies <code>/etc/docker/daemon.json</code> exists.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> The daemon configuration file controls Docker's security settings (TLS, logging, userns-remap, icc). Without it, Docker runs with default settings that are optimized for convenience rather than security.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-003</code> Docker socket permissions <span class="badge high">HIGH</span></h4>
+            <p>Checks <code>/var/run/docker.sock</code> is not world-accessible.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> The Docker socket is equivalent to root access. Anyone who can write to the Docker socket can create a privileged container, mount the host filesystem, and gain full root access. The socket should be accessible only to root and the docker group.<br>
+                <strong>References:</strong> CIS Docker Benchmark 3.15
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-004</code> No containers running as root <span class="badge high">HIGH</span></h4>
+            <p>Inspects running containers for <code>User: ""</code> or <code>User: "0"</code>.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> A container running as root has UID 0 — if the container escapes (via a kernel vulnerability or misconfiguration), the attacker has root on the host. Running containers as non-root users limits the impact of container breakout.<br>
+                <strong>References:</strong> CIS Docker Benchmark 4.1
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-005</code> No privileged containers <span class="badge critical">CRITICAL</span></h4>
+            <p>Checks <code>HostConfig.Privileged</code> flag for all running containers.</p>
+            <div class="risk-box critical">
+                <strong>Why it matters:</strong> A privileged container has full access to the host's devices, capabilities, and kernel — it is effectively root on the host with no isolation. Container escape from a privileged container is trivial and well-documented. Privileged mode should never be used in production; use specific capabilities instead.<br>
+                <strong>References:</strong> CIS Docker Benchmark 5.4
+            </div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-006</code> Container resource limits <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies memory and CPU limits are set for running containers.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Containers without resource limits can consume all host resources (CPU, memory), causing denial of service to other containers and the host itself. A compromised container performing crypto-mining or a fork bomb will affect all co-located services.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-007</code> Docker content trust enabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>DOCKER_CONTENT_TRUST=1</code> environment variable.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Content trust ensures only signed images can be pulled and run. Without it, a compromised registry or MITM attack can serve malicious images that appear legitimate. Content trust provides cryptographic verification of image integrity and publisher identity.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-008</code> Inter-container communication restricted <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>"icc": false</code> in daemon.json.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> By default, Docker allows all containers on the default bridge network to communicate freely. If one container is compromised, the attacker can reach all other containers directly. Disabling ICC forces containers to use explicit links or user-defined networks, implementing network segmentation.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-009</code> Read-only root filesystem <span class="badge low">LOW</span></h4>
+            <p>Checks <code>HostConfig.ReadonlyRootfs</code> for running containers.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> A read-only root filesystem prevents an attacker from modifying container binaries, installing tools, or establishing persistence within the container. Applications should write only to explicitly mounted volumes.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-010</code> Docker logging driver configured <span class="badge low">LOW</span></h4>
+            <p>Verifies logging driver is not <code>none</code>.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Without logging, container activity is invisible. Security incidents within containers cannot be investigated, and compliance requirements for log retention cannot be met.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>CTR-011</code> Images from trusted registries <span class="badge medium">MEDIUM</span></h4>
+            <p>Lists container images and flags those from unknown registries.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Images from untrusted registries may contain malware, backdoors, crypto-miners, or vulnerabilities. Supply chain attacks via malicious container images are increasingly common. Only images from vetted registries should be used.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ RLIM ═══════════════════════════════════════ -->
         <h2 id="rlimit">RLIM — Resource Limits</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>RLIM-001</code></td><td>Open files limit is reasonable</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>RLIM-002</code></td><td>Max user processes (nproc) limit set</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>RLIM-003</code></td><td>Stack size limits configured</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>RLIM-004</code></td><td>No wildcard unlimited entries in limits.conf</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>RLIM-005</code></td><td>Root filesystem space below 85%</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>RLIM-006</code></td><td>/var, /var/log, /tmp have sufficient space</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>RLIM-007</code></td><td>Inode usage is not exhausted</td><td><span class="badge high">HIGH</span></td></tr>
-            </tbody>
-        </table>
+        <p>Monitors system resource limits and disk usage to prevent denial of service and resource exhaustion.</p>
 
-        <!-- NFS -->
+        <div class="check-detail">
+            <h4><code>RLIM-001</code> Open files limit <span class="badge low">LOW</span></h4>
+            <p>Checks <code>fs.file-max &ge; 65536</code>.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> A low open files limit can cause services to fail under load when they cannot open new sockets, files, or connections. This is primarily an availability concern but can impact security tools that need many file descriptors.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>RLIM-002</code> Max user processes limit <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies <code>nproc</code> is configured in <code>/etc/security/limits.conf</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Without process limits, a single user can execute a fork bomb (<code>:(){ :|:&amp; };:</code>) that creates processes exponentially until the system crashes. Process limits contain the blast radius to a single user session.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>RLIM-003</code> Stack size limits <span class="badge low">LOW</span></h4>
+            <p>Checks stack size configuration in limits.conf.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Excessive stack sizes waste memory and can facilitate stack-based buffer overflow attacks. Reasonable limits help contain both resource consumption and exploit capabilities.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>RLIM-004</code> No wildcard unlimited entries <span class="badge medium">MEDIUM</span></h4>
+            <p>Scans limits.conf for <code>* ... unlimited</code> entries.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Wildcard unlimited entries remove resource restrictions for all users, negating all other limit configurations. This opens the door to resource exhaustion attacks and fork bombs from any user account.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>RLIM-005</code> Root filesystem below 85% <span class="badge high">HIGH</span></h4>
+            <p>Checks disk usage of <code>/</code>.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> A full root filesystem causes system-wide failures: logging stops (hiding attacker activity), package updates fail (leaving vulnerabilities unpatched), services crash (causing outages), and the system may become unbootable. Maintaining free space is both an availability and security requirement.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>RLIM-006</code> Key directories have space <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>/var</code>, <code>/var/log</code>, and <code>/tmp</code> usage.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> A full <code>/var/log</code> silently stops logging — the perfect cover for an attack. A full <code>/tmp</code> breaks applications that depend on temporary files. Monitoring individual directory usage catches problems before they cascade.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>RLIM-007</code> Inode usage not exhausted <span class="badge high">HIGH</span></h4>
+            <p>Runs <code>df -i</code> and checks for usage above 85%.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Inode exhaustion is more insidious than disk space exhaustion — the filesystem still shows free space, but no new files can be created. This breaks logging, application operation, and package management. Attackers can cause inode exhaustion by creating millions of small files.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ NFS ═══════════════════════════════════════ -->
         <h2 id="nfs">NFS — Network Filesystems</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>NFS-001</code></td><td>NFS exports reviewed (no world-export, root_squash enabled)</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>NFS-002</code></td><td>NFSv3 disabled if NFSv4 available</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>NFS-003</code></td><td>Samba config reviewed (no guest access)</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>NFS-004</code></td><td>rpcbind disabled if NFS not in use</td><td><span class="badge medium">MEDIUM</span></td></tr>
-            </tbody>
-        </table>
+        <p>Audits NFS exports, Samba shares, and related services to prevent unauthorized file access across the network.</p>
 
-        <!-- MAL -->
+        <div class="check-detail">
+            <h4><code>NFS-001</code> NFS exports reviewed <span class="badge high">HIGH</span></h4>
+            <p>Checks <code>/etc/exports</code> for world exports (<code>*</code>) and <code>no_root_squash</code>.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> World-exported NFS shares are accessible from any host on the network. <code>no_root_squash</code> allows the remote root user to have root privileges on the NFS share, enabling them to create SUID binaries, modify sensitive files, and escalate privileges on the NFS server.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NFS-002</code> NFSv3 disabled <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>vers3=no</code> in <code>/etc/nfs.conf</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> NFSv3 relies on IP-based authentication, which can be spoofed. NFSv4 supports Kerberos authentication and has better security features. NFSv3 should be disabled when NFSv4 is available.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NFS-003</code> Samba config reviewed <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>/etc/samba/smb.conf</code> for <code>guest ok = yes</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Guest access to Samba shares allows unauthenticated access to files. This can expose sensitive data and provide a staging area for attackers. WannaCry and similar worms exploit open SMB shares for propagation.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>NFS-004</code> rpcbind disabled if unused <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks if rpcbind runs without an active NFS server.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> rpcbind maps RPC services to ports and has a history of vulnerabilities. If NFS is not in use, rpcbind is unnecessary attack surface that should be disabled.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ MAL ═══════════════════════════════════════ -->
         <h2 id="malware">MAL — Rootkits &amp; Malware</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>MAL-001</code></td><td>rkhunter or chkrootkit installed</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>MAL-002</code></td><td>Rootkit scans scheduled</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>MAL-003</code></td><td>ClamAV installed if server handles uploads/mail</td><td><span class="badge low">LOW</span></td></tr>
-                <tr><td><code>MAL-004</code></td><td>Antimalware definitions up to date</td><td><span class="badge medium">MEDIUM</span></td></tr>
-            </tbody>
-        </table>
+        <p>Verifies rootkit detection tools and antimalware solutions are installed and scheduled.</p>
 
-        <!-- BAK -->
+        <div class="check-detail">
+            <h4><code>MAL-001</code> Rootkit scanner installed <span class="badge medium">MEDIUM</span></h4>
+            <p>Detects <code>rkhunter</code> or <code>chkrootkit</code>.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Rootkits hide attacker presence by modifying system binaries and kernel modules. Without a rootkit scanner, a compromised server can remain undetected indefinitely. rkhunter checks file hashes, hidden processes, and known rootkit signatures.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>MAL-002</code> Rootkit scans scheduled <span class="badge medium">MEDIUM</span></h4>
+            <p>Looks for rootkit scanner cron jobs.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> A rootkit scanner that isn't run regularly provides no protection. Scheduled scans ensure rootkits are detected within the scan interval, limiting the duration of an undetected compromise.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>MAL-003</code> ClamAV installed <span class="badge low">LOW</span></h4>
+            <p>Detects <code>clamscan</code> or <code>clamdscan</code>.</p>
+            <div class="risk-box low"><strong>Why it matters:</strong> Servers that handle file uploads or email are vectors for malware distribution. ClamAV can scan uploaded files and email attachments for known malware, preventing the server from becoming a distribution point.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>MAL-004</code> Antimalware definitions updated <span class="badge medium">MEDIUM</span></h4>
+            <p>Checks <code>clamav-freshclam</code> service or rkhunter version.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Antimalware tools with outdated definitions cannot detect recent threats. New malware variants are released daily — definitions more than a week old miss a significant portion of current threats.</div>
+        </div>
+
+        <!-- ═══════════════════════════════════════ BAK ═══════════════════════════════════════ -->
         <h2 id="backup">BAK — Backups</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Check</th><th>Severity</th></tr></thead>
-            <tbody>
-                <tr><td><code>BAK-001</code></td><td>Backup schedule exists and ran recently</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>BAK-002</code></td><td>Backups are encrypted</td><td><span class="badge medium">MEDIUM</span></td></tr>
-                <tr><td><code>BAK-003</code></td><td>Backup files not world-readable</td><td><span class="badge high">HIGH</span></td></tr>
-                <tr><td><code>BAK-004</code></td><td>Off-site/off-host backup exists</td><td><span class="badge medium">MEDIUM</span></td></tr>
-            </tbody>
-        </table>
+        <p>Validates that backup solutions are configured, encrypted, secured, and stored off-site — the last line of defense against data loss and ransomware.</p>
+
+        <div class="check-detail">
+            <h4><code>BAK-001</code> Backup schedule exists <span class="badge high">HIGH</span></h4>
+            <p>Detects backup tools (restic, borg, duplicity) and cron/timer schedules.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> Without backups, any data loss event — ransomware, hardware failure, accidental deletion, or attacker sabotage — is permanent. Backups are the ultimate recovery mechanism. A backup tool without a schedule means backups are not happening automatically.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BAK-002</code> Backups are encrypted <span class="badge medium">MEDIUM</span></h4>
+            <p>Verifies backup tool supports encryption (borg, restic encrypt by default).</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Unencrypted backups contain all the server's sensitive data in a portable, easily accessible format. If an attacker gains access to the backup storage, they get a complete copy of every database, configuration file, and secret — potentially across multiple time periods.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BAK-003</code> Backup files not world-readable <span class="badge high">HIGH</span></h4>
+            <p>Checks permissions on common backup directories.</p>
+            <div class="risk-box high"><strong>Why it matters:</strong> World-readable backup directories allow any user to access backup archives, which may contain sensitive data from restricted areas of the filesystem. Backup directories should be readable only by root and the backup service account.</div>
+        </div>
+
+        <div class="check-detail">
+            <h4><code>BAK-004</code> Off-site backup exists <span class="badge medium">MEDIUM</span></h4>
+            <p>Warns to verify backup repository is on a remote host.</p>
+            <div class="risk-box medium"><strong>Why it matters:</strong> Backups stored only on the same server are destroyed by the same event that destroys the server — hardware failure, fire, ransomware encryption, or attacker sabotage. Off-site backups (remote server, S3, etc.) ensure recovery is possible even if the primary server is completely lost. This is the 3-2-1 backup rule: 3 copies, 2 media types, 1 off-site.</div>
+        </div>
     </main>
 </body>
 </html>

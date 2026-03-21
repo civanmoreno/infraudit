@@ -1,7 +1,7 @@
 Ejecutar los tests del proyecto infraudit.
 
 Ejecutá:
-1. `export PATH=~/go-sdk/go/bin:$PATH`
+1. `export PATH=/home/ivan/.local/go/bin:$PATH`
 2. `go test ./...` en el directorio del proyecto
 3. Reportá los resultados: tests pasados, fallidos, y cobertura si está disponible.
 

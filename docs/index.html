@@ -45,7 +45,7 @@
                     <p>From SSH and PAM to Docker containers and TLS certificates — comprehensive server coverage.</p>
                 </div>
                 <div class="feature-card">
-                    <h3>120+ Security Checks</h3>
+                    <h3>132 Security Checks</h3>
                     <p>Each check includes severity level, detailed findings, and actionable remediation steps.</p>
                 </div>
                 <div class="feature-card">
@@ -73,17 +73,26 @@
 curl -sL https://github.com/ivan/infraudit/releases/latest/download/infraudit -o infraudit
 chmod +x infraudit
 
-<span class="comment"># Run full audit</span>
+<span class="comment"># Run full audit (requires root for most checks)</span>
 sudo ./infraudit audit
 
-<span class="comment"># Run specific category</span>
+<span class="comment"># Run a specific category</span>
 sudo ./infraudit audit --category auth
 
-<span class="comment"># List all available checks</span>
+<span class="comment"># Use a server profile</span>
+sudo ./infraudit audit --profile web-server
+
+<span class="comment"># Skip checks you've accepted</span>
+sudo ./infraudit audit --skip HARD-007,SVC-012
+
+<span class="comment"># List all 132 available checks</span>
 ./infraudit list
 
-<span class="comment"># Export as JSON</span>
-sudo ./infraudit audit --format json --output report.json</code></pre>
+<span class="comment"># Export as JSON for CI/CD</span>
+sudo ./infraudit audit --format json --output report.json
+
+<span class="comment"># Export as YAML</span>
+sudo ./infraudit audit --format yaml --output report.yaml</code></pre>
         </section>
 
         <section class="severity-table">
