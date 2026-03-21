@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ivan/infraudit/internal/version"
+	"github.com/civanmoreno/infraudit/internal/version"
 	"github.com/spf13/cobra"
 )
 

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ivan/infraudit/internal/check"
+	"github.com/civanmoreno/infraudit/internal/check"
 )
 
 func init() {

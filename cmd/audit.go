@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ivan/infraudit/internal/check"
-	"github.com/ivan/infraudit/internal/config"
-	"github.com/ivan/infraudit/internal/report"
+	"github.com/civanmoreno/infraudit/internal/check"
+	"github.com/civanmoreno/infraudit/internal/config"
+	"github.com/civanmoreno/infraudit/internal/report"
 	"github.com/spf13/cobra"
 )
 

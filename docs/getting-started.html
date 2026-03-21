@@ -22,7 +22,7 @@
             <li><a href="roadmap.html">Roadmap</a></li>
         </ul>
         <div class="sidebar-footer">
-            <a href="https://github.com/ivan/infraudit">GitHub</a>
+            <a href="https://github.com/civanmoreno/infraudit">GitHub</a>
         </div>
     </nav>
 
@@ -32,13 +32,21 @@
 
         <h2>Installation</h2>
 
-        <h3>Option 1: Download binary</h3>
-        <pre><code>curl -sL https://github.com/ivan/infraudit/releases/latest/download/infraudit-linux-amd64 -o infraudit
-chmod +x infraudit
-sudo mv infraudit /usr/local/bin/</code></pre>
+        <h3>Option 1: Install script (recommended)</h3>
+        <pre><code><span class="comment"># Detects architecture (amd64/arm64) automatically</span>
+curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh</code></pre>
 
-        <h3>Option 2: Build from source</h3>
-        <pre><code>git clone https://github.com/ivan/infraudit.git
+        <h3>Option 2: Manual download</h3>
+        <pre><code><span class="comment"># For x86_64 (Intel/AMD) servers</span>
+curl -sLO https://github.com/civanmoreno/infraudit/releases/latest/download/infraudit-linux-amd64
+chmod +x infraudit-linux-amd64 && sudo mv infraudit-linux-amd64 /usr/local/bin/infraudit
+
+<span class="comment"># For ARM64 (Graviton, Ampere) servers</span>
+curl -sLO https://github.com/civanmoreno/infraudit/releases/latest/download/infraudit-linux-arm64
+chmod +x infraudit-linux-arm64 && sudo mv infraudit-linux-arm64 /usr/local/bin/infraudit</code></pre>
+
+        <h3>Option 3: Build from source</h3>
+        <pre><code>git clone https://github.com/civanmoreno/infraudit.git
 cd infraudit
 go build -o infraudit .
 sudo mv infraudit /usr/local/bin/</code></pre>

@@ -5,7 +5,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/ivan/infraudit/internal/check"
+	"github.com/civanmoreno/infraudit/internal/check"
 	"github.com/spf13/cobra"
 )
 

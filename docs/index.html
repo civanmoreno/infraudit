@@ -22,7 +22,7 @@
             <li><a href="roadmap.html">Roadmap</a></li>
         </ul>
         <div class="sidebar-footer">
-            <a href="https://github.com/ivan/infraudit">GitHub</a>
+            <a href="https://github.com/civanmoreno/infraudit">GitHub</a>
         </div>
     </nav>
 
@@ -69,9 +69,8 @@
 
         <section class="quickstart">
             <h2>Quick Start</h2>
-            <pre><code><span class="comment"># Download and run</span>
-curl -sL https://github.com/ivan/infraudit/releases/latest/download/infraudit -o infraudit
-chmod +x infraudit
+            <pre><code><span class="comment"># Install (detects architecture automatically)</span>
+curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh
 
 <span class="comment"># Run full audit (requires root for most checks)</span>
 sudo ./infraudit audit

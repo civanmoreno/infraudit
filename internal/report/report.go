@@ -7,8 +7,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ivan/infraudit/internal/check"
-	"github.com/ivan/infraudit/internal/version"
+	"github.com/civanmoreno/infraudit/internal/check"
+	"github.com/civanmoreno/infraudit/internal/version"
 )
 
 // Entry holds one check result for reporting.

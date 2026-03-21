@@ -1,4 +1,4 @@
-module github.com/ivan/infraudit
+module github.com/civanmoreno/infraudit
 
 go 1.24.1
 
