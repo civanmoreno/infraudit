@@ -16,11 +16,6 @@ func init() {
 	check.Register(&autoUpdates{})
 }
 
-func svcActive(name string) bool {
-	out, err := exec.Command("systemctl", "is-active", name).CombinedOutput()
-	return err == nil && strings.TrimSpace(string(out)) == "active"
-}
-
 // PKG-001
 type securityUpdates struct{}
 
@@ -161,12 +156,12 @@ func (c *autoUpdates) Description() string    { return "Verify unattended-upgrad
 
 func (c *autoUpdates) Run() check.Result {
 	// Check unattended-upgrades (Debian/Ubuntu)
-	if svcActive("unattended-upgrades") || svcActive("apt-daily-upgrade.timer") {
+	if check.ServiceActive("unattended-upgrades") || check.ServiceActive("apt-daily-upgrade.timer") {
 		return check.Result{Status: check.Pass, Message: "unattended-upgrades is active"}
 	}
 
 	// Check dnf-automatic (RHEL/Fedora)
-	if svcActive("dnf-automatic.timer") || svcActive("dnf-automatic-install.timer") {
+	if check.ServiceActive("dnf-automatic.timer") || check.ServiceActive("dnf-automatic-install.timer") {
 		return check.Result{Status: check.Pass, Message: "dnf-automatic is active"}
 	}
 

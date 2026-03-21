@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -22,11 +21,6 @@ func init() {
 	check.Register(&aidePaths{})
 }
 
-func svcActive(name string) bool {
-	out, err := exec.Command("systemctl", "is-active", name).CombinedOutput()
-	return err == nil && strings.TrimSpace(string(out)) == "active"
-}
-
 // LOG-001
 type syslogActive struct{}
 
@@ -38,7 +32,7 @@ func (c *syslogActive) Description() string    { return "Verify logging service 
 
 func (c *syslogActive) Run() check.Result {
 	for _, svc := range []string{"rsyslog", "syslog-ng", "systemd-journald"} {
-		if svcActive(svc) {
+		if check.ServiceActive(svc) {
 			return check.Result{Status: check.Pass, Message: svc + " is active"}
 		}
 	}
@@ -58,7 +52,7 @@ func (c *auditdRunning) Severity() check.Severity { return check.High }
 func (c *auditdRunning) Description() string    { return "Verify auditd is installed and active" }
 
 func (c *auditdRunning) Run() check.Result {
-	if svcActive("auditd") {
+	if check.ServiceActive("auditd") {
 		return check.Result{Status: check.Pass, Message: "auditd is active"}
 	}
 	return check.Result{
@@ -266,18 +260,13 @@ func (c *aidePaths) Run() check.Result {
 		}
 	}
 
-	f, err := os.Open(confPath)
+	data, err := os.ReadFile(confPath)
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read AIDE config"}
 	}
-	defer f.Close()
 
 	critical := []string{"/bin", "/sbin", "/lib", "/etc", "/boot"}
-	content := ""
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		content += scanner.Text() + "\n"
-	}
+	content := string(data)
 
 	var missing []string
 	for _, p := range critical {

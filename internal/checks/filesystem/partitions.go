@@ -2,7 +2,6 @@ package filesystem
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -59,7 +58,7 @@ func (c *tmpCleanup) Severity() check.Severity { return check.Low }
 func (c *tmpCleanup) Description() string    { return "Verify systemd-tmpfiles or tmpreaper cleans temporary files" }
 
 func (c *tmpCleanup) Run() check.Result {
-	if serviceActive("systemd-tmpfiles-clean.timer") {
+	if check.ServiceActive("systemd-tmpfiles-clean.timer") {
 		return check.Result{
 			Status:  check.Pass,
 			Message: "systemd-tmpfiles-clean.timer is active",
@@ -73,16 +72,3 @@ func (c *tmpCleanup) Run() check.Result {
 	}
 }
 
-func serviceActive(name string) bool {
-	// Import from services package not possible (circular), reimplement
-	out, err := execCommand("systemctl", "is-active", name)
-	return err == nil && strings.TrimSpace(out) == "active"
-}
-
-func execCommand(name string, args ...string) (string, error) {
-	cmd := execCommandFn(name, args...)
-	out, err := cmd.CombinedOutput()
-	return string(out), err
-}
-
-var execCommandFn = exec.Command

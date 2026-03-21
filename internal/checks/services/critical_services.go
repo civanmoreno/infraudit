@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -24,12 +23,12 @@ func (c *criticalServices) Run() check.Result {
 	var missing []string
 
 	// Check sshd
-	if !serviceActive("sshd") && !serviceActive("ssh") {
+	if !check.ServiceActive("sshd") && !check.ServiceActive("ssh") {
 		missing = append(missing, "sshd")
 	}
 
 	// Check intrusion prevention
-	if !serviceActive("fail2ban") && !serviceActive("crowdsec") {
+	if !check.ServiceActive("fail2ban") && !check.ServiceActive("crowdsec") {
 		missing = append(missing, "fail2ban/crowdsec")
 	}
 
@@ -45,9 +44,4 @@ func (c *criticalServices) Run() check.Result {
 		Status:  check.Pass,
 		Message: "Critical services (sshd, intrusion prevention) are active",
 	}
-}
-
-func serviceActive(name string) bool {
-	out, err := exec.Command("systemctl", "is-active", name).CombinedOutput()
-	return err == nil && strings.TrimSpace(string(out)) == "active"
 }

@@ -1,7 +1,6 @@
 package network
 
 import (
-	"os"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -20,8 +19,8 @@ func (c *ipForwarding) Severity() check.Severity { return check.Medium }
 func (c *ipForwarding) Description() string    { return "Verify IP forwarding is disabled unless the system is a router/gateway" }
 
 func (c *ipForwarding) Run() check.Result {
-	v4 := readSysctl("/proc/sys/net/ipv4/ip_forward")
-	v6 := readSysctl("/proc/sys/net/ipv6/conf/all/forwarding")
+	v4 := check.ReadSysctl("/proc/sys/net/ipv4/ip_forward")
+	v6 := check.ReadSysctl("/proc/sys/net/ipv6/conf/all/forwarding")
 
 	var issues []string
 	if v4 == "1" {
@@ -45,10 +44,3 @@ func (c *ipForwarding) Run() check.Result {
 	}
 }
 
-func readSysctl(path string) string {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(string(data))
-}

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/civanmoreno/infraudit/internal/check"
 	"github.com/civanmoreno/infraudit/internal/config"
@@ -56,6 +57,9 @@ func runAudit(cmd *cobra.Command, args []string) {
 	// Add CLI skip flags
 	cfg.Skip = append(cfg.Skip, skipFlag...)
 
+	// Store config globally so checks can access it
+	config.Set(cfg)
+
 	// Get checks
 	var checks []check.Check
 	if categoryFlag != "" {
@@ -101,6 +105,7 @@ func runAudit(cmd *cobra.Command, args []string) {
 	// Determine output writer
 	var w *os.File
 	if outputFlag != "" {
+		outputFlag = filepath.Clean(outputFlag)
 		f, err := os.Create(outputFlag)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Cannot create output file: %s\n", err)

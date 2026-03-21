@@ -20,7 +20,7 @@ func (c *ipv6Config) Severity() check.Severity { return check.Medium }
 func (c *ipv6Config) Description() string    { return "Verify IPv6 is either disabled or properly configured" }
 
 func (c *ipv6Config) Run() check.Result {
-	disableAll := readSysctl("/proc/sys/net/ipv6/conf/all/disable_ipv6")
+	disableAll := check.ReadSysctl("/proc/sys/net/ipv6/conf/all/disable_ipv6")
 
 	if disableAll == "1" {
 		return check.Result{
@@ -55,7 +55,7 @@ func (c *ipv6Config) Run() check.Result {
 	}
 
 	// Check if accept_ra is disabled to prevent rogue RA attacks
-	acceptRA := readSysctl("/proc/sys/net/ipv6/conf/all/accept_ra")
+	acceptRA := check.ReadSysctl("/proc/sys/net/ipv6/conf/all/accept_ra")
 	if acceptRA != "0" {
 		return check.Result{
 			Status:      check.Warn,

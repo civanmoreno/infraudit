@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
+	"github.com/civanmoreno/infraudit/internal/config"
 )
 
 func init() {
@@ -22,12 +24,22 @@ func (c *openPorts) Severity() check.Severity { return check.High }
 func (c *openPorts) Description() string    { return "List all listening TCP/UDP ports for review" }
 
 func (c *openPorts) Run() check.Result {
+	cfg := config.Get()
+	allowed := make(map[int]bool)
+	for _, p := range cfg.AllowedPorts {
+		allowed[p] = true
+	}
+
 	var listening []string
 
 	// Parse /proc/net/tcp and /proc/net/tcp6 for LISTEN state
 	for _, proto := range []string{"tcp", "tcp6"} {
 		ports := parseProcNet("/proc/net/" + proto)
 		for _, p := range ports {
+			port, _ := strconv.Atoi(p)
+			if allowed[port] {
+				continue
+			}
 			listening = append(listening, fmt.Sprintf("%s/%s", proto, p))
 		}
 	}
@@ -35,13 +47,13 @@ func (c *openPorts) Run() check.Result {
 	if len(listening) == 0 {
 		return check.Result{
 			Status:  check.Pass,
-			Message: "No listening TCP ports detected",
+			Message: "No unexpected listening TCP ports detected",
 		}
 	}
 
 	return check.Result{
 		Status:  check.Warn,
-		Message: fmt.Sprintf("Found %d listening ports: %s", len(listening), strings.Join(listening, ", ")),
+		Message: fmt.Sprintf("Found %d unexpected listening ports: %s", len(listening), strings.Join(listening, ", ")),
 		Details: map[string]string{"ports": strings.Join(listening, "\n")},
 	}
 }

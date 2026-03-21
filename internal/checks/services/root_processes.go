@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
+	"github.com/civanmoreno/infraudit/internal/config"
 )
 
 func init() {
@@ -38,6 +39,11 @@ var expectedRoot = map[string]bool{
 }
 
 func (c *rootProcesses) Run() check.Result {
+	// Add user-configured allowed root processes
+	for _, p := range config.Get().AllowedRootProcesses {
+		expectedRoot[p] = true
+	}
+
 	entries, err := os.ReadDir("/proc")
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /proc: " + err.Error()}

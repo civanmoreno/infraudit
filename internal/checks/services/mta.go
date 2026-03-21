@@ -26,7 +26,7 @@ func (c *mtaLocalOnly) Description() string    { return "Verify Postfix inet_int
 func (c *mtaLocalOnly) Run() check.Result {
 	val := postfixMainCfValue("inet_interfaces")
 	if val == "" {
-		if !serviceActive("postfix") {
+		if !check.ServiceActive("postfix") {
 			return check.Result{Status: check.Pass, Message: "Postfix is not running"}
 		}
 		return check.Result{
@@ -58,7 +58,7 @@ func (c *mtaOpenRelay) Severity() check.Severity { return check.Critical }
 func (c *mtaOpenRelay) Description() string    { return "Verify Postfix does not relay mail for untrusted networks" }
 
 func (c *mtaOpenRelay) Run() check.Result {
-	if !serviceActive("postfix") {
+	if !check.ServiceActive("postfix") {
 		return check.Result{Status: check.Pass, Message: "Postfix is not running"}
 	}
 

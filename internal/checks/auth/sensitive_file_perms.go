@@ -53,7 +53,7 @@ func (c *sensitiveFilePerms) Run() check.Result {
 		return check.Result{
 			Status:      check.Fail,
 			Message:     fmt.Sprintf("Insecure permissions: %s", strings.Join(bad, "; ")),
-			Remediation: "Fix with: chmod 644 /etc/passwd /etc/group && chmod 640 /etc/shadow",
+			Remediation: "Fix with: chmod 644 /etc/passwd /etc/group && chmod 640 /etc/shadow && chown root:shadow /etc/shadow",
 		}
 	}
 

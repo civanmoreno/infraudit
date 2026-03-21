@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -20,11 +19,6 @@ func init() {
 	check.Register(&userCrontabs{})
 }
 
-func svcActive(name string) bool {
-	out, err := exec.Command("systemctl", "is-active", name).CombinedOutput()
-	return err == nil && strings.TrimSpace(string(out)) == "active"
-}
-
 // CRON-001
 type cronRunning struct{}
 
@@ -35,7 +29,7 @@ func (c *cronRunning) Severity() check.Severity { return check.Low }
 func (c *cronRunning) Description() string    { return "Verify cron service is active" }
 
 func (c *cronRunning) Run() check.Result {
-	if svcActive("cron") || svcActive("crond") {
+	if check.ServiceActive("cron") || check.ServiceActive("crond") {
 		return check.Result{Status: check.Pass, Message: "Cron daemon is active"}
 	}
 	return check.Result{

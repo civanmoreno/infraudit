@@ -24,7 +24,7 @@ func (c *desktopEnv) Description() string    { return "Verify no GUI desktop env
 func (c *desktopEnv) Run() check.Result {
 	// Check if gdm, lightdm, or sddm is active
 	for _, dm := range []string{"gdm", "gdm3", "lightdm", "sddm"} {
-		if serviceActive(dm) {
+		if check.ServiceActive(dm) {
 			return check.Result{
 				Status:      check.Warn,
 				Message:     "Display manager '" + dm + "' is running on this server",
@@ -59,7 +59,7 @@ func (c *automount) Severity() check.Severity { return check.Medium }
 func (c *automount) Description() string    { return "Verify autofs is not running" }
 
 func (c *automount) Run() check.Result {
-	if serviceActive("autofs") {
+	if check.ServiceActive("autofs") {
 		return check.Result{
 			Status:      check.Warn,
 			Message:     "autofs is running",

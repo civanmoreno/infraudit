@@ -24,14 +24,6 @@ func init() {
 	check.Register(&bluetooth{})
 }
 
-func readSysctl(path string) string {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(string(data))
-}
-
 func moduleBlacklisted(mod string) bool {
 	// Check modprobe blacklist
 	out, err := exec.Command("modprobe", "-n", "--show-depends", mod).CombinedOutput()
@@ -79,7 +71,7 @@ func (c *coreDumps) Severity() check.Severity { return check.Medium }
 func (c *coreDumps) Description() string    { return "Verify core dumps are disabled" }
 
 func (c *coreDumps) Run() check.Result {
-	val := readSysctl("/proc/sys/kernel/core_pattern")
+	val := check.ReadSysctl("/proc/sys/kernel/core_pattern")
 	// Check if core_pattern pipes to nothing or is disabled
 	if strings.HasPrefix(val, "|") {
 		// Piped to a handler (like apport) — may be acceptable
@@ -108,7 +100,7 @@ func (c *aslr) Severity() check.Severity { return check.High }
 func (c *aslr) Description() string    { return "Verify ASLR is set to 2 (full randomization)" }
 
 func (c *aslr) Run() check.Result {
-	val := readSysctl("/proc/sys/kernel/randomize_va_space")
+	val := check.ReadSysctl("/proc/sys/kernel/randomize_va_space")
 	if val == "2" {
 		return check.Result{Status: check.Pass, Message: "ASLR is fully enabled (randomize_va_space=2)"}
 	}
@@ -128,7 +120,7 @@ func (c *dmesgRestrict) Severity() check.Severity { return check.Medium }
 func (c *dmesgRestrict) Description() string    { return "Verify kernel.dmesg_restrict = 1" }
 
 func (c *dmesgRestrict) Run() check.Result {
-	val := readSysctl("/proc/sys/kernel/dmesg_restrict")
+	val := check.ReadSysctl("/proc/sys/kernel/dmesg_restrict")
 	if val == "1" {
 		return check.Result{Status: check.Pass, Message: "dmesg is restricted to privileged users"}
 	}
@@ -148,7 +140,7 @@ func (c *ptraceScope) Severity() check.Severity { return check.Medium }
 func (c *ptraceScope) Description() string    { return "Verify kernel.yama.ptrace_scope >= 1" }
 
 func (c *ptraceScope) Run() check.Result {
-	val := readSysctl("/proc/sys/kernel/yama/ptrace_scope")
+	val := check.ReadSysctl("/proc/sys/kernel/yama/ptrace_scope")
 	if val == "" {
 		return check.Result{Status: check.Warn, Message: "Yama LSM not available"}
 	}

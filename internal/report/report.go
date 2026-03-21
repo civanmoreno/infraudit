@@ -389,6 +389,12 @@ func WriteYAML(w io.Writer, r *Report) error {
 		if e.Remediation != "" {
 			fmt.Fprintf(w, "    remediation: %s\n", yamlEscape(e.Remediation))
 		}
+		if len(e.Details) > 0 {
+			fmt.Fprintln(w, "    details:")
+			for k, v := range e.Details {
+				fmt.Fprintf(w, "      %s: %s\n", yamlEscape(k), yamlEscape(v))
+			}
+		}
 	}
 	return nil
 }

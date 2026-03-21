@@ -75,6 +75,21 @@ func loadFile(path string) (*Config, error) {
 	return &cfg, nil
 }
 
+var globalCfg *Config
+
+// Set stores the config for global access by checks.
+func Set(c *Config) {
+	globalCfg = c
+}
+
+// Get returns the globally stored config, or a zero config if none was set.
+func Get() *Config {
+	if globalCfg == nil {
+		return &Config{}
+	}
+	return globalCfg
+}
+
 // ShouldSkip returns true if the check ID or category should be skipped.
 func (c *Config) ShouldSkip(id, category string) bool {
 	for _, s := range c.Skip {

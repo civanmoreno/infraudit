@@ -230,7 +230,7 @@ func (c *tmpMount) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "/tmp is already a separate mount"}
 	}
 
-	if serviceActive("tmp.mount") {
+	if check.ServiceActive("tmp.mount") {
 		return check.Result{Status: check.Pass, Message: "tmp.mount is active"}
 	}
 
