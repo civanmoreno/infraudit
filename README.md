@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/checks-132-34d399?style=flat-square&logo=checkmarx&logoColor=white" alt="132 checks">
   <img src="https://img.shields.io/badge/categories-17-60a5fa?style=flat-square" alt="17 categories">
   <img src="https://img.shields.io/badge/go-1.24+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go 1.24+">
-  <img src="https://img.shields.io/badge/license-MIT-yellow?style=flat-square" alt="MIT License">
+  <img src="https://img.shields.io/badge/license-BSL--1.1-yellow?style=flat-square" alt="BSL 1.1 License">
   <img src="https://img.shields.io/github/v/release/civanmoreno/infraudit?style=flat-square&color=fbbf24" alt="Release">
 </p>
 
@@ -246,4 +246,6 @@ Full documentation: **[civanmoreno.github.io/infraudit](https://civanmoreno.gith
 
 ## License
 
-MIT
+[Business Source License 1.1](LICENSE)
+
+You can **use** infraudit freely to audit your own servers. You **cannot** fork, redistribute, resell, or offer it as a service. After 4 years each version converts to Apache 2.0.
