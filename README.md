@@ -1,18 +1,35 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/checks-132-34d399?style=flat-square&logo=checkmarx&logoColor=white" alt="132 checks">
+  <img src="https://img.shields.io/badge/categories-17-60a5fa?style=flat-square" alt="17 categories">
+  <img src="https://img.shields.io/badge/go-1.24+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go 1.24+">
+  <img src="https://img.shields.io/badge/license-MIT-yellow?style=flat-square" alt="MIT License">
+  <img src="https://img.shields.io/github/v/release/civanmoreno/infraudit?style=flat-square&color=fbbf24" alt="Release">
+</p>
+
 # infraudit
 
-Linux server security auditing from the command line.
+> Linux server security auditing from the command line.
 
-A single binary you drop on any Linux server to audit its security posture. Validates users, SSH, firewall, permissions, kernel hardening, containers, certificates, and 132 checks based on CIS Benchmarks, DISA STIG, and industry best practices.
+A single binary you drop on any Linux server to audit its security posture. No dependencies, no agents, no runtime — just copy and run. Validates **132 checks** across **17 categories** based on **CIS Benchmarks**, **DISA STIG**, and industry best practices.
 
-## Install
+<br>
 
-One command. Detects your server's architecture automatically:
+📖 **[Full Documentation](https://civanmoreno.github.io/infraudit/)** · 📋 **[Checks Reference](https://civanmoreno.github.io/infraudit/checks.html)** · ⚙️ **[Configuration Guide](https://civanmoreno.github.io/infraudit/configuration.html)**
+
+---
+
+## ⚡ Quick Start
 
 ```bash
+# Install (detects architecture automatically)
 curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh
+
+# Run full audit
+sudo infraudit audit
 ```
 
-### Build from source
+<details>
+<summary><strong>Build from source</strong></summary>
 
 Requires Go 1.24+:
 
@@ -22,7 +39,11 @@ cd infraudit
 go build -o infraudit .
 ```
 
-## Usage
+</details>
+
+---
+
+## 🔍 Usage
 
 ```bash
 # Full audit (requires root for most checks)
@@ -47,114 +68,13 @@ sudo infraudit audit --format yaml --output report.yaml
 infraudit list
 ```
 
-## Commands
+---
 
-| Command | Description |
-|---------|-------------|
-| `infraudit audit` | Run security checks and generate a report |
-| `infraudit list` | Show all available checks |
-| `infraudit completion` | Generate shell autocompletion (bash, zsh, fish) |
-
-## Audit flags
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--category` | *(all)* | Run checks for a single category |
-| `--format` | `console` | Output format: `console`, `json`, `yaml` |
-| `--output` | *(stdout)* | Write report to file |
-| `--profile` | *(none)* | Server profile: `web-server`, `db-server`, `container-host`, `minimal` |
-| `--skip` | *(none)* | Comma-separated check IDs to skip |
-
-## Categories
-
-infraudit organizes 132 checks into 17 categories:
-
-| Category | Prefix | Checks | Description |
-|----------|--------|--------|-------------|
-| `auth` | AUTH- | 8 | Users, SSH, sudoers, passwords |
-| `pam` | PAM- | 5 | Password quality, lockout, expiration |
-| `network` | NET- | 11 | Firewall, ports, DNS, SNMP |
-| `services` | SVC- | 13 | Daemons, NTP, MTA, desktop |
-| `filesystem` | FS- | 12 | Permissions, SUID, partitions |
-| `logging` | LOG- | 9 | Syslog, auditd, AIDE |
-| `packages` | PKG- | 4 | Updates, repos, kernel |
-| `hardening` | HARD- | 12 | Kernel params, ASLR, modules |
-| `boot` | BOOT- | 8 | GRUB, Secure Boot, SELinux/AppArmor |
-| `cron` | CRON- | 7 | Cron/at permissions, job review |
-| `crypto` | CRYPTO- | 9 | TLS, certificates, ciphers |
-| `secrets` | SEC- | 4 | Exposed credentials, history |
-| `container` | CTR- | 11 | Docker/Podman security |
-| `rlimit` | RLIM- | 7 | Resource limits, disk, inodes |
-| `nfs` | NFS- | 4 | NFS exports, Samba, rpcbind |
-| `malware` | MAL- | 4 | Rootkits, antimalware |
-| `backup` | BAK- | 4 | Backups, encryption, off-site |
-
-## Severity levels
-
-| Level | Meaning |
-|-------|---------|
-| **CRITICAL** | Exploitable vulnerability — immediate action required |
-| **HIGH** | Significant risk — fix soon |
-| **MEDIUM** | Best practice not applied |
-| **LOW** | Recommended improvement, low risk |
-| **INFO** | Informational, no action needed |
-
-## Exit codes
-
-| Code | Meaning |
-|------|---------|
-| `0` | All checks passed |
-| `1` | Warnings found (no failures) |
-| `2` | Failures or errors found |
-
-Use exit codes in CI/CD pipelines to gate deployments:
-
-```bash
-sudo infraudit audit --format json --output report.json
-if [ $? -eq 2 ]; then
-    echo "Security failures found — blocking deployment"
-    exit 1
-fi
-```
-
-## Server profiles
-
-Profiles skip categories not relevant to your server role:
-
-| Profile | Skips | Allowed Ports |
-|---------|-------|---------------|
-| `web-server` | container, nfs | 22, 80, 443 |
-| `db-server` | container, nfs | 22, 3306, 5432, 6379, 27017 |
-| `container-host` | nfs | 22, 80, 443, 2376 |
-| `minimal` | container, nfs, malware, backup | 22 |
-
-## Configuration
-
-Create a JSON config file for persistent settings:
-
-```jsonc
-// ~/.infraudit.json
-{
-  "skip": ["HARD-007", "SVC-012"],
-  "skip_categories": ["container", "nfs"],
-  "allowed_ports": [22, 80, 443],
-  "allowed_root_processes": ["sshd", "nginx", "fail2ban"]
-}
-```
-
-Config file locations (first found wins):
-
-1. `/etc/infraudit/config.json` — system-wide
-2. `~/.infraudit.json` — user-level
-3. `./.infraudit.json` — directory-level
-
-## Output formats
-
-**Console** — colored, grouped by category, sorted by severity:
+## 📊 Sample Output
 
 ```
   infraudit v0.1.0 — Security Audit Report
-  ────────────────────────────────────────────
+  ────────────────────────────────────────────────────
 
   AUTH — Users & Authentication   5 passed  2 warn  1 fail
   ──────────────────────────────────────────────────────────
@@ -167,40 +87,162 @@ Config file locations (first found wins):
 
   ══════════════════════════════════════════════════════════
   SUMMARY
-  ████████████████████████████████████████  5/8 checks
+  █████████████████████████████████████████  5/8 checks
   ✓ 5 Passed    ! 2 Warnings    ✗ 1 Failures    0 Errors
 ```
 
-**JSON** — for CI/CD, monitoring, and automation:
+---
+
+## 🛡️ Categories
+
+| Category | Prefix | Checks | What it audits |
+|:---------|:------:|:------:|:---------------|
+| **auth** | `AUTH-` | 8 | Users, SSH, sudoers, passwords |
+| **pam** | `PAM-` | 5 | Password quality, lockout, expiration |
+| **network** | `NET-` | 11 | Firewall, ports, DNS, SNMP |
+| **services** | `SVC-` | 13 | Daemons, NTP, MTA, desktop |
+| **filesystem** | `FS-` | 12 | Permissions, SUID, partitions |
+| **logging** | `LOG-` | 9 | Syslog, auditd, AIDE |
+| **packages** | `PKG-` | 4 | Updates, repos, kernel |
+| **hardening** | `HARD-` | 12 | Kernel params, ASLR, modules |
+| **boot** | `BOOT-` | 8 | GRUB, Secure Boot, SELinux/AppArmor |
+| **cron** | `CRON-` | 7 | Cron/at permissions, job review |
+| **crypto** | `CRYPTO-` | 9 | TLS, certificates, ciphers |
+| **secrets** | `SEC-` | 4 | Exposed credentials, history |
+| **container** | `CTR-` | 11 | Docker/Podman security |
+| **rlimit** | `RLIM-` | 7 | Resource limits, disk, inodes |
+| **nfs** | `NFS-` | 4 | NFS exports, Samba, rpcbind |
+| **malware** | `MAL-` | 4 | Rootkits, antimalware |
+| **backup** | `BAK-` | 4 | Backups, encryption, off-site |
+
+> 📋 See the **[Checks Reference](https://civanmoreno.github.io/infraudit/checks.html)** for detailed descriptions, security impact, and remediation for every check.
+
+---
+
+## 🎯 Severity Levels
+
+| Level | Meaning | Response |
+|:------|:--------|:---------|
+| 🔴 **CRITICAL** | Exploitable vulnerability | Immediate action |
+| 🟠 **HIGH** | Significant risk | Fix within days |
+| 🟡 **MEDIUM** | Best practice not applied | Fix within weeks |
+| 🔵 **LOW** | Recommended improvement | Backlog |
+| ⚪ **INFO** | Informational | No action needed |
+
+---
+
+## 🖥️ Commands & Flags
+
+### Commands
+
+| Command | Description |
+|:--------|:------------|
+| `infraudit audit` | Run security checks and generate a report |
+| `infraudit list` | Show all available checks |
+| `infraudit completion` | Generate shell autocompletion (bash, zsh, fish) |
+
+### Audit Flags
+
+| Flag | Default | Description |
+|:-----|:--------|:------------|
+| `--category` | *(all)* | Run checks for a single category |
+| `--format` | `console` | Output format: `console`, `json`, `yaml` |
+| `--output` | *(stdout)* | Write report to file |
+| `--profile` | *(none)* | Server profile to apply |
+| `--skip` | *(none)* | Comma-separated check IDs to skip |
+
+---
+
+## 📦 Server Profiles
+
+Pre-built configurations for common server roles:
+
+| Profile | Skipped categories | Allowed Ports |
+|:--------|:-------------------|:--------------|
+| `web-server` | container, nfs | 22, 80, 443 |
+| `db-server` | container, nfs | 22, 3306, 5432, 6379, 27017 |
+| `container-host` | nfs | 22, 80, 443, 2376 |
+| `minimal` | container, nfs, malware, backup | 22 |
+
+```bash
+sudo infraudit audit --profile web-server
+```
+
+---
+
+## ⚙️ Configuration
+
+Create a config file for persistent settings:
+
+```jsonc
+// ~/.infraudit.json
+{
+  "skip": ["HARD-007", "SVC-012"],
+  "skip_categories": ["container", "nfs"],
+  "allowed_ports": [22, 80, 443],
+  "allowed_root_processes": ["sshd", "nginx", "fail2ban"]
+}
+```
+
+Config file search order:
+
+| Priority | Path | Scope |
+|:---------|:-----|:------|
+| 1 | `/etc/infraudit/config.json` | System-wide |
+| 2 | `~/.infraudit.json` | User |
+| 3 | `./.infraudit.json` | Directory |
+
+> ⚙️ Full details in the **[Configuration Guide](https://civanmoreno.github.io/infraudit/configuration.html)**
+
+---
+
+## 🔄 CI/CD Integration
+
+Use exit codes to gate deployments:
+
+| Code | Meaning | Action |
+|:-----|:--------|:-------|
+| `0` | All checks passed | Proceed |
+| `1` | Warnings found | Review recommended |
+| `2` | Failures or errors | Block deployment |
 
 ```bash
 sudo infraudit audit --format json --output report.json
+if [ $? -eq 2 ]; then
+    echo "Security failures — blocking deployment"
+    exit 1
+fi
 ```
 
-**YAML** — for config management and GitOps:
+> 📊 See **[Output & Reports](https://civanmoreno.github.io/infraudit/output.html)** for JSON/YAML format details.
 
-```bash
-sudo infraudit audit --format yaml --output report.yaml
-```
+---
 
-## Standards coverage
+## 📏 Standards Coverage
 
 | Standard | Coverage |
-|----------|----------|
+|:---------|:---------|
 | CIS Benchmark Level 1 | ~90% of applicable controls |
 | CIS Benchmark Level 2 | ~70% of applicable controls |
 | DISA STIG | Key findings covered |
 | Lynis categories | All major categories mapped |
 
-## Documentation
+---
 
-Full documentation available at the [project docs](https://civanmoreno.github.io/infraudit/):
+## 📖 Documentation
 
-- [Getting Started](https://civanmoreno.github.io/infraudit/getting-started.html)
-- [Checks Reference](https://civanmoreno.github.io/infraudit/checks.html) — detailed description and security impact of each check
-- [Configuration](https://civanmoreno.github.io/infraudit/configuration.html) — CLI flags, config files, profiles
-- [Output & Reports](https://civanmoreno.github.io/infraudit/output.html) — format details and CI/CD integration
-- [Architecture](https://civanmoreno.github.io/infraudit/architecture.html)
+Full documentation: **[civanmoreno.github.io/infraudit](https://civanmoreno.github.io/infraudit/)**
+
+| Page | Description |
+|:-----|:------------|
+| [Getting Started](https://civanmoreno.github.io/infraudit/getting-started.html) | Installation, basic usage, CLI reference |
+| [Checks Reference](https://civanmoreno.github.io/infraudit/checks.html) | All 132 checks with security impact and remediation |
+| [Configuration](https://civanmoreno.github.io/infraudit/configuration.html) | Flags, config files, profiles |
+| [Output & Reports](https://civanmoreno.github.io/infraudit/output.html) | Console, JSON, YAML formats and CI/CD integration |
+| [Architecture](https://civanmoreno.github.io/infraudit/architecture.html) | Internal design and check interface |
+| [Roadmap](https://civanmoreno.github.io/infraudit/roadmap.html) | Development phases and progress |
+
+---
 
 ## License
 
