@@ -32,21 +32,42 @@
             <p class="tagline">Linux server security auditing from the command line.</p>
             <p class="description">
                 A single binary you drop on any Linux server to audit its security posture.
-                Validates users, SSH, firewall, permissions, kernel hardening, containers, certificates,
-                and 100+ checks based on CIS Benchmarks, DISA STIG, and industry best practices.
+                No dependencies, no agents, no runtime — just copy and run. Validates
+                <strong>132 checks</strong> across <strong>17 categories</strong> based on
+                CIS Benchmarks, DISA STIG, and industry best practices.
             </p>
         </section>
 
+        <!-- ── Quick Start ── -->
+        <section class="quickstart">
+            <h2>Quick Start</h2>
+            <pre><code><span class="comment"># Install (detects architecture automatically)</span>
+curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh
+
+<span class="comment"># Run full audit</span>
+sudo infraudit audit
+
+<span class="comment"># Audit a specific category</span>
+sudo infraudit audit --category auth
+
+<span class="comment"># Use a server profile</span>
+sudo infraudit audit --profile web-server
+
+<span class="comment"># Export as JSON for CI/CD</span>
+sudo infraudit audit --format json --output report.json</code></pre>
+        </section>
+
+        <!-- ── Features ── -->
         <section class="features">
             <h2>Features</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <h3>17 Audit Categories</h3>
-                    <p>From SSH and PAM to Docker containers and TLS certificates — comprehensive server coverage.</p>
+                    <h3>132 Security Checks</h3>
+                    <p>Each check includes severity, detailed findings, and the exact command to remediate.</p>
                 </div>
                 <div class="feature-card">
-                    <h3>132 Security Checks</h3>
-                    <p>Each check includes severity level, detailed findings, and actionable remediation steps.</p>
+                    <h3>17 Audit Categories</h3>
+                    <p>From SSH and PAM to Docker containers and TLS certificates — comprehensive server coverage.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Standards Based</h3>
@@ -54,11 +75,11 @@
                 </div>
                 <div class="feature-card">
                     <h3>Single Binary</h3>
-                    <p>Written in Go. No dependencies, no runtime, no agents. Just copy and run.</p>
+                    <p>Written in Go. No dependencies, no runtime, no agents. Just copy and run on any Linux server.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Multiple Output Formats</h3>
-                    <p>Console with colors, JSON for pipelines, YAML for config management integration.</p>
+                    <p>Console with colors, JSON for CI/CD pipelines, YAML for config management and GitOps.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Server Profiles</h3>
@@ -67,63 +88,240 @@
             </div>
         </section>
 
-        <section class="quickstart">
-            <h2>Quick Start</h2>
-            <pre><code><span class="comment"># Install (detects architecture automatically)</span>
-curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh
-
-<span class="comment"># Run full audit (requires root for most checks)</span>
-sudo ./infraudit audit
-
-<span class="comment"># Run a specific category</span>
-sudo ./infraudit audit --category auth
-
-<span class="comment"># Use a server profile</span>
-sudo ./infraudit audit --profile web-server
-
-<span class="comment"># Skip checks you've accepted</span>
-sudo ./infraudit audit --skip HARD-007,SVC-012
-
-<span class="comment"># List all 132 available checks</span>
-./infraudit list
-
-<span class="comment"># Export as JSON for CI/CD</span>
-sudo ./infraudit audit --format json --output report.json
-
-<span class="comment"># Export as YAML</span>
-sudo ./infraudit audit --format yaml --output report.yaml</code></pre>
+        <!-- ── What it audits ── -->
+        <section>
+            <h2>What It Audits</h2>
+            <p>infraudit inspects every layer of your server's security:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Checks</th>
+                        <th>What it reviews</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>AUTH</strong></td>
+                        <td>8</td>
+                        <td>SSH root login, password auth, UID 0 accounts, empty passwords, sudoers NOPASSWD, shadow file permissions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PAM</strong></td>
+                        <td>5</td>
+                        <td>Password quality (pam_pwquality), reuse prevention, account lockout (pam_faillock), expiration policies</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NET</strong></td>
+                        <td>11</td>
+                        <td>Firewall active, open ports, IP forwarding, bind addresses, DNS/DNSSEC/DoT, SNMP v1/v2c, default community strings</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SVC</strong></td>
+                        <td>13</td>
+                        <td>Insecure services (telnet/rsh), SSH ciphers, NTP sync, fail2ban/crowdsec, MTA open relay, desktop environment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>FS</strong></td>
+                        <td>12</td>
+                        <td>SUID/SGID binaries, world-writable files, sticky bit, mount options (noexec/nosuid), /dev/shm, partitions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LOG</strong></td>
+                        <td>9</td>
+                        <td>Syslog/journald, auditd rules, log rotation, log permissions, AIDE file integrity monitoring</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PKG</strong></td>
+                        <td>4</td>
+                        <td>Pending security updates, HTTPS repos, kernel updates, automatic security patches</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HARD</strong></td>
+                        <td>12</td>
+                        <td>ASLR, core dumps, ptrace, dmesg restrict, kernel modules (USB, wireless, firewire), bluetooth</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BOOT</strong></td>
+                        <td>8</td>
+                        <td>GRUB password, bootloader permissions, Secure Boot, SELinux/AppArmor enforcing, unconfined processes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CRON</strong></td>
+                        <td>7</td>
+                        <td>Crontab permissions, cron directories, cron.allow/deny whitelist, suspicious jobs (curl/wget/nc in cron)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CRYPTO</strong></td>
+                        <td>9</td>
+                        <td>Expired certificates, TLS 1.0/1.1, weak ciphers (RC4/DES/3DES), private key permissions, MD5 password hashes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SEC</strong></td>
+                        <td>4</td>
+                        <td>Secrets in env vars, passwords in bash_history, world-readable credential files (.pgpass, .my.cnf, .aws/credentials)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CTR</strong></td>
+                        <td>11</td>
+                        <td>Docker socket permissions, containers as root, privileged mode, resource limits, content trust, ICC, logging</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RLIM</strong></td>
+                        <td>7</td>
+                        <td>Open files limit, nproc (fork bomb protection), disk usage >85%, inode exhaustion</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NFS</strong></td>
+                        <td>4</td>
+                        <td>NFS world exports, no_root_squash, Samba guest access, rpcbind when unused</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MAL</strong></td>
+                        <td>4</td>
+                        <td>rkhunter/chkrootkit installed, scheduled scans, ClamAV, malware definitions up to date</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BAK</strong></td>
+                        <td>4</td>
+                        <td>Backup schedule exists, backups encrypted, backup permissions, off-site/off-host backup</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>See the <a href="checks.html">Checks Reference</a> for detailed descriptions, security impact, and remediation for every check.</p>
         </section>
 
-        <section class="severity-table">
+        <!-- ── Where to run ── -->
+        <section>
+            <h2>Where You Can Run It</h2>
+            <p>Any Linux server with root access:</p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>VPS Providers</h3>
+                    <p>DigitalOcean, Linode, Vultr, Hetzner, OVH, Contabo</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Cloud</h3>
+                    <p>AWS EC2, GCP Compute Engine, Azure VMs, Oracle Cloud</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Bare Metal</h3>
+                    <p>Dedicated servers, colocation, on-premise datacenters</p>
+                </div>
+                <div class="feature-card">
+                    <h3>ARM Servers</h3>
+                    <p>AWS Graviton, Oracle Ampere, Raspberry Pi, Apple Silicon VMs</p>
+                </div>
+            </div>
+            <p><strong>Supported distros:</strong> Ubuntu, Debian, RHEL, CentOS, Fedora, AlmaLinux, Rocky Linux, and any systemd-based distribution.</p>
+        </section>
+
+        <!-- ── Output ── -->
+        <section>
+            <h2>Sample Output</h2>
+            <pre><code>  <span style="color:#34d399;font-weight:bold">infraudit v1.1.0 — Security Audit Report</span>
+  <span style="color:#6b7280">────────────────────────────────────────────────────</span>
+
+  <span style="color:#60a5fa;font-weight:bold">AUTH</span> — <span style="font-weight:bold">Users &amp; Authentication</span>   <span style="color:#34d399">5 passed</span>  <span style="color:#fbbf24">2 warn</span>  <span style="color:#f87171">1 fail</span>
+  <span style="color:#6b7280">──────────────────────────────────────────────────────────────</span>
+  <span style="color:#f87171">✗</span> <span style="color:#f87171;font-weight:bold"> FAIL  </span> <span style="color:#6b7280">AUTH-001</span>   <span style="color:#f87171;font-weight:bold">CRITICAL</span> PermitRootLogin is set to 'yes'
+         <span style="color:#6b7280">↳ Set 'PermitRootLogin no' in /etc/ssh/sshd_config</span>
+  <span style="color:#fbbf24">!</span> <span style="color:#fbbf24;font-weight:bold"> WARN  </span> <span style="color:#6b7280">AUTH-006</span>   <span style="color:#fbbf24">HIGH</span>     Found 2 NOPASSWD entries in sudoers
+         <span style="color:#6b7280">↳ Review NOPASSWD entries and remove unnecessary ones</span>
+  <span style="color:#34d399">✓</span> <span style="color:#34d399;font-weight:bold"> PASS  </span> <span style="color:#6b7280">AUTH-003</span>   <span style="color:#f87171;font-weight:bold">CRITICAL</span> Only root has UID 0
+  <span style="color:#34d399">✓</span> <span style="color:#34d399;font-weight:bold"> PASS  </span> <span style="color:#6b7280">AUTH-007</span>   <span style="color:#fbbf24">HIGH</span>     Permissions correct
+
+  <span style="color:#6b7280">══════════════════════════════════════════════════════════════</span>
+  <span style="font-weight:bold">SUMMARY</span>
+
+  <span style="color:#34d399">█████████████████████████</span><span style="color:#fbbf24">██████████</span><span style="color:#f87171">█████</span>  <span style="font-weight:bold">5</span>/8 checks
+
+  <span style="color:#34d399">✓ 5 Passed</span>    <span style="color:#fbbf24">! 2 Warnings</span>    <span style="color:#f87171">✗ 1 Failures</span>    0 Errors
+  <span style="color:#6b7280">══════════════════════════════════════════════════════════════</span></code></pre>
+            <p>Also available in <strong>JSON</strong> and <strong>YAML</strong>. See <a href="output.html">Output &amp; Reports</a> for details.</p>
+        </section>
+
+        <!-- ── Severity ── -->
+        <section>
             <h2>Severity Levels</h2>
             <table>
                 <thead>
                     <tr>
                         <th>Level</th>
-                        <th>Meaning</th>
+                        <th>Risk</th>
+                        <th>Response Time</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="severity-critical">
+                    <tr>
                         <td><span class="badge critical">CRITICAL</span></td>
-                        <td>Exploitable vulnerability — immediate action required</td>
+                        <td>Exploitable vulnerability — attacker can gain access or full system control</td>
+                        <td>Immediate</td>
                     </tr>
-                    <tr class="severity-high">
+                    <tr>
                         <td><span class="badge high">HIGH</span></td>
-                        <td>Significant risk — fix soon</td>
+                        <td>Significant risk — may enable privilege escalation or data exposure</td>
+                        <td>Within days</td>
                     </tr>
-                    <tr class="severity-medium">
+                    <tr>
                         <td><span class="badge medium">MEDIUM</span></td>
-                        <td>Best practice not applied</td>
+                        <td>Security best practice not applied — increases overall risk</td>
+                        <td>Within weeks</td>
                     </tr>
-                    <tr class="severity-low">
+                    <tr>
                         <td><span class="badge low">LOW</span></td>
-                        <td>Recommended improvement, low risk</td>
+                        <td>Recommended improvement — defense-in-depth measure</td>
+                        <td>Backlog</td>
                     </tr>
-                    <tr class="severity-info">
+                    <tr>
                         <td><span class="badge info">INFO</span></td>
-                        <td>Informational, no action needed</td>
+                        <td>Informational — no action needed</td>
+                        <td>None</td>
                     </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ── Exit codes ── -->
+        <section>
+            <h2>Exit Codes</h2>
+            <p>For scripting and CI/CD pipeline integration:</p>
+            <table>
+                <thead>
+                    <tr><th>Code</th><th>Meaning</th><th>CI/CD Action</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>0</code></td>
+                        <td>All checks passed</td>
+                        <td>Proceed — system meets security requirements</td>
+                    </tr>
+                    <tr>
+                        <td><code>1</code></td>
+                        <td>Warnings found (no failures)</td>
+                        <td>Review recommended before production</td>
+                    </tr>
+                    <tr>
+                        <td><code>2</code></td>
+                        <td>Failures or errors found</td>
+                        <td>Block deployment — resolve issues first</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ── Standards ── -->
+        <section>
+            <h2>Standards Coverage</h2>
+            <table>
+                <thead>
+                    <tr><th>Standard</th><th>Coverage</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>CIS Benchmark Level 1</td><td>~90% of applicable controls</td></tr>
+                    <tr><td>CIS Benchmark Level 2</td><td>~70% of applicable controls</td></tr>
+                    <tr><td>DISA STIG</td><td>Key findings covered</td></tr>
+                    <tr><td>Lynis categories</td><td>All major categories mapped</td></tr>
                 </tbody>
             </table>
         </section>
