@@ -73,7 +73,7 @@ infraudit list
 ## 📊 Sample Output
 
 ```
-  infraudit v0.1.0 — Security Audit Report
+  infraudit v1.1.0 — Security Audit Report
   ────────────────────────────────────────────────────
 
   AUTH — Users & Authentication   5 passed  2 warn  1 fail
