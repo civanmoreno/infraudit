@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -22,20 +25,60 @@ jobs:
       - name: Test
         run: go test ./...
 
+      - name: Vet
+        run: go vet ./...
+
       - name: Verify binary
         run: ./infraudit --version
 
       - name: Verify checks registered
         run: ./infraudit list | tail -1
 
-  lint:
+  release:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-go@v5
         with:
           go-version: '1.24'
 
-      - name: Vet
-        run: go vet ./...
+      - name: Get version from source
+        id: version
+        run: |
+          VERSION=$(grep 'Version =' internal/version/version.go | cut -d'"' -f2)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build linux/amd64
+        env:
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: 0
+        run: go build -ldflags="-s -w" -o dist/infraudit-linux-amd64 .
+
+      - name: Build linux/arm64
+        env:
+          GOOS: linux
+          GOARCH: arm64
+          CGO_ENABLED: 0
+        run: go build -ldflags="-s -w" -o dist/infraudit-linux-arm64 .
+
+      - name: Generate checksums
+        working-directory: dist
+        run: sha256sum infraudit-* > checksums.txt
+
+      - name: Create or update release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: infraudit v${{ steps.version.outputs.VERSION }}
+          generate_release_notes: true
+          make_latest: true
+          files: |
+            dist/infraudit-linux-amd64
+            dist/infraudit-linux-arm64
+            dist/checksums.txt
