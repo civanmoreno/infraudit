@@ -49,7 +49,7 @@
                 <tr>
                     <td><code>--category</code></td>
                     <td><em>(all)</em></td>
-                    <td>Run checks for a single category</td>
+                    <td>Filter by category (comma-separated: auth,network,crypto)</td>
                     <td><code>--category auth</code></td>
                 </tr>
                 <tr>
@@ -81,6 +81,30 @@
                     <td><code>0</code></td>
                     <td>Run checks in parallel with N workers (0=sequential)</td>
                     <td><code>--parallel 4</code></td>
+                </tr>
+                <tr>
+                    <td><code>-q, --quiet</code></td>
+                    <td><code>false</code></td>
+                    <td>Suppress progress output (auto-disabled in pipes)</td>
+                    <td><code>--quiet</code></td>
+                </tr>
+                <tr>
+                    <td><code>--severity-min</code></td>
+                    <td><em>(none)</em></td>
+                    <td>Show only results at or above this severity level</td>
+                    <td><code>--severity-min high</code></td>
+                </tr>
+                <tr>
+                    <td><code>--check</code></td>
+                    <td><em>(none)</em></td>
+                    <td>Run a single check by ID</td>
+                    <td><code>--check AUTH-001</code></td>
+                </tr>
+                <tr>
+                    <td><code>--ignore-errors</code></td>
+                    <td><code>false</code></td>
+                    <td>Don't count errors toward exit code 2</td>
+                    <td><code>--ignore-errors</code></td>
                 </tr>
                 <tr>
                     <td><code>-h, --help</code></td>

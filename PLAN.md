@@ -253,6 +253,20 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] SBOM generation (anchore/sbom-action)
 - [x] Release artifact signing (cosign/Sigstore)
 
+### Phase 23: CLI UX Improvements ✅
+
+- [x] Auto-disable progress indicator when stderr is not a TTY (pipe-safe)
+- [x] ANSI escape `\033[2K` for clean line clearing
+- [x] `--quiet` / `-q` flag to suppress progress output
+- [x] `--category` now supports comma-separated values (auth,network,crypto)
+- [x] `--check ID` to run a single check by ID
+- [x] `--severity-min` to filter displayed results (low,medium,high,critical)
+- [x] `--ignore-errors` to not count errors toward exit code 2
+- [x] Duration displayed in summary ("Completed in 12.3s") and JSON/YAML
+- [x] `list` command: sorted by category+ID, `--category`, `--severity`, `--format json`
+- [x] New `categories` subcommand with check counts and JSON output
+- [x] `ParseSeverity()`, `ByCategories()`, `ByID()` added to check package
+
 ## Check Categories
 
 | Category | Prefix | Description |

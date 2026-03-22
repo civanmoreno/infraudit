@@ -31,11 +31,12 @@ type Report struct {
 
 // Summary holds aggregate counts.
 type Summary struct {
-	Total    int `json:"total" yaml:"total"`
-	Passed   int `json:"passed" yaml:"passed"`
-	Warnings int `json:"warnings" yaml:"warnings"`
-	Failures int `json:"failures" yaml:"failures"`
-	Errors   int `json:"errors" yaml:"errors"`
+	Total    int     `json:"total" yaml:"total"`
+	Passed   int     `json:"passed" yaml:"passed"`
+	Warnings int     `json:"warnings" yaml:"warnings"`
+	Failures int     `json:"failures" yaml:"failures"`
+	Errors   int     `json:"errors" yaml:"errors"`
+	Duration float64 `json:"duration_seconds,omitempty" yaml:"duration_seconds,omitempty"`
 }
 
 // NewEntry creates a report entry from a check and its result.
@@ -359,6 +360,9 @@ func writeSummaryBox(w io.Writer, r *Report) {
 	fmt.Fprintf(w, "    %s! %d Warnings%s", yellow, s.Warnings, rst)
 	fmt.Fprintf(w, "    %s✗ %d Failures%s", red, s.Failures, rst)
 	fmt.Fprintf(w, "    %s? %d Errors%s\n", magenta, s.Errors, rst)
+	if s.Duration > 0 {
+		fmt.Fprintf(w, "\n  %sCompleted in %.1fs%s\n", dim, s.Duration, rst)
+	}
 	fmt.Fprintf(w, "  %s%s%s\n", dim, strings.Repeat("═", 78), rst)
 	fmt.Fprintln(w)
 }
@@ -378,6 +382,9 @@ func WriteYAML(w io.Writer, r *Report) error {
 	fmt.Fprintf(w, "  warnings: %d\n", r.Summary.Warnings)
 	fmt.Fprintf(w, "  failures: %d\n", r.Summary.Failures)
 	fmt.Fprintf(w, "  errors: %d\n", r.Summary.Errors)
+	if r.Summary.Duration > 0 {
+		fmt.Fprintf(w, "  duration_seconds: %.1f\n", r.Summary.Duration)
+	}
 	fmt.Fprintln(w, "checks:")
 	for _, e := range r.Entries {
 		fmt.Fprintf(w, "  - id: %s\n", e.ID)

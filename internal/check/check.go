@@ -1,6 +1,9 @@
 package check
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Severity indicates the risk level of a check finding.
 type Severity int
@@ -71,6 +74,24 @@ type Check interface {
 	Severity() Severity
 	Description() string
 	Run() Result
+}
+
+// ParseSeverity converts a string to a Severity value. Returns -1 if invalid.
+func ParseSeverity(s string) Severity {
+	switch strings.ToUpper(s) {
+	case "INFO":
+		return Info
+	case "LOW":
+		return Low
+	case "MEDIUM":
+		return Medium
+	case "HIGH":
+		return High
+	case "CRITICAL":
+		return Critical
+	default:
+		return Severity(-1)
+	}
 }
 
 // Summary provides a human-readable one-liner for a check result.

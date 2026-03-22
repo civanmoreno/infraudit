@@ -37,6 +37,35 @@ func ByCategory(category string) []Check {
 	return out
 }
 
+// ByCategories returns checks matching any of the given categories.
+func ByCategories(categories []string) []Check {
+	mu.Lock()
+	defer mu.Unlock()
+	set := make(map[string]bool, len(categories))
+	for _, c := range categories {
+		set[c] = true
+	}
+	var out []Check
+	for _, c := range registry {
+		if set[c.Category()] {
+			out = append(out, c)
+		}
+	}
+	return out
+}
+
+// ByID returns the check with the given ID, or nil if not found.
+func ByID(id string) Check {
+	mu.Lock()
+	defer mu.Unlock()
+	for _, c := range registry {
+		if c.ID() == id {
+			return c
+		}
+	}
+	return nil
+}
+
 // Categories returns a sorted list of unique category names.
 func Categories() []string {
 	mu.Lock()

@@ -59,8 +59,11 @@ docker run --rm --privileged -v /:/host:ro infraudit audit
 # Full audit (requires root for most checks)
 sudo infraudit audit
 
-# Audit a specific category
-sudo infraudit audit --category auth
+# Audit specific categories (comma-separated)
+sudo infraudit audit --category auth,network,crypto
+
+# Run a single check
+sudo infraudit audit --check AUTH-001
 
 # Use a server profile
 sudo infraudit audit --profile web-server
@@ -71,14 +74,21 @@ sudo infraudit audit --skip HARD-007,SVC-012
 # Export as JSON
 sudo infraudit audit --format json --output report.json
 
-# Export as YAML
-sudo infraudit audit --format yaml --output report.yaml
+# Show only HIGH and CRITICAL findings
+sudo infraudit audit --severity-min high
 
-# Run checks in parallel (4 workers)
-sudo infraudit audit --parallel 4
+# Run checks in parallel (4 workers), quiet mode
+sudo infraudit audit --parallel 4 --quiet
 
-# List all available checks
-infraudit list
+# Ignore permission errors in exit code
+sudo infraudit audit --ignore-errors
+
+# List checks (with filters)
+infraudit list --category auth --severity high
+infraudit list --format json
+
+# Show available categories
+infraudit categories
 ```
 
 ---
@@ -151,19 +161,24 @@ infraudit list
 | Command | Description |
 |:--------|:------------|
 | `infraudit audit` | Run security checks and generate a report |
-| `infraudit list` | Show all available checks |
+| `infraudit list` | Show all available checks (filterable) |
+| `infraudit categories` | Show available categories with check counts |
 | `infraudit completion` | Generate shell autocompletion (bash, zsh, fish) |
 
 ### Audit Flags
 
 | Flag | Default | Description |
 |:-----|:--------|:------------|
-| `--category` | *(all)* | Run checks for a single category |
+| `--category` | *(all)* | Filter by categories (comma-separated: `auth,network`) |
+| `--check` | *(none)* | Run a single check by ID (`AUTH-001`) |
 | `--format` | `console` | Output format: `console`, `json`, `yaml` |
 | `--output` | *(stdout)* | Write report to file |
 | `--profile` | *(none)* | Server profile to apply |
 | `--skip` | *(none)* | Comma-separated check IDs to skip |
-| `--parallel` | `0` | Run checks in parallel with N workers (0=sequential) |
+| `--severity-min` | *(none)* | Show only results at or above this severity |
+| `--parallel` | `0` | Run checks in parallel with N workers |
+| `-q, --quiet` | `false` | Suppress progress output |
+| `--ignore-errors` | `false` | Don't count errors toward exit code 2 |
 
 ---
 

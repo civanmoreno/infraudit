@@ -54,6 +54,7 @@ docker run --rm --privileged -v /:/host:ro infraudit audit</code></pre>
             <tbody>
                 <tr><td><code>infraudit audit</code></td><td>Run security checks and generate a report</td></tr>
                 <tr><td><code>infraudit list</code></td><td>Show all available checks in a table</td></tr>
+                <tr><td><code>infraudit categories</code></td><td>Show available categories with check counts</td></tr>
                 <tr><td><code>infraudit completion</code></td><td>Generate shell autocompletion (bash, zsh, fish, powershell)</td></tr>
             </tbody>
         </table>
@@ -129,7 +130,7 @@ sudo infraudit audit --profile minimal</code></pre>
                 <tr>
                     <td><code>--category &lt;name&gt;</code></td>
                     <td><em>(all)</em></td>
-                    <td>Run checks for a single category only. Valid values: <code>auth</code>, <code>pam</code>, <code>network</code>, <code>services</code>, <code>filesystem</code>, <code>logging</code>, <code>packages</code>, <code>hardening</code>, <code>boot</code>, <code>cron</code>, <code>crypto</code>, <code>secrets</code>, <code>container</code>, <code>rlimit</code>, <code>nfs</code>, <code>malware</code>, <code>backup</code></td>
+                    <td>Filter by category (comma-separated). Valid values: <code>auth</code>, <code>pam</code>, <code>network</code>, <code>services</code>, <code>filesystem</code>, <code>logging</code>, <code>packages</code>, <code>hardening</code>, <code>boot</code>, <code>cron</code>, <code>crypto</code>, <code>secrets</code>, <code>container</code>, <code>rlimit</code>, <code>nfs</code>, <code>malware</code>, <code>backup</code></td>
                 </tr>
                 <tr>
                     <td><code>--format &lt;type&gt;</code></td>
@@ -155,6 +156,26 @@ sudo infraudit audit --profile minimal</code></pre>
                     <td><code>--parallel &lt;N&gt;</code></td>
                     <td><code>0</code></td>
                     <td>Run checks in parallel with N workers (0=sequential). Example: <code>--parallel 4</code></td>
+                </tr>
+                <tr>
+                    <td><code>-q, --quiet</code></td>
+                    <td><code>false</code></td>
+                    <td>Suppress progress output (auto-disabled in pipes)</td>
+                </tr>
+                <tr>
+                    <td><code>--severity-min</code></td>
+                    <td><em>(none)</em></td>
+                    <td>Show only results at or above this severity level</td>
+                </tr>
+                <tr>
+                    <td><code>--check</code></td>
+                    <td><em>(none)</em></td>
+                    <td>Run a single check by ID</td>
+                </tr>
+                <tr>
+                    <td><code>--ignore-errors</code></td>
+                    <td><code>false</code></td>
+                    <td>Don't count errors toward exit code 2</td>
                 </tr>
                 <tr>
                     <td><code>-h, --help</code></td>

@@ -4,45 +4,78 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/civanmoreno/infraudit/internal/check"
 	"github.com/civanmoreno/infraudit/internal/config"
 	"github.com/civanmoreno/infraudit/internal/report"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 var (
-	categoryFlag string
-	formatFlag   string
-	outputFlag   string
-	profileFlag  string
-	skipFlag     []string
-	parallelFlag int
+	categoryFlag   string
+	formatFlag     string
+	outputFlag     string
+	profileFlag    string
+	skipFlag       []string
+	parallelFlag   int
+	quietFlag      bool
+	severityMinFlag string
+	checkFlag      string
+	ignoreErrors   bool
 )
 
 var auditCmd = &cobra.Command{
 	Use:   "audit",
 	Short: "Run security audit checks",
 	Long: `Execute all registered security checks against the current system.
-Use --category to filter by a specific check category.
+Use --category to filter by check categories (comma-separated).
 Use --profile to apply a predefined server profile.
 Use --format to change output format (console, json, yaml).`,
 	Run: runAudit,
 }
 
 func init() {
-	auditCmd.Flags().StringVar(&categoryFlag, "category", "", "Filter checks by category (e.g. auth, network, services)")
+	auditCmd.Flags().StringVar(&categoryFlag, "category", "", "Filter by category (comma-separated: auth,network,crypto)")
 	auditCmd.Flags().StringVar(&formatFlag, "format", "console", "Output format: console, json, yaml")
 	auditCmd.Flags().StringVar(&outputFlag, "output", "", "Write report to file")
 	auditCmd.Flags().StringVar(&profileFlag, "profile", "", "Server profile: web-server, db-server, container-host, minimal")
 	auditCmd.Flags().StringSliceVar(&skipFlag, "skip", nil, "Skip specific check IDs (comma-separated)")
 	auditCmd.Flags().IntVar(&parallelFlag, "parallel", 0, "Run checks in parallel with N workers (0=sequential)")
+	auditCmd.Flags().BoolVarP(&quietFlag, "quiet", "q", false, "Suppress progress output")
+	auditCmd.Flags().StringVar(&severityMinFlag, "severity-min", "", "Show only results at or above this severity (low,medium,high,critical)")
+	auditCmd.Flags().StringVar(&checkFlag, "check", "", "Run a single check by ID (e.g. AUTH-001)")
+	auditCmd.Flags().BoolVar(&ignoreErrors, "ignore-errors", false, "Don't count errors toward exit code 2")
 	rootCmd.AddCommand(auditCmd)
 }
 
+// showProgress returns true if progress indicator should be displayed.
+func showProgress() bool {
+	if quietFlag {
+		return false
+	}
+	return term.IsTerminal(int(os.Stderr.Fd()))
+}
+
+func progress(done, total int) {
+	if showProgress() {
+		fmt.Fprintf(os.Stderr, "\033[2K\r  Running checks... %d/%d", done, total)
+	}
+}
+
+func clearProgress() {
+	if showProgress() {
+		fmt.Fprint(os.Stderr, "\033[2K\r")
+	}
+}
+
 func runAudit(cmd *cobra.Command, args []string) {
+	start := time.Now()
+
 	// Load config
 	cfg := config.Load()
 
@@ -53,7 +86,6 @@ func runAudit(cmd *cobra.Command, args []string) {
 			fmt.Fprintf(os.Stderr, "Unknown profile: %s\nAvailable: web-server, db-server, container-host, minimal\n", profileFlag)
 			os.Exit(1)
 		}
-		// Merge profile into config
 		cfg.SkipCategories = append(cfg.SkipCategories, profile.SkipCategories...)
 		cfg.AllowedPorts = append(cfg.AllowedPorts, profile.AllowedPorts...)
 	}
@@ -66,18 +98,37 @@ func runAudit(cmd *cobra.Command, args []string) {
 
 	// Get checks
 	var checks []check.Check
-	if categoryFlag != "" {
-		checks = check.ByCategory(categoryFlag)
+	if checkFlag != "" {
+		// Single check mode
+		c := check.ByID(checkFlag)
+		if c == nil {
+			fmt.Fprintf(os.Stderr, "Check not found: %s\n", checkFlag)
+			os.Exit(1)
+		}
+		checks = []check.Check{c}
+	} else if categoryFlag != "" {
+		// Multi-category support
+		cats := strings.Split(categoryFlag, ",")
+		for i := range cats {
+			cats[i] = strings.TrimSpace(cats[i])
+		}
+		if len(cats) == 1 {
+			checks = check.ByCategory(cats[0])
+		} else {
+			checks = check.ByCategories(cats)
+		}
 	} else {
 		checks = check.All()
 	}
 
 	if len(checks) == 0 {
-		if categoryFlag != "" {
+		if checkFlag != "" {
+			fmt.Fprintf(os.Stderr, "Check not found: %s\n", checkFlag)
+		} else if categoryFlag != "" {
 			fmt.Fprintf(os.Stderr, "No checks found for category: %s\n", categoryFlag)
-			os.Exit(1)
+		} else {
+			fmt.Fprintln(os.Stderr, "No checks registered.")
 		}
-		fmt.Fprintln(os.Stderr, "No checks registered.")
 		os.Exit(1)
 	}
 
@@ -90,11 +141,20 @@ func runAudit(cmd *cobra.Command, args []string) {
 	}
 	total := len(active)
 
+	// Parse severity filter
+	var minSeverity check.Severity = -1
+	if severityMinFlag != "" {
+		minSeverity = check.ParseSeverity(severityMinFlag)
+		if minSeverity < 0 {
+			fmt.Fprintf(os.Stderr, "Invalid severity: %s\nValid values: info, low, medium, high, critical\n", severityMinFlag)
+			os.Exit(1)
+		}
+	}
+
 	// Run checks and build report
 	rpt := &report.Report{}
 
 	if parallelFlag > 0 && total > 1 {
-		// Parallel execution with worker pool
 		type checkResult struct {
 			check  check.Check
 			result check.Result
@@ -112,8 +172,8 @@ func runAudit(cmd *cobra.Command, args []string) {
 				for c := range jobs {
 					r := c.Run()
 					results <- checkResult{check: c, result: r}
-					done := completed.Add(1)
-					fmt.Fprintf(os.Stderr, "\r  Running checks... %d/%d", done, total)
+					done := int(completed.Add(1))
+					progress(done, total)
 				}
 			}()
 		}
@@ -129,43 +189,20 @@ func runAudit(cmd *cobra.Command, args []string) {
 		}()
 
 		for cr := range results {
-			entry := report.NewEntry(cr.check, cr.result)
-			rpt.Entries = append(rpt.Entries, entry)
-			rpt.Summary.Total++
-			switch cr.result.Status {
-			case check.Pass:
-				rpt.Summary.Passed++
-			case check.Warn:
-				rpt.Summary.Warnings++
-			case check.Fail:
-				rpt.Summary.Failures++
-			case check.Error:
-				rpt.Summary.Errors++
-			}
+			addResult(rpt, cr.check, cr.result, minSeverity)
 		}
-		fmt.Fprint(os.Stderr, "\r                              \r")
 	} else {
-		// Sequential execution
 		for i, c := range active {
-			fmt.Fprintf(os.Stderr, "\r  Running checks... %d/%d", i+1, total)
+			progress(i+1, total)
 			r := c.Run()
-			entry := report.NewEntry(c, r)
-			rpt.Entries = append(rpt.Entries, entry)
-			rpt.Summary.Total++
-
-			switch r.Status {
-			case check.Pass:
-				rpt.Summary.Passed++
-			case check.Warn:
-				rpt.Summary.Warnings++
-			case check.Fail:
-				rpt.Summary.Failures++
-			case check.Error:
-				rpt.Summary.Errors++
-			}
+			addResult(rpt, c, r, minSeverity)
 		}
-		fmt.Fprint(os.Stderr, "\r                              \r")
 	}
+
+	clearProgress()
+
+	// Set duration
+	rpt.Summary.Duration = time.Since(start).Seconds()
 
 	// Determine output writer
 	var w *os.File
@@ -206,10 +243,33 @@ func runAudit(cmd *cobra.Command, args []string) {
 	}
 
 	// Exit code
-	if rpt.Summary.Failures > 0 || rpt.Summary.Errors > 0 {
+	hasFailures := rpt.Summary.Failures > 0
+	hasErrors := !ignoreErrors && rpt.Summary.Errors > 0
+	if hasFailures || hasErrors {
 		os.Exit(2)
 	}
 	if rpt.Summary.Warnings > 0 {
 		os.Exit(1)
 	}
+}
+
+func addResult(rpt *report.Report, c check.Check, r check.Result, minSeverity check.Severity) {
+	rpt.Summary.Total++
+	switch r.Status {
+	case check.Pass:
+		rpt.Summary.Passed++
+	case check.Warn:
+		rpt.Summary.Warnings++
+	case check.Fail:
+		rpt.Summary.Failures++
+	case check.Error:
+		rpt.Summary.Errors++
+	}
+
+	// Apply severity filter to displayed entries
+	if minSeverity >= 0 && c.Severity() < minSeverity {
+		return
+	}
+	entry := report.NewEntry(c, r)
+	rpt.Entries = append(rpt.Entries, entry)
 }
