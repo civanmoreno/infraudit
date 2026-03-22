@@ -28,7 +28,7 @@
 
     <main class="content">
         <h1>Output &amp; Reports</h1>
-        <p>infraudit generates detailed security audit reports in three formats. Each report groups findings by category, sorts them by severity, and provides actionable remediation for every finding.</p>
+        <p>infraudit generates detailed security audit reports in four formats. Each report groups findings by category, sorts them by severity, and provides actionable remediation for every finding.</p>
 
         <h2>Report Structure</h2>
         <p>Every report — regardless of format — contains the same information:</p>
@@ -246,6 +246,25 @@ checks:
             <li><strong>GitOps:</strong> Commit reports to a repository for change tracking and audit trails</li>
         </ul>
 
+        <h2>HTML Output</h2>
+        <p>Visual, self-contained report that opens in any browser. Use <code>--format html</code>. The report is a single <code>.html</code> file with embedded CSS — no external dependencies. Dark theme, responsive design, print-friendly.</p>
+        <pre><code>$ sudo infraudit audit --format html --output report.html</code></pre>
+        <h3>What the HTML report includes</h3>
+        <ul class="check-list">
+            <li><strong>Header:</strong> Version, hostname, timestamp, and audit duration</li>
+            <li><strong>Summary dashboard:</strong> Four metric cards (Passed, Warnings, Failures, Errors) with a color-coded progress bar</li>
+            <li><strong>Category sections:</strong> Checks grouped by category with status badges, severity indicators, and per-category statistics</li>
+            <li><strong>Remediation:</strong> Fix instructions shown inline for every non-passing check</li>
+            <li><strong>Print to PDF:</strong> Use Ctrl+P in the browser for a clean PDF export</li>
+        </ul>
+        <h3>HTML use cases</h3>
+        <ul class="check-list">
+            <li><strong>Client deliverables:</strong> Send a professional audit report to clients or management</li>
+            <li><strong>Compliance evidence:</strong> Attach to compliance tickets as proof of security assessment</li>
+            <li><strong>Team review:</strong> Share via Slack, email, or wiki — opens in any browser, no tools needed</li>
+            <li><strong>PDF generation:</strong> Print from browser for a formatted PDF document</li>
+        </ul>
+
         <h2>File Output</h2>
         <p>Use <code>--output &lt;file&gt;</code> with any format to write the report to a file instead of stdout:</p>
         <pre><code><span class="comment"># JSON report to file</span>
@@ -253,6 +272,9 @@ sudo infraudit audit --format json --output /var/log/infraudit/audit-$(date +%F)
 
 <span class="comment"># YAML report to file</span>
 sudo infraudit audit --format yaml --output /tmp/report.yaml
+
+<span class="comment"># HTML visual report</span>
+sudo infraudit audit --format html --output /var/log/infraudit/audit-$(date +%F).html
 
 <span class="comment"># Console report is still written to stdout when --output is used with console format</span>
 sudo infraudit audit --output /tmp/audit.txt</code></pre>
