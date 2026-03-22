@@ -28,10 +28,9 @@ func (c *worldWritable) Run() check.Result {
 		"-path", "/sys", "-prune", "-o",
 		"-path", "/run", "-prune", "-o",
 		"-type", "f", "-perm", "-0002", "-print")
-	if err != nil {
-		// find may return non-zero due to permission denied on some dirs
-		// but still output results
-	}
+	// find may return non-zero due to permission denied on some dirs
+	// but still output results, so we ignore the error
+	_ = err
 
 	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 	var files []string

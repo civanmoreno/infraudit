@@ -36,7 +36,7 @@ func TestShouldSkipEmpty(t *testing.T) {
 func TestLoadFromFile(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "config.json")
-	err := os.WriteFile(cfgPath, []byte(`{"skip":["AUTH-001"],"allowed_ports":[22,80]}`), 0644)
+	err := os.WriteFile(cfgPath, []byte(`{"skip":["AUTH-001"],"allowed_ports":[22,80]}`), 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestLoadFileMissing(t *testing.T) {
 func TestLoadFileInvalidJSON(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "bad.json")
-	os.WriteFile(cfgPath, []byte(`{invalid`), 0644)
+	os.WriteFile(cfgPath, []byte(`{invalid`), 0600)
 
 	_, err := loadFile(cfgPath)
 	if err == nil {
@@ -144,7 +144,7 @@ func TestMergeZeroTimeout(t *testing.T) {
 func TestCommandTimeoutField(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := filepath.Join(dir, "config.json")
-	os.WriteFile(cfgPath, []byte(`{"command_timeout":60}`), 0644)
+	os.WriteFile(cfgPath, []byte(`{"command_timeout":60}`), 0600)
 
 	cfg, err := loadFile(cfgPath)
 	if err != nil {

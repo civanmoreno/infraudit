@@ -68,7 +68,7 @@ func (c *systemShell) Run() check.Result {
 
 		// Parse UID as number for correct comparison
 		var uidNum int
-		fmt.Sscanf(uid, "%d", &uidNum)
+		_, _ = fmt.Sscanf(uid, "%d", &uidNum)
 		if uidNum >= 1000 {
 			continue
 		}

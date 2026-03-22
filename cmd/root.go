@@ -22,7 +22,7 @@ security posture, and compliance across your environments.`,
 			fmt.Printf("%s v%s\n", version.Name, version.Version)
 			return
 		}
-		cmd.Help()
+		_ = cmd.Help()
 	},
 }
 

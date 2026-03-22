@@ -291,7 +291,7 @@ func (c *iccDisabled) Run() check.Result {
 	}
 
 	var conf map[string]interface{}
-	json.Unmarshal(data, &conf)
+	_ = json.Unmarshal(data, &conf)
 	if icc, ok := conf["icc"]; ok {
 		if icc == false {
 			return check.Result{Status: check.Pass, Message: "ICC is disabled"}

@@ -64,7 +64,7 @@ func (c *certExpiry) Run() check.Result {
 
 	certDirs := []string{"/etc/ssl/certs", "/etc/pki/tls/certs"}
 	for _, dir := range certDirs {
-		filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		_ = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 			if err != nil || info.IsDir() || info.Size() > 100*1024 {
 				return nil
 			}
@@ -246,7 +246,7 @@ func (c *privateKeyPerms) Run() check.Result {
 	var bad []string
 
 	for _, dir := range keyDirs {
-		filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		_ = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 			if err != nil || info.IsDir() {
 				return nil
 			}

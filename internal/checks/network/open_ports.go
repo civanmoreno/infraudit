@@ -93,6 +93,6 @@ func parseProcNet(path string) []string {
 
 func hexToPort(h string) int {
 	var port int
-	fmt.Sscanf(h, "%X", &port)
+	_, _ = fmt.Sscanf(h, "%X", &port)
 	return port
 }

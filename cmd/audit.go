@@ -169,6 +169,7 @@ func runAudit(cmd *cobra.Command, args []string) {
 
 	// Determine output writer
 	var w *os.File
+	var outFile *os.File
 	if outputFlag != "" {
 		outputFlag = filepath.Clean(outputFlag)
 		f, err := os.Create(outputFlag)
@@ -176,30 +177,32 @@ func runAudit(cmd *cobra.Command, args []string) {
 			fmt.Fprintf(os.Stderr, "Cannot create output file: %s\n", err)
 			os.Exit(1)
 		}
-		defer f.Close()
+		outFile = f
 		w = f
 	} else {
 		w = os.Stdout
 	}
 
 	// Write report
+	var writeErr error
 	switch formatFlag {
 	case "json":
-		if err := report.WriteJSON(w, rpt); err != nil {
-			fmt.Fprintf(os.Stderr, "Error writing JSON: %s\n", err)
-			os.Exit(1)
-		}
+		writeErr = report.WriteJSON(w, rpt)
 	case "yaml":
-		if err := report.WriteYAML(w, rpt); err != nil {
-			fmt.Fprintf(os.Stderr, "Error writing YAML: %s\n", err)
-			os.Exit(1)
-		}
+		writeErr = report.WriteYAML(w, rpt)
 	default:
 		report.WriteConsole(w, rpt)
 	}
 
-	if outputFlag != "" {
+	// Close output file before any exit
+	if outFile != nil {
+		outFile.Close()
 		fmt.Fprintf(os.Stderr, "Report written to %s\n", outputFlag)
+	}
+
+	if writeErr != nil {
+		fmt.Fprintf(os.Stderr, "Error writing report: %s\n", writeErr)
+		os.Exit(1)
 	}
 
 	// Exit code

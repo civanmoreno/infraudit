@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -110,12 +109,3 @@ func parseFaillockConf() map[string]string {
 	return conf
 }
 
-func denyFromArgs(args string) int {
-	for _, field := range strings.Fields(args) {
-		if strings.HasPrefix(field, "deny=") {
-			v, _ := strconv.Atoi(strings.TrimPrefix(field, "deny="))
-			return v
-		}
-	}
-	return 0
-}
