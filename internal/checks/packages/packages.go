@@ -28,7 +28,7 @@ func (c *securityUpdates) Description() string    { return "Check for pending se
 func (c *securityUpdates) Run() check.Result {
 	// Try apt (Debian/Ubuntu)
 	if _, err := exec.LookPath("apt"); err == nil {
-		out, _ := exec.Command("apt", "list", "--upgradable").CombinedOutput()
+		out, _ := check.RunCmd(check.DefaultCmdTimeout, "apt", "list", "--upgradable")
 		lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 		var security int
 		for _, l := range lines {
@@ -48,7 +48,7 @@ func (c *securityUpdates) Run() check.Result {
 
 	// Try dnf (RHEL/Fedora)
 	if _, err := exec.LookPath("dnf"); err == nil {
-		out, _ := exec.Command("dnf", "check-update", "--security", "--quiet").CombinedOutput()
+		out, _ := check.RunCmd(check.DefaultCmdTimeout, "dnf", "check-update", "--security", "--quiet")
 		if strings.TrimSpace(string(out)) != "" {
 			return check.Result{
 				Status:      check.Warn,

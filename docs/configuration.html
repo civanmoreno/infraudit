@@ -77,6 +77,12 @@
                     <td><code>--skip HARD-007,NET-008</code></td>
                 </tr>
                 <tr>
+                    <td><code>--parallel</code></td>
+                    <td><code>0</code></td>
+                    <td>Run checks in parallel with N workers (0=sequential)</td>
+                    <td><code>--parallel 4</code></td>
+                </tr>
+                <tr>
                     <td><code>-h, --help</code></td>
                     <td></td>
                     <td>Show help for audit command</td>
@@ -109,7 +115,7 @@ infraudit completion zsh &gt; "${fpath[1]}/_infraudit"
 infraudit completion fish &gt; ~/.config/fish/completions/infraudit.fish</code></pre>
 
         <h2>Config File</h2>
-        <p>For persistent settings that apply on every run, create a JSON config file. infraudit checks these paths in order (first found wins):</p>
+        <p>For persistent settings that apply on every run, create a JSON config file. infraudit loads and <strong>merges</strong> all config files found (system → user → directory), with deduplication:</p>
         <table>
             <thead><tr><th>Priority</th><th>Path</th><th>Scope</th></tr></thead>
             <tbody>
@@ -148,6 +154,12 @@ infraudit completion fish &gt; ~/.config/fish/completions/infraudit.fish</code><
                     <td>Process names allowed as root for SVC-008</td>
                     <td><code>["sshd", "nginx"]</code></td>
                 </tr>
+                <tr>
+                    <td><code>command_timeout</code></td>
+                    <td>int</td>
+                    <td>Override default timeout (seconds) for external commands</td>
+                    <td><code>30</code></td>
+                </tr>
             </tbody>
         </table>
 
@@ -164,7 +176,8 @@ infraudit completion fish &gt; ~/.config/fish/completions/infraudit.fish</code><
     "nfs"          <span class="comment">// No NFS in use</span>
   ],
   "allowed_ports": [22, 80, 443],
-  "allowed_root_processes": ["sshd", "nginx", "fail2ban"]
+  "allowed_root_processes": ["sshd", "nginx", "fail2ban"],
+  "command_timeout": 30
 }</code></pre>
 
         <h2>Server Profiles</h2>

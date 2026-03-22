@@ -3,7 +3,6 @@ package nfs
 import (
 	"bufio"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -68,7 +67,7 @@ func (c *nfsv3Disabled) Description() string    { return "Verify NFSv3 is disabl
 
 func (c *nfsv3Disabled) Run() check.Result {
 	// Check if NFS server is running
-	out, err := exec.Command("systemctl", "is-active", "nfs-server").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "nfs-server")
 	if err != nil || strings.TrimSpace(string(out)) != "active" {
 		return check.Result{Status: check.Pass, Message: "NFS server not running"}
 	}
@@ -137,10 +136,10 @@ func (c *rpcbindDisabled) Severity() check.Severity { return check.Medium }
 func (c *rpcbindDisabled) Description() string    { return "Verify rpcbind is not running if NFS is not needed" }
 
 func (c *rpcbindDisabled) Run() check.Result {
-	rpcOut, _ := exec.Command("systemctl", "is-active", "rpcbind").CombinedOutput()
+	rpcOut, _ := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "rpcbind")
 	rpcActive := strings.TrimSpace(string(rpcOut)) == "active"
 
-	nfsOut, _ := exec.Command("systemctl", "is-active", "nfs-server").CombinedOutput()
+	nfsOut, _ := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "nfs-server")
 	nfsActive := strings.TrimSpace(string(nfsOut)) == "active"
 
 	if rpcActive && !nfsActive {

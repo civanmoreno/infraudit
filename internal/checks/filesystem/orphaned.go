@@ -2,7 +2,6 @@ package filesystem
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -21,8 +20,8 @@ func (c *orphanedFiles) Severity() check.Severity { return check.Low }
 func (c *orphanedFiles) Description() string    { return "Find files without a valid owner or group" }
 
 func (c *orphanedFiles) Run() check.Result {
-	out, _ := exec.Command("find", "/usr", "/etc", "/var",
-		"-xdev", "-nouser", "-o", "-nogroup").CombinedOutput()
+	out, _ := check.RunCmd(check.LongCmdTimeout, "find", "/usr", "/etc", "/var",
+		"-xdev", "-nouser", "-o", "-nogroup")
 
 	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 	var files []string

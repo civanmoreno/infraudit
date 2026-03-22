@@ -16,6 +16,8 @@ type Config struct {
 	AllowedPorts []int `json:"allowed_ports,omitempty"`
 	// Whitelist of processes allowed to run as root (for SVC-008)
 	AllowedRootProcesses []string `json:"allowed_root_processes,omitempty"`
+	// CommandTimeout overrides the default timeout (in seconds) for external commands.
+	CommandTimeout int `json:"command_timeout,omitempty"`
 }
 
 // Profiles defines pre-built configurations for common server types.
@@ -38,7 +40,7 @@ var Profiles = map[string]Config{
 	},
 }
 
-// Load reads config from the first file found in the search paths.
+// Load reads and merges config from all found files (system → user → local).
 func Load() *Config {
 	paths := []string{
 		"/etc/infraudit/config.json",
@@ -53,14 +55,52 @@ func Load() *Config {
 	// Local config
 	paths = append(paths, ".infraudit.json")
 
+	result := &Config{}
 	for _, p := range paths {
 		cfg, err := loadFile(p)
 		if err == nil {
-			return cfg
+			result = merge(result, cfg)
 		}
 	}
 
-	return &Config{}
+	return result
+}
+
+// merge combines base and overlay configs, with overlay values taking precedence.
+func merge(base, overlay *Config) *Config {
+	result := *base
+	result.Skip = dedup(append(result.Skip, overlay.Skip...))
+	result.SkipCategories = dedup(append(result.SkipCategories, overlay.SkipCategories...))
+	result.AllowedPorts = dedupInt(append(result.AllowedPorts, overlay.AllowedPorts...))
+	result.AllowedRootProcesses = dedup(append(result.AllowedRootProcesses, overlay.AllowedRootProcesses...))
+	if overlay.CommandTimeout > 0 {
+		result.CommandTimeout = overlay.CommandTimeout
+	}
+	return &result
+}
+
+func dedup(s []string) []string {
+	seen := make(map[string]bool, len(s))
+	out := make([]string, 0, len(s))
+	for _, v := range s {
+		if !seen[v] {
+			seen[v] = true
+			out = append(out, v)
+		}
+	}
+	return out
+}
+
+func dedupInt(s []int) []int {
+	seen := make(map[int]bool, len(s))
+	out := make([]int, 0, len(s))
+	for _, v := range s {
+		if !seen[v] {
+			seen[v] = true
+			out = append(out, v)
+		}
+	}
+	return out
 }
 
 func loadFile(path string) (*Config, error) {

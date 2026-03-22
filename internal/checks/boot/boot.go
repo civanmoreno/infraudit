@@ -3,7 +3,6 @@ package boot
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -96,7 +95,7 @@ func (c *secureBoot) Severity() check.Severity { return check.Medium }
 func (c *secureBoot) Description() string    { return "Check if Secure Boot is enabled" }
 
 func (c *secureBoot) Run() check.Result {
-	out, err := exec.Command("mokutil", "--sb-state").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "mokutil", "--sb-state")
 	if err == nil {
 		if strings.Contains(string(out), "SecureBoot enabled") {
 			return check.Result{Status: check.Pass, Message: "Secure Boot is enabled"}
@@ -161,7 +160,7 @@ func (c *macInstalled) Description() string    { return "Verify a mandatory acce
 
 func (c *macInstalled) Run() check.Result {
 	// Check AppArmor
-	out, err := exec.Command("aa-status", "--enabled").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "aa-status", "--enabled")
 	if err == nil && strings.Contains(string(out), "Yes") {
 		return check.Result{Status: check.Pass, Message: "AppArmor is enabled"}
 	}
@@ -170,7 +169,7 @@ func (c *macInstalled) Run() check.Result {
 	}
 
 	// Check SELinux
-	out, err = exec.Command("getenforce").CombinedOutput()
+	out, err = check.RunCmd(check.DefaultCmdTimeout, "getenforce")
 	if err == nil {
 		mode := strings.TrimSpace(string(out))
 		if mode == "Enforcing" || mode == "Permissive" {
@@ -195,7 +194,7 @@ func (c *macEnforcing) Description() string    { return "Verify SELinux is Enfor
 
 func (c *macEnforcing) Run() check.Result {
 	// AppArmor
-	out, err := exec.Command("aa-status").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "aa-status")
 	if err == nil {
 		output := string(out)
 		if strings.Contains(output, "enforce") {
@@ -204,7 +203,7 @@ func (c *macEnforcing) Run() check.Result {
 	}
 
 	// SELinux
-	out, err = exec.Command("getenforce").CombinedOutput()
+	out, err = check.RunCmd(check.DefaultCmdTimeout, "getenforce")
 	if err == nil {
 		mode := strings.TrimSpace(string(out))
 		if mode == "Enforcing" {
@@ -231,7 +230,7 @@ func (c *unconfinedProcs) Severity() check.Severity { return check.Medium }
 func (c *unconfinedProcs) Description() string    { return "Check for processes without MAC confinement" }
 
 func (c *unconfinedProcs) Run() check.Result {
-	out, err := exec.Command("aa-unconfined").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "aa-unconfined")
 	if err == nil {
 		lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 		count := 0
@@ -262,7 +261,7 @@ func (c *macDenials) Description() string    { return "Check for recent SELinux/
 
 func (c *macDenials) Run() check.Result {
 	// Check AppArmor denials in dmesg
-	out, _ := exec.Command("dmesg").CombinedOutput()
+	out, _ := check.RunCmd(check.DefaultCmdTimeout, "dmesg")
 	output := string(out)
 	denials := 0
 	for _, line := range strings.Split(output, "\n") {

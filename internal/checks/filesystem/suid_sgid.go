@@ -2,7 +2,6 @@ package filesystem
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -38,8 +37,8 @@ var knownSUID = map[string]bool{
 }
 
 func (c *suidSgid) Run() check.Result {
-	out, err := exec.Command("find", "/usr", "/bin", "/sbin",
-		"-perm", "/6000", "-type", "f", "-print").CombinedOutput()
+	out, err := check.RunCmd(check.LongCmdTimeout, "find", "/usr", "/bin", "/sbin",
+		"-perm", "/6000", "-type", "f", "-print")
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Could not search for SUID/SGID files"}
 	}

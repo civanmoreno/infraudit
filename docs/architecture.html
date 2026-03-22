@@ -111,9 +111,22 @@
             </thead>
             <tbody>
                 <tr><td><code>github.com/spf13/cobra</code></td><td>CLI framework</td></tr>
-                <tr><td><code>github.com/spf13/viper</code></td><td>Configuration (planned)</td></tr>
             </tbody>
         </table>
+        <h2>Command Execution</h2>
+        <p>All external commands are executed via <code>check.RunCmd()</code>, which wraps <code>exec.CommandContext</code> with a timeout (<code>DefaultCmdTimeout = 30s</code>, <code>LongCmdTimeout = 60s</code> for filesystem scans). This prevents indefinite blocking on hung commands or unresponsive mounts.</p>
+
+        <h2>Build &amp; Tooling</h2>
+        <table>
+            <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td><code>Makefile</code></td><td>Build, test, lint, release, cover, docker targets</td></tr>
+                <tr><td><code>Dockerfile</code></td><td>Multi-stage build (golang:1.24-alpine → alpine:3.21)</td></tr>
+                <tr><td><code>.golangci.yml</code></td><td>Linter config: gosec, errcheck, staticcheck, gocritic</td></tr>
+                <tr><td><code>.github/workflows/ci.yml</code></td><td>CI: test, lint, race detector, release with SBOM and cosign signing</td></tr>
+            </tbody>
+        </table>
+
         <p>infraudit deliberately minimizes dependencies. Checks use only the Go standard library to read files, parse configs, and execute system commands.</p>
     </main>
 </body>

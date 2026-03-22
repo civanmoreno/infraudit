@@ -52,7 +52,7 @@ func (c *backupSchedule) Run() check.Result {
 	}
 
 	// Check systemd timers
-	out, err := exec.Command("systemctl", "list-timers", "--no-pager").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "list-timers", "--no-pager")
 	if err == nil {
 		for _, line := range strings.Split(string(out), "\n") {
 			lower := strings.ToLower(line)

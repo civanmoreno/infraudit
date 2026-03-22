@@ -5,7 +5,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -35,7 +34,7 @@ func (c *cryptoPolicy) Severity() check.Severity { return check.High }
 func (c *cryptoPolicy) Description() string    { return "Verify system-wide crypto policy is not set to LEGACY" }
 
 func (c *cryptoPolicy) Run() check.Result {
-	out, err := exec.Command("update-crypto-policies", "--show").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "update-crypto-policies", "--show")
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "crypto-policies not available (non-RHEL system)"}
 	}
@@ -181,7 +180,7 @@ func (c *weakCiphers) Severity() check.Severity { return check.High }
 func (c *weakCiphers) Description() string    { return "Verify no RC4, DES, 3DES, or NULL ciphers are available" }
 
 func (c *weakCiphers) Run() check.Result {
-	out, err := exec.Command("openssl", "ciphers", "-v", "ALL").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "openssl", "ciphers", "-v", "ALL")
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot list OpenSSL ciphers"}
 	}

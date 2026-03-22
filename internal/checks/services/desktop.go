@@ -1,7 +1,6 @@
 package services
 
 import (
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -34,7 +33,7 @@ func (c *desktopEnv) Run() check.Result {
 	}
 
 	// Check default target
-	out, err := exec.Command("systemctl", "get-default").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "get-default")
 	if err == nil && strings.TrimSpace(string(out)) == "graphical.target" {
 		return check.Result{
 			Status:      check.Warn,

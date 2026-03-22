@@ -40,8 +40,12 @@
         <p>Requires Go 1.24+:</p>
         <pre><code>git clone https://github.com/civanmoreno/infraudit.git
 cd infraudit
-go build -o infraudit .
+make build
 sudo mv infraudit /usr/local/bin/</code></pre>
+
+        <h3>Option 3: Docker</h3>
+        <pre><code>docker build -t infraudit .
+docker run --rm --privileged -v /:/host:ro infraudit audit</code></pre>
 
         <h2>Commands</h2>
         <p>infraudit has three main commands:</p>
@@ -146,6 +150,11 @@ sudo infraudit audit --profile minimal</code></pre>
                     <td><code>--skip &lt;ids&gt;</code></td>
                     <td><em>(none)</em></td>
                     <td>Comma-separated list of check IDs to skip (e.g. <code>--skip HARD-007,NET-008</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>--parallel &lt;N&gt;</code></td>
+                    <td><code>0</code></td>
+                    <td>Run checks in parallel with N workers (0=sequential). Example: <code>--parallel 4</code></td>
                 </tr>
                 <tr>
                     <td><code>-h, --help</code></td>

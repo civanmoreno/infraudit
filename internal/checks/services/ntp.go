@@ -1,7 +1,6 @@
 package services
 
 import (
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -25,7 +24,7 @@ func (c *ntpSync) Description() string    { return "Verify time synchronization 
 
 func (c *ntpSync) Run() check.Result {
 	// Check timedatectl
-	out, err := exec.Command("timedatectl", "show", "--property=NTPSynchronized").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "timedatectl", "show", "--property=NTPSynchronized")
 	if err == nil {
 		if strings.Contains(string(out), "NTPSynchronized=yes") {
 			return check.Result{Status: check.Pass, Message: "System clock is NTP synchronized"}
@@ -34,7 +33,7 @@ func (c *ntpSync) Run() check.Result {
 
 	// Check if chrony or ntpd is running
 	for _, svc := range []string{"chronyd", "chrony", "ntpd", "ntp", "systemd-timesyncd"} {
-		sOut, sErr := exec.Command("systemctl", "is-active", svc).CombinedOutput()
+		sOut, sErr := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", svc)
 		if sErr == nil && strings.TrimSpace(string(sOut)) == "active" {
 			return check.Result{
 				Status:  check.Warn,
@@ -61,7 +60,7 @@ func (c *ntpUser) Description() string    { return "Verify NTP daemon runs as a 
 
 func (c *ntpUser) Run() check.Result {
 	// chrony typically runs as _chrony or chrony
-	out, err := exec.Command("ps", "-eo", "user,comm").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "ps", "-eo", "user,comm")
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Could not list processes"}
 	}
@@ -103,7 +102,7 @@ func (c *ntpNTS) Severity() check.Severity { return check.Low }
 func (c *ntpNTS) Description() string    { return "Check if NTS is enabled for authenticated time synchronization" }
 
 func (c *ntpNTS) Run() check.Result {
-	out, err := exec.Command("chronyc", "authdata").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "chronyc", "authdata")
 	if err == nil && strings.Contains(string(out), "NTS") {
 		return check.Result{Status: check.Pass, Message: "NTS is configured in chrony"}
 	}
@@ -125,7 +124,7 @@ func (c *ntpSources) Severity() check.Severity { return check.Low }
 func (c *ntpSources) Description() string    { return "Verify NTP time sources are configured and reachable" }
 
 func (c *ntpSources) Run() check.Result {
-	out, err := exec.Command("chronyc", "sources").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "chronyc", "sources")
 	if err == nil {
 		lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 		if len(lines) > 2 {
@@ -147,7 +146,7 @@ func (c *ntpSources) Run() check.Result {
 	}
 
 	// Try ntpq
-	out, err = exec.Command("ntpq", "-p").CombinedOutput()
+	out, err = check.RunCmd(check.DefaultCmdTimeout, "ntpq", "-p")
 	if err == nil && len(strings.Split(string(out), "\n")) > 2 {
 		return check.Result{Status: check.Pass, Message: "NTP has configured time sources"}
 	}

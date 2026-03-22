@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   test:
@@ -22,11 +23,22 @@ jobs:
       - name: Build
         run: go build -o infraudit .
 
-      - name: Test
-        run: go test ./...
+      - name: Test with coverage
+        run: go test -race -count=1 -coverprofile=coverage.out ./...
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.out
+        continue-on-error: true
 
       - name: Vet
         run: go vet ./...
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
 
       - name: Verify binary
         run: ./infraudit --version
@@ -71,6 +83,21 @@ jobs:
         working-directory: dist
         run: sha256sum infraudit-* > checksums.txt
 
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          artifact-name: sbom.spdx.json
+          output-file: dist/sbom.spdx.json
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign artifacts
+        run: |
+          for f in dist/infraudit-*; do
+            cosign sign-blob --yes --output-signature "${f}.sig" "$f"
+          done
+
       - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
@@ -80,5 +107,8 @@ jobs:
           make_latest: true
           files: |
             dist/infraudit-linux-amd64
+            dist/infraudit-linux-amd64.sig
             dist/infraudit-linux-arm64
+            dist/infraudit-linux-arm64.sig
             dist/checksums.txt
+            dist/sbom.spdx.json

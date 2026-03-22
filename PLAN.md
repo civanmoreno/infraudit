@@ -233,6 +233,26 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Pre-built profiles: `web-server`, `db-server`, `minimal`, `container-host`
 - [x] `--profile <name>` to select profile
 
+### Phase 22: DevOps Hardening ✅
+
+- [x] Command timeouts — `RunCmd()` with `context.WithTimeout` for all 50 `exec.Command` calls (30s default, 60s for filesystem scans)
+- [x] Configurable timeout via `command_timeout` field in config JSON
+- [x] Makefile with targets: build, test, lint, vet, clean, release, cover, docker
+- [x] `.golangci.yml` — linters: gosec, errcheck, staticcheck, gocritic, govet, ineffassign, unused
+- [x] Race detector in CI (`go test -race`)
+- [x] golangci-lint in CI pipeline
+- [x] Integration tests for helpers (RunCmd timeout, ServiceActive, ReadSysctl)
+- [x] Unit tests for config (Load, ShouldSkip, merge, CommandTimeout)
+- [x] Unit tests for report (WriteJSON, WriteYAML, WriteConsole)
+- [x] Coverage: check 92.9%, config 64.3%, report 76.6%
+- [x] Dockerfile — multi-stage build (golang:1.24-alpine → alpine:3.21)
+- [x] Config merge — configs from all levels (system + user + directory) merged with deduplication
+- [x] Parallel check execution — `--parallel N` flag with worker pool
+- [x] Progress indicator — running counter on stderr
+- [x] CI coverage upload (codecov)
+- [x] SBOM generation (anchore/sbom-action)
+- [x] Release artifact signing (cosign/Sigstore)
+
 ## Check Categories
 
 | Category | Prefix | Description |
@@ -302,6 +322,9 @@ infraudit/
 ├── install.sh              # Install script
 ├── main.go
 ├── go.mod / go.sum
+├── Makefile                # Build, test, lint, release targets
+├── Dockerfile              # Multi-stage build
+├── .golangci.yml           # Linter configuration
 ├── PLAN.md
 ├── README.md
 └── LICENSE

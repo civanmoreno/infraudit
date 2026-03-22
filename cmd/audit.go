@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
+	"sync/atomic"
 
 	"github.com/civanmoreno/infraudit/internal/check"
 	"github.com/civanmoreno/infraudit/internal/config"
@@ -17,6 +19,7 @@ var (
 	outputFlag   string
 	profileFlag  string
 	skipFlag     []string
+	parallelFlag int
 )
 
 var auditCmd = &cobra.Command{
@@ -35,6 +38,7 @@ func init() {
 	auditCmd.Flags().StringVar(&outputFlag, "output", "", "Write report to file")
 	auditCmd.Flags().StringVar(&profileFlag, "profile", "", "Server profile: web-server, db-server, container-host, minimal")
 	auditCmd.Flags().StringSliceVar(&skipFlag, "skip", nil, "Skip specific check IDs (comma-separated)")
+	auditCmd.Flags().IntVar(&parallelFlag, "parallel", 0, "Run checks in parallel with N workers (0=sequential)")
 	rootCmd.AddCommand(auditCmd)
 }
 
@@ -77,29 +81,90 @@ func runAudit(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
+	// Filter skipped checks
+	var active []check.Check
+	for _, c := range checks {
+		if !cfg.ShouldSkip(c.ID(), c.Category()) {
+			active = append(active, c)
+		}
+	}
+	total := len(active)
+
 	// Run checks and build report
 	rpt := &report.Report{}
 
-	for _, c := range checks {
-		if cfg.ShouldSkip(c.ID(), c.Category()) {
-			continue
+	if parallelFlag > 0 && total > 1 {
+		// Parallel execution with worker pool
+		type checkResult struct {
+			check  check.Check
+			result check.Result
 		}
 
-		r := c.Run()
-		entry := report.NewEntry(c, r)
-		rpt.Entries = append(rpt.Entries, entry)
-		rpt.Summary.Total++
+		jobs := make(chan check.Check, total)
+		results := make(chan checkResult, total)
+		var completed atomic.Int32
 
-		switch r.Status {
-		case check.Pass:
-			rpt.Summary.Passed++
-		case check.Warn:
-			rpt.Summary.Warnings++
-		case check.Fail:
-			rpt.Summary.Failures++
-		case check.Error:
-			rpt.Summary.Errors++
+		var wg sync.WaitGroup
+		for i := 0; i < parallelFlag; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				for c := range jobs {
+					r := c.Run()
+					results <- checkResult{check: c, result: r}
+					done := completed.Add(1)
+					fmt.Fprintf(os.Stderr, "\r  Running checks... %d/%d", done, total)
+				}
+			}()
 		}
+
+		for _, c := range active {
+			jobs <- c
+		}
+		close(jobs)
+
+		go func() {
+			wg.Wait()
+			close(results)
+		}()
+
+		for cr := range results {
+			entry := report.NewEntry(cr.check, cr.result)
+			rpt.Entries = append(rpt.Entries, entry)
+			rpt.Summary.Total++
+			switch cr.result.Status {
+			case check.Pass:
+				rpt.Summary.Passed++
+			case check.Warn:
+				rpt.Summary.Warnings++
+			case check.Fail:
+				rpt.Summary.Failures++
+			case check.Error:
+				rpt.Summary.Errors++
+			}
+		}
+		fmt.Fprint(os.Stderr, "\r                              \r")
+	} else {
+		// Sequential execution
+		for i, c := range active {
+			fmt.Fprintf(os.Stderr, "\r  Running checks... %d/%d", i+1, total)
+			r := c.Run()
+			entry := report.NewEntry(c, r)
+			rpt.Entries = append(rpt.Entries, entry)
+			rpt.Summary.Total++
+
+			switch r.Status {
+			case check.Pass:
+				rpt.Summary.Passed++
+			case check.Warn:
+				rpt.Summary.Warnings++
+			case check.Fail:
+				rpt.Summary.Failures++
+			case check.Error:
+				rpt.Summary.Errors++
+			}
+		}
+		fmt.Fprint(os.Stderr, "\r                              \r")
 	}
 
 	// Determine output writer

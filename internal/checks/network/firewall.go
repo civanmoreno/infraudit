@@ -1,7 +1,6 @@
 package network
 
 import (
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -21,7 +20,7 @@ func (c *firewallActive) Description() string    { return "Verify a firewall (ip
 
 func (c *firewallActive) Run() check.Result {
 	// Check ufw
-	if out, err := exec.Command("ufw", "status").CombinedOutput(); err == nil {
+	if out, err := check.RunCmd(check.DefaultCmdTimeout, "ufw", "status"); err == nil {
 		if strings.Contains(string(out), "Status: active") {
 			return check.Result{
 				Status:  check.Pass,
@@ -31,7 +30,7 @@ func (c *firewallActive) Run() check.Result {
 	}
 
 	// Check nftables
-	if out, err := exec.Command("nft", "list", "ruleset").CombinedOutput(); err == nil {
+	if out, err := check.RunCmd(check.DefaultCmdTimeout, "nft", "list", "ruleset"); err == nil {
 		output := strings.TrimSpace(string(out))
 		if output != "" && strings.Contains(output, "table") {
 			return check.Result{
@@ -42,7 +41,7 @@ func (c *firewallActive) Run() check.Result {
 	}
 
 	// Check iptables
-	if out, err := exec.Command("iptables", "-L", "-n").CombinedOutput(); err == nil {
+	if out, err := check.RunCmd(check.DefaultCmdTimeout, "iptables", "-L", "-n"); err == nil {
 		lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 		// More than just the default empty chains header
 		if len(lines) > 8 {

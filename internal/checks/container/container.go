@@ -136,7 +136,7 @@ func (c *rootContainers) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "No container runtime (skipped)"}
 	}
 
-	out, err := exec.Command(rt, "ps", "--format", "{{.ID}} {{.Names}}").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, rt, "ps", "--format", "{{.ID}} {{.Names}}")
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "No running containers"}
 	}
@@ -149,7 +149,7 @@ func (c *rootContainers) Run() check.Result {
 			continue
 		}
 		id := fields[0]
-		inspOut, _ := exec.Command(rt, "inspect", "--format", "{{.Config.User}}", id).CombinedOutput()
+		inspOut, _ := check.RunCmd(check.DefaultCmdTimeout, rt, "inspect", "--format", "{{.Config.User}}", id)
 		user := strings.TrimSpace(string(inspOut))
 		if user == "" || user == "0" || user == "root" {
 			name := id
@@ -185,7 +185,7 @@ func (c *privilegedContainers) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "No container runtime (skipped)"}
 	}
 
-	out, err := exec.Command(rt, "ps", "-q").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, rt, "ps", "-q")
 	if err != nil || strings.TrimSpace(string(out)) == "" {
 		return check.Result{Status: check.Pass, Message: "No running containers"}
 	}
@@ -193,7 +193,7 @@ func (c *privilegedContainers) Run() check.Result {
 	ids := strings.Fields(strings.TrimSpace(string(out)))
 	var priv []string
 	for _, id := range ids {
-		inspOut, _ := exec.Command(rt, "inspect", "--format", "{{.HostConfig.Privileged}}", id).CombinedOutput()
+		inspOut, _ := check.RunCmd(check.DefaultCmdTimeout, rt, "inspect", "--format", "{{.HostConfig.Privileged}}", id)
 		if strings.TrimSpace(string(inspOut)) == "true" {
 			priv = append(priv, id[:12])
 		}
@@ -224,7 +224,7 @@ func (c *resourceLimits) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "No container runtime (skipped)"}
 	}
 
-	out, err := exec.Command(rt, "ps", "-q").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, rt, "ps", "-q")
 	if err != nil || strings.TrimSpace(string(out)) == "" {
 		return check.Result{Status: check.Pass, Message: "No running containers"}
 	}
@@ -232,7 +232,7 @@ func (c *resourceLimits) Run() check.Result {
 	ids := strings.Fields(strings.TrimSpace(string(out)))
 	var noLimits []string
 	for _, id := range ids {
-		memOut, _ := exec.Command(rt, "inspect", "--format", "{{.HostConfig.Memory}}", id).CombinedOutput()
+		memOut, _ := check.RunCmd(check.DefaultCmdTimeout, rt, "inspect", "--format", "{{.HostConfig.Memory}}", id)
 		mem := strings.TrimSpace(string(memOut))
 		if mem == "0" || mem == "" {
 			noLimits = append(noLimits, id[:12])
@@ -319,7 +319,7 @@ func (c *readonlyRootfs) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "No container runtime (skipped)"}
 	}
 
-	out, err := exec.Command(rt, "ps", "-q").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, rt, "ps", "-q")
 	if err != nil || strings.TrimSpace(string(out)) == "" {
 		return check.Result{Status: check.Pass, Message: "No running containers"}
 	}
@@ -327,7 +327,7 @@ func (c *readonlyRootfs) Run() check.Result {
 	ids := strings.Fields(strings.TrimSpace(string(out)))
 	var rwRoot []string
 	for _, id := range ids {
-		inspOut, _ := exec.Command(rt, "inspect", "--format", "{{.HostConfig.ReadonlyRootfs}}", id).CombinedOutput()
+		inspOut, _ := check.RunCmd(check.DefaultCmdTimeout, rt, "inspect", "--format", "{{.HostConfig.ReadonlyRootfs}}", id)
 		if strings.TrimSpace(string(inspOut)) != "true" {
 			rwRoot = append(rwRoot, id[:12])
 		}
@@ -357,7 +357,7 @@ func (c *loggingDriver) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "Docker not installed (skipped)"}
 	}
 
-	out, err := exec.Command("docker", "info", "--format", "{{.LoggingDriver}}").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "docker", "info", "--format", "{{.LoggingDriver}}")
 	if err != nil {
 		return check.Result{Status: check.Warn, Message: "Cannot query Docker logging driver"}
 	}
@@ -387,7 +387,7 @@ func (c *trustedRegistries) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "No container runtime (skipped)"}
 	}
 
-	out, err := exec.Command(rt, "images", "--format", "{{.Repository}}").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, rt, "images", "--format", "{{.Repository}}")
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "Cannot list images"}
 	}

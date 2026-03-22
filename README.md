@@ -36,7 +36,17 @@ Requires Go 1.24+:
 ```bash
 git clone https://github.com/civanmoreno/infraudit.git
 cd infraudit
-go build -o infraudit .
+make build
+```
+
+</details>
+
+<details>
+<summary><strong>Run with Docker</strong></summary>
+
+```bash
+docker build -t infraudit .
+docker run --rm --privileged -v /:/host:ro infraudit audit
 ```
 
 </details>
@@ -63,6 +73,9 @@ sudo infraudit audit --format json --output report.json
 
 # Export as YAML
 sudo infraudit audit --format yaml --output report.yaml
+
+# Run checks in parallel (4 workers)
+sudo infraudit audit --parallel 4
 
 # List all available checks
 infraudit list
@@ -150,6 +163,7 @@ infraudit list
 | `--output` | *(stdout)* | Write report to file |
 | `--profile` | *(none)* | Server profile to apply |
 | `--skip` | *(none)* | Comma-separated check IDs to skip |
+| `--parallel` | `0` | Run checks in parallel with N workers (0=sequential) |
 
 ---
 
@@ -180,19 +194,35 @@ Create a config file for persistent settings:
   "skip": ["HARD-007", "SVC-012"],
   "skip_categories": ["container", "nfs"],
   "allowed_ports": [22, 80, 443],
-  "allowed_root_processes": ["sshd", "nginx", "fail2ban"]
+  "allowed_root_processes": ["sshd", "nginx", "fail2ban"],
+  "command_timeout": 30
 }
 ```
 
-Config file search order:
+Config files are **merged** across all levels (system + user + directory). Values from higher-priority files extend lower ones, with deduplication:
 
 | Priority | Path | Scope |
 |:---------|:-----|:------|
-| 1 | `/etc/infraudit/config.json` | System-wide |
+| 1 (base) | `/etc/infraudit/config.json` | System-wide |
 | 2 | `~/.infraudit.json` | User |
-| 3 | `./.infraudit.json` | Directory |
+| 3 (top) | `./.infraudit.json` | Directory |
 
 > ⚙️ Full details in the **[Configuration Guide](https://civanmoreno.github.io/infraudit/configuration.html)**
+
+---
+
+## 🛠️ Development
+
+```bash
+make build       # Build static binary
+make test        # Run tests with race detector
+make lint        # Run golangci-lint
+make vet         # Run go vet
+make cover       # Test coverage report
+make release     # Cross-compile for amd64/arm64
+make docker      # Build Docker image
+make clean       # Remove build artifacts
+```
 
 ---
 

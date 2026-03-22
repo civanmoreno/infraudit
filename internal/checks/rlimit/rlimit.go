@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 
@@ -198,7 +197,7 @@ func (c *inodeUsage) Severity() check.Severity { return check.High }
 func (c *inodeUsage) Description() string    { return "Verify inode usage is below critical levels" }
 
 func (c *inodeUsage) Run() check.Result {
-	out, err := exec.Command("df", "-i", "--output=ipcent,target").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "df", "-i", "--output=ipcent,target")
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot check inode usage"}
 	}
@@ -227,7 +226,7 @@ func (c *inodeUsage) Run() check.Result {
 }
 
 func getDiskUsage(path string) int {
-	out, err := exec.Command("df", "--output=pcent", path).CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "df", "--output=pcent", path)
 	if err != nil {
 		return -1
 	}

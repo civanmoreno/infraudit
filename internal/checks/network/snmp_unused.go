@@ -2,7 +2,6 @@ package network
 
 import (
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -30,7 +29,7 @@ func (c *snmpUnused) Run() check.Result {
 	}
 
 	// Check if snmpd service is running
-	out, err := exec.Command("systemctl", "is-active", "snmpd").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "snmpd")
 	if err == nil && strings.TrimSpace(string(out)) == "active" {
 		return check.Result{
 			Status:      check.Warn,

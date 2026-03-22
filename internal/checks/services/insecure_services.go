@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -28,7 +27,7 @@ var insecureSvcs = []string{
 func (c *insecureServices) Run() check.Result {
 	var active []string
 	for _, svc := range insecureSvcs {
-		out, err := exec.Command("systemctl", "is-active", svc).CombinedOutput()
+		out, err := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", svc)
 		if err == nil && strings.TrimSpace(string(out)) == "active" {
 			active = append(active, svc)
 		}

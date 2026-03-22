@@ -71,7 +71,7 @@ func (c *auditRules) Severity() check.Severity { return check.High }
 func (c *auditRules) Description() string    { return "Verify audit rules watch /etc/passwd, /etc/shadow, sudoers" }
 
 func (c *auditRules) Run() check.Result {
-	out, err := exec.Command("auditctl", "-l").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "auditctl", "-l")
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read audit rules (auditctl not available or not root)"}
 	}
@@ -228,7 +228,7 @@ func (c *aideCron) Run() check.Result {
 	}
 
 	// Check crontab
-	out, _ := exec.Command("grep", "-r", "aide", "/etc/crontab").CombinedOutput()
+	out, _ := check.RunCmd(check.DefaultCmdTimeout, "grep", "-r", "aide", "/etc/crontab")
 	if strings.TrimSpace(string(out)) != "" {
 		return check.Result{Status: check.Pass, Message: "AIDE scheduled in /etc/crontab"}
 	}

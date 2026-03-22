@@ -2,7 +2,6 @@ package filesystem
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -21,14 +20,14 @@ func (c *worldWritable) Severity() check.Severity { return check.High }
 func (c *worldWritable) Description() string    { return "Find world-writable files outside temporary directories" }
 
 func (c *worldWritable) Run() check.Result {
-	out, err := exec.Command("find", "/", "-xdev",
+	out, err := check.RunCmd(check.LongCmdTimeout, "find", "/", "-xdev",
 		"-path", "/tmp", "-prune", "-o",
 		"-path", "/var/tmp", "-prune", "-o",
 		"-path", "/dev", "-prune", "-o",
 		"-path", "/proc", "-prune", "-o",
 		"-path", "/sys", "-prune", "-o",
 		"-path", "/run", "-prune", "-o",
-		"-type", "f", "-perm", "-0002", "-print").CombinedOutput()
+		"-type", "f", "-perm", "-0002", "-print")
 	if err != nil {
 		// find may return non-zero due to permission denied on some dirs
 		// but still output results

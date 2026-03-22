@@ -3,7 +3,6 @@ package hardening
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -26,7 +25,7 @@ func init() {
 
 func moduleBlacklisted(mod string) bool {
 	// Check modprobe blacklist
-	out, err := exec.Command("modprobe", "-n", "--show-depends", mod).CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "modprobe", "-n", "--show-depends", mod)
 	if err != nil {
 		return true // Module doesn't exist or is blocked
 	}
@@ -324,7 +323,7 @@ func (c *bluetooth) Severity() check.Severity { return check.Low }
 func (c *bluetooth) Description() string    { return "Verify bluetooth is disabled on servers" }
 
 func (c *bluetooth) Run() check.Result {
-	out, err := exec.Command("systemctl", "is-active", "bluetooth").CombinedOutput()
+	out, err := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "bluetooth")
 	if err == nil && strings.TrimSpace(string(out)) == "active" {
 		return check.Result{
 			Status: check.Warn, Message: "Bluetooth service is active",

@@ -136,6 +136,24 @@
             </ul>
         </div>
 
+        <div class="phase">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 22: DevOps Hardening</h2>
+                <span class="phase-status done">DONE</span>
+            </div>
+            <ul class="check-list">
+                <li>Command timeouts (context.WithTimeout) on all external commands <span class="phase-status done">DONE</span></li>
+                <li>Makefile with build, test, lint, release, docker targets <span class="phase-status done">DONE</span></li>
+                <li>golangci-lint config (.golangci.yml) and CI integration <span class="phase-status done">DONE</span></li>
+                <li>Race detector in CI (go test -race) <span class="phase-status done">DONE</span></li>
+                <li>Integration tests for helpers, config, and report <span class="phase-status done">DONE</span></li>
+                <li>Dockerfile — multi-stage build <span class="phase-status done">DONE</span></li>
+                <li>Config merge across levels with deduplication <span class="phase-status done">DONE</span></li>
+                <li>Parallel check execution (--parallel N) with progress <span class="phase-status done">DONE</span></li>
+                <li>CI hardening: coverage, SBOM, cosign signing <span class="phase-status done">DONE</span></li>
+            </ul>
+        </div>
+
         <h2>Standards Coverage</h2>
         <table>
             <thead>
