@@ -267,6 +267,16 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] New `categories` subcommand with check counts and JSON output
 - [x] `ParseSeverity()`, `ByCategories()`, `ByID()` added to check package
 
+### Phase 24: HTML Report ✅
+
+- [x] `--format html` generates a self-contained visual HTML report
+- [x] Dark theme matching documentation design system
+- [x] Summary dashboard with 4 metric cards and progress bar
+- [x] Checks grouped by category with status badges and severity indicators
+- [x] Remediation displayed inline for each finding
+- [x] Responsive design (mobile + print-friendly via @media print)
+- [x] Autocontenido — single .html file with embedded CSS, Google Fonts
+
 ## Check Categories
 
 | Category | Prefix | Description |

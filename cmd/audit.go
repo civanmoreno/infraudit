@@ -41,7 +41,7 @@ Use --format to change output format (console, json, yaml).`,
 
 func init() {
 	auditCmd.Flags().StringVar(&categoryFlag, "category", "", "Filter by category (comma-separated: auth,network,crypto)")
-	auditCmd.Flags().StringVar(&formatFlag, "format", "console", "Output format: console, json, yaml")
+	auditCmd.Flags().StringVar(&formatFlag, "format", "console", "Output format: console, json, yaml, html")
 	auditCmd.Flags().StringVar(&outputFlag, "output", "", "Write report to file")
 	auditCmd.Flags().StringVar(&profileFlag, "profile", "", "Server profile: web-server, db-server, container-host, minimal")
 	auditCmd.Flags().StringSliceVar(&skipFlag, "skip", nil, "Skip specific check IDs (comma-separated)")
@@ -227,6 +227,8 @@ func runAudit(cmd *cobra.Command, args []string) {
 		writeErr = report.WriteJSON(w, rpt)
 	case "yaml":
 		writeErr = report.WriteYAML(w, rpt)
+	case "html":
+		writeErr = report.WriteHTML(w, rpt)
 	default:
 		report.WriteConsole(w, rpt)
 	}

@@ -74,6 +74,9 @@ sudo infraudit audit --skip HARD-007,SVC-012
 # Export as JSON
 sudo infraudit audit --format json --output report.json
 
+# Generate visual HTML report
+sudo infraudit audit --format html --output report.html
+
 # Show only HIGH and CRITICAL findings
 sudo infraudit audit --severity-min high
 
@@ -171,7 +174,7 @@ infraudit categories
 |:-----|:--------|:------------|
 | `--category` | *(all)* | Filter by categories (comma-separated: `auth,network`) |
 | `--check` | *(none)* | Run a single check by ID (`AUTH-001`) |
-| `--format` | `console` | Output format: `console`, `json`, `yaml` |
+| `--format` | `console` | Output format: `console`, `json`, `yaml`, `html` |
 | `--output` | *(stdout)* | Write report to file |
 | `--profile` | *(none)* | Server profile to apply |
 | `--skip` | *(none)* | Comma-separated check IDs to skip |
