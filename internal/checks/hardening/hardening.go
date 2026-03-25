@@ -24,10 +24,15 @@ func init() {
 }
 
 func moduleBlacklisted(mod string) bool {
-	// Check modprobe blacklist
+	// First check if the module is explicitly blacklisted in modprobe config
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "modprobe", "-n", "--show-depends", mod)
 	if err != nil {
-		return true // Module doesn't exist or is blocked
+		// Distinguish between "module not found" (blacklisted/absent) and other errors
+		errMsg := string(out) + err.Error()
+		if strings.Contains(errMsg, "not found") || strings.Contains(errMsg, "Module") {
+			return true // Module genuinely doesn't exist
+		}
+		return false // Permission denied or other error — assume not blacklisted
 	}
 	return strings.Contains(string(out), "install /bin/true") ||
 		strings.Contains(string(out), "install /bin/false") ||

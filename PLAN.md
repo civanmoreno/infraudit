@@ -288,6 +288,18 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] HTML report — score circle card with grade, color-coded by rating
 - [x] Unit tests for `ComputeScore` and `ScoreGrade` (all pass, all fail, mixed, errors excluded, info ignored, empty)
 
+### Phase 26: Quality Hardening ✅
+
+- [x] Fix: UID comparison bug — `system_shell.go` used string comparison (`uid >= "1000"`) instead of numeric, replaced with `strconv.Atoi`
+- [x] Fix: `moduleBlacklisted()` — distinguished "module not found" from permission errors to avoid false positives
+- [x] Fix: Certificate check — surface parse errors as warnings instead of silently swallowing, add Details with affected filenames
+- [x] SUID scan expanded — added `/opt` and `/usr/local` to search paths, added `-xdev` to prevent crossing filesystem boundaries
+- [x] SSH config parser — handle both `Key Value` and `Key=Value` formats
+- [x] Check details — added `Details` map to SNMP, container root, privileged, resource limits, read-only rootfs, and cert expiry checks
+- [x] Shared helpers — `ParsePasswd()`, `ParseShadow()`, `ParseMounts()`, `HasMountOption()` in `check/helpers.go` to reduce code duplication
+- [x] Config expansion — added `allowed_suid` config field; FS-001 now respects user-defined SUID whitelist
+- [x] Samba pattern matching — normalized `guest ok`, `guest_ok`, and `map to guest` parsing to handle spacing variations
+
 ## Check Categories
 
 | Category | Prefix | Description |

@@ -95,6 +95,8 @@ func parseSSHDirective(path, directive string) (string, error) {
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
+		// Handle both "Key Value" and "Key=Value" formats
+		line = strings.Replace(line, "=", " ", 1)
 		parts := strings.Fields(line)
 		if len(parts) >= 2 && strings.ToLower(parts[0]) == lower {
 			value = parts[1]

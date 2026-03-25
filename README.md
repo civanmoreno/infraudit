@@ -231,6 +231,7 @@ Create a config file for persistent settings:
   "skip_categories": ["container", "nfs"],
   "allowed_ports": [22, 80, 443],
   "allowed_root_processes": ["sshd", "nginx", "fail2ban"],
+  "allowed_suid": ["/opt/myapp/bin/helper"],
   "command_timeout": 30
 }
 ```

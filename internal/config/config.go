@@ -16,6 +16,8 @@ type Config struct {
 	AllowedPorts []int `json:"allowed_ports,omitempty"`
 	// Whitelist of processes allowed to run as root (for SVC-008)
 	AllowedRootProcesses []string `json:"allowed_root_processes,omitempty"`
+	// Whitelist of SUID/SGID binaries to ignore (for FS-001)
+	AllowedSUID []string `json:"allowed_suid,omitempty"`
 	// CommandTimeout overrides the default timeout (in seconds) for external commands.
 	CommandTimeout int `json:"command_timeout,omitempty"`
 }
@@ -73,6 +75,7 @@ func merge(base, overlay *Config) *Config {
 	result.SkipCategories = dedup(append(result.SkipCategories, overlay.SkipCategories...))
 	result.AllowedPorts = dedupInt(append(result.AllowedPorts, overlay.AllowedPorts...))
 	result.AllowedRootProcesses = dedup(append(result.AllowedRootProcesses, overlay.AllowedRootProcesses...))
+	result.AllowedSUID = dedup(append(result.AllowedSUID, overlay.AllowedSUID...))
 	if overlay.CommandTimeout > 0 {
 		result.CommandTimeout = overlay.CommandTimeout
 	}

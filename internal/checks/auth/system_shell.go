@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -62,14 +63,8 @@ func (c *systemShell) Run() check.Result {
 		}
 
 		// System accounts typically have UID < 1000
-		if uid >= "1000" {
-			continue
-		}
-
-		// Parse UID as number for correct comparison
-		var uidNum int
-		_, _ = fmt.Sscanf(uid, "%d", &uidNum)
-		if uidNum >= 1000 {
+		uidNum, err := strconv.Atoi(uid)
+		if err != nil || uidNum >= 1000 {
 			continue
 		}
 

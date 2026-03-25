@@ -163,8 +163,9 @@ func (c *rootContainers) Run() check.Result {
 	if len(rootCtnrs) > 0 {
 		return check.Result{
 			Status:      check.Warn,
-			Message:     "Containers running as root: " + strings.Join(rootCtnrs, ", "),
-			Remediation: "Set USER directive in Dockerfile or use --user flag",
+			Message:     fmt.Sprintf("%d container(s) running as root: %s", len(rootCtnrs), strings.Join(rootCtnrs, ", ")),
+			Remediation: "Set USER directive in Dockerfile or use --user flag at runtime",
+			Details:     map[string]string{"containers": strings.Join(rootCtnrs, "\n")},
 		}
 	}
 	return check.Result{Status: check.Pass, Message: "No containers running as root"}
@@ -202,8 +203,9 @@ func (c *privilegedContainers) Run() check.Result {
 	if len(priv) > 0 {
 		return check.Result{
 			Status:      check.Fail,
-			Message:     "Privileged containers: " + strings.Join(priv, ", "),
-			Remediation: "Remove --privileged flag and use specific capabilities instead",
+			Message:     fmt.Sprintf("%d privileged container(s): %s", len(priv), strings.Join(priv, ", ")),
+			Remediation: "Remove --privileged flag and use specific capabilities instead (--cap-add)",
+			Details:     map[string]string{"containers": strings.Join(priv, "\n")},
 		}
 	}
 	return check.Result{Status: check.Pass, Message: "No privileged containers"}
@@ -241,9 +243,10 @@ func (c *resourceLimits) Run() check.Result {
 
 	if len(noLimits) > 0 {
 		return check.Result{
-			Status:  check.Warn,
-			Message: fmt.Sprintf("%d container(s) without memory limits", len(noLimits)),
+			Status:      check.Warn,
+			Message:     fmt.Sprintf("%d container(s) without memory limits", len(noLimits)),
 			Remediation: "Set limits: --memory and --cpus flags",
+			Details:     map[string]string{"containers": strings.Join(noLimits, "\n")},
 		}
 	}
 	return check.Result{Status: check.Pass, Message: "All containers have resource limits"}
@@ -335,9 +338,10 @@ func (c *readonlyRootfs) Run() check.Result {
 
 	if len(rwRoot) > 0 {
 		return check.Result{
-			Status:  check.Warn,
-			Message: fmt.Sprintf("%d container(s) without read-only root filesystem", len(rwRoot)),
+			Status:      check.Warn,
+			Message:     fmt.Sprintf("%d container(s) without read-only root filesystem", len(rwRoot)),
 			Remediation: "Use --read-only flag when starting containers",
+			Details:     map[string]string{"containers": strings.Join(rwRoot, "\n")},
 		}
 	}
 	return check.Result{Status: check.Pass, Message: "All containers use read-only root filesystem"}

@@ -109,17 +109,20 @@ func (c *sambaConfig) Run() check.Result {
 		if strings.HasPrefix(line, ";") || strings.HasPrefix(line, "#") {
 			continue
 		}
-		if strings.Contains(line, "guest ok") && strings.Contains(line, "yes") {
+		// Normalize: remove spaces around '=' for consistent parsing
+		normalized := strings.ReplaceAll(line, " ", "")
+		if (strings.Contains(normalized, "guestok=yes") || strings.Contains(normalized, "guest_ok=yes")) {
 			return check.Result{
 				Status:      check.Warn,
 				Message:     "Samba allows guest access",
 				Remediation: "Set 'guest ok = no' in /etc/samba/smb.conf",
 			}
 		}
-		if strings.Contains(line, "map to guest") {
+		if strings.Contains(normalized, "maptoguest=") && !strings.Contains(normalized, "maptoguest=never") {
 			return check.Result{
-				Status:  check.Warn,
-				Message: "Samba maps failed logins to guest",
+				Status:      check.Warn,
+				Message:     "Samba maps failed logins to guest",
+				Remediation: "Set 'map to guest = Never' in /etc/samba/smb.conf",
 			}
 		}
 	}

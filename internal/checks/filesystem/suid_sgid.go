@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
+	"github.com/civanmoreno/infraudit/internal/config"
 )
 
 func init() {
@@ -37,10 +38,19 @@ var knownSUID = map[string]bool{
 }
 
 func (c *suidSgid) Run() check.Result {
-	out, err := check.RunCmd(check.LongCmdTimeout, "find", "/usr", "/bin", "/sbin",
-		"-perm", "/6000", "-type", "f", "-print")
+	out, err := check.RunCmd(check.LongCmdTimeout, "find", "/usr", "/bin", "/sbin", "/opt", "/usr/local",
+		"-xdev", "-perm", "/6000", "-type", "f", "-print")
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Could not search for SUID/SGID files"}
+	}
+
+	// Build allowed set from defaults + config
+	allowed := make(map[string]bool, len(knownSUID))
+	for k, v := range knownSUID {
+		allowed[k] = v
+	}
+	for _, p := range config.Get().AllowedSUID {
+		allowed[p] = true
 	}
 
 	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
@@ -50,7 +60,7 @@ func (c *suidSgid) Run() check.Result {
 		if l == "" {
 			continue
 		}
-		if !knownSUID[l] {
+		if !allowed[l] {
 			unknown = append(unknown, l)
 		}
 	}
