@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -59,21 +60,38 @@ type PasswdEntry struct {
 	Shell string
 }
 
+var (
+	passwdOnce  sync.Once
+	passwdCache []PasswdEntry
+	passwdErr   error
+
+	shadowOnce  sync.Once
+	shadowCache []ShadowEntry
+	shadowErr   error
+
+	mountsOnce  sync.Once
+	mountsCache []MountEntry
+)
+
 // ParsePasswd reads /etc/passwd and returns parsed entries.
+// Results are cached for the lifetime of the process.
 func ParsePasswd() ([]PasswdEntry, error) {
-	return parseColonFile("/etc/passwd", func(parts []string) *PasswdEntry {
-		if len(parts) < 7 {
-			return nil
-		}
-		uid, err := fmt.Sscanf(parts[2], "%d", new(int))
-		if uid == 0 || err != nil {
-			return nil
-		}
-		var uidNum, gidNum int
-		fmt.Sscanf(parts[2], "%d", &uidNum)
-		fmt.Sscanf(parts[3], "%d", &gidNum)
-		return &PasswdEntry{User: parts[0], UID: uidNum, GID: gidNum, Home: parts[5], Shell: parts[6]}
+	passwdOnce.Do(func() {
+		passwdCache, passwdErr = parseColonFile("/etc/passwd", func(parts []string) *PasswdEntry {
+			if len(parts) < 7 {
+				return nil
+			}
+			uid, err := fmt.Sscanf(parts[2], "%d", new(int))
+			if uid == 0 || err != nil {
+				return nil
+			}
+			var uidNum, gidNum int
+			fmt.Sscanf(parts[2], "%d", &uidNum)
+			fmt.Sscanf(parts[3], "%d", &gidNum)
+			return &PasswdEntry{User: parts[0], UID: uidNum, GID: gidNum, Home: parts[5], Shell: parts[6]}
+		})
 	})
+	return passwdCache, passwdErr
 }
 
 // ShadowEntry represents a parsed line from /etc/shadow.
@@ -83,13 +101,17 @@ type ShadowEntry struct {
 }
 
 // ParseShadow reads /etc/shadow and returns parsed entries.
+// Results are cached for the lifetime of the process.
 func ParseShadow() ([]ShadowEntry, error) {
-	return parseColonFile("/etc/shadow", func(parts []string) *ShadowEntry {
-		if len(parts) < 2 {
-			return nil
-		}
-		return &ShadowEntry{User: parts[0], Hash: parts[1]}
+	shadowOnce.Do(func() {
+		shadowCache, shadowErr = parseColonFile("/etc/shadow", func(parts []string) *ShadowEntry {
+			if len(parts) < 2 {
+				return nil
+			}
+			return &ShadowEntry{User: parts[0], Hash: parts[1]}
+		})
 	})
+	return shadowCache, shadowErr
 }
 
 // parseColonFile is a generic colon-separated file parser.
@@ -123,26 +145,41 @@ type MountEntry struct {
 }
 
 // ParseMounts reads /proc/mounts and returns parsed entries.
+// Results are cached for the lifetime of the process.
 func ParseMounts() []MountEntry {
-	f, err := os.Open("/proc/mounts")
-	if err != nil {
-		return nil
-	}
-	defer f.Close()
-
-	var mounts []MountEntry
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		fields := strings.Fields(scanner.Text())
-		if len(fields) < 4 {
-			continue
+	mountsOnce.Do(func() {
+		f, err := os.Open("/proc/mounts")
+		if err != nil {
+			return
 		}
-		mounts = append(mounts, MountEntry{
-			Device: fields[0], Mount: fields[1],
-			FSType: fields[2], Options: fields[3],
-		})
-	}
-	return mounts
+		defer f.Close()
+
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			fields := strings.Fields(scanner.Text())
+			if len(fields) < 4 {
+				continue
+			}
+			mountsCache = append(mountsCache, MountEntry{
+				Device: fields[0], Mount: fields[1],
+				FSType: fields[2], Options: fields[3],
+			})
+		}
+	})
+	return mountsCache
+}
+
+// ResetCache clears cached results from ParsePasswd, ParseShadow, and ParseMounts.
+// Used only in tests.
+func ResetCache() {
+	passwdOnce = sync.Once{}
+	passwdCache = nil
+	passwdErr = nil
+	shadowOnce = sync.Once{}
+	shadowCache = nil
+	shadowErr = nil
+	mountsOnce = sync.Once{}
+	mountsCache = nil
 }
 
 // HasMountOption checks if a comma-separated option string contains the given option.

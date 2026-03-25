@@ -310,6 +310,17 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Unit tests — added `TestHasMountOption`, `TestParseMounts`, `TestParsePasswd` to `helpers_test.go`
 - [x] Documentation — `docs/index.html` updated with Hardening Index feature card, HTML output mention, and score in sample output
 
+### Phase 28: Check Validation Tests & Performance Cache ✅
+
+- [x] Registry validation test suite — 8 tests validating all 132 registered checks:
+  - No duplicate IDs, ID format (PREFIX-NNN), valid categories, valid severities
+  - Non-empty fields (ID, Name, Description), all 17 categories covered
+  - ID prefix matches category (AUTH-xxx → auth, NET-xxx → network, etc.)
+- [x] Performance: `sync.Once` cache for `ParsePasswd()`, `ParseShadow()`, `ParseMounts()`
+  - Each file read once per audit instead of 3–6 times
+  - Thread-safe via `sync.Once` — safe with `--parallel`
+  - `ResetCache()` available for tests
+
 ## Check Categories
 
 | Category | Prefix | Description |
