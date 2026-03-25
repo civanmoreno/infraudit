@@ -139,11 +139,8 @@ func (c *rpcbindDisabled) Severity() check.Severity { return check.Medium }
 func (c *rpcbindDisabled) Description() string    { return "Verify rpcbind is not running if NFS is not needed" }
 
 func (c *rpcbindDisabled) Run() check.Result {
-	rpcOut, _ := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "rpcbind")
-	rpcActive := strings.TrimSpace(string(rpcOut)) == "active"
-
-	nfsOut, _ := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "nfs-server")
-	nfsActive := strings.TrimSpace(string(nfsOut)) == "active"
+	rpcActive := check.ServiceActive("rpcbind")
+	nfsActive := check.ServiceActive("nfs-server")
 
 	if rpcActive && !nfsActive {
 		return check.Result{

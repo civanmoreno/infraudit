@@ -317,20 +317,15 @@ func (c *weakHash) Severity() check.Severity { return check.High }
 func (c *weakHash) Description() string    { return "Verify MD5 and SHA1 are not used for password hashing" }
 
 func (c *weakHash) Run() check.Result {
-	data, err := os.ReadFile("/etc/shadow")
+	entries, err := check.ParseShadow()
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/shadow: " + err.Error()}
 	}
 
 	var md5Users []string
-	for _, line := range strings.Split(string(data), "\n") {
-		parts := strings.Split(line, ":")
-		if len(parts) < 2 {
-			continue
-		}
-		user, hash := parts[0], parts[1]
-		if strings.HasPrefix(hash, "$1$") {
-			md5Users = append(md5Users, user)
+	for _, e := range entries {
+		if strings.HasPrefix(e.Hash, "$1$") {
+			md5Users = append(md5Users, e.User)
 		}
 	}
 

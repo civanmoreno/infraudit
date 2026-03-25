@@ -1,10 +1,7 @@
 package auth
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strconv"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -23,63 +20,35 @@ func (c *systemShell) Severity() check.Severity { return check.High }
 func (c *systemShell) Description() string    { return "Ensure system/service accounts use /sbin/nologin or /bin/false" }
 
 func (c *systemShell) Run() check.Result {
-	f, err := os.Open("/etc/passwd")
+	entries, err := check.ParsePasswd()
 	if err != nil {
 		return check.Result{
 			Status:  check.Error,
 			Message: "Could not read /etc/passwd: " + err.Error(),
 		}
 	}
-	defer f.Close()
 
-	// Shells considered safe for system accounts
 	safeShells := map[string]bool{
-		"/sbin/nologin":  true,
+		"/sbin/nologin":     true,
 		"/usr/sbin/nologin": true,
-		"/bin/false":     true,
-		"/usr/bin/false": true,
+		"/bin/false":        true,
+		"/usr/bin/false":    true,
 	}
 
-	// Accounts that are allowed to have a login shell
 	allowed := map[string]bool{
 		"root": true,
 		"sync": true,
 	}
 
 	var bad []string
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := scanner.Text()
-		parts := strings.Split(line, ":")
-		if len(parts) < 7 {
+	for _, e := range entries {
+		if allowed[e.User] || e.UID >= 1000 {
 			continue
 		}
-		user := parts[0]
-		uid := parts[2]
-		shell := parts[6]
-
-		if allowed[user] {
+		if e.Shell == "" || safeShells[e.Shell] {
 			continue
 		}
-
-		// System accounts typically have UID < 1000
-		uidNum, err := strconv.Atoi(uid)
-		if err != nil || uidNum >= 1000 {
-			continue
-		}
-
-		if shell == "" || safeShells[shell] {
-			continue
-		}
-
-		bad = append(bad, fmt.Sprintf("%s (shell: %s)", user, shell))
-	}
-
-	if err := scanner.Err(); err != nil {
-		return check.Result{
-			Status:  check.Error,
-			Message: "Error reading /etc/passwd: " + err.Error(),
-		}
+		bad = append(bad, fmt.Sprintf("%s (shell: %s)", e.User, e.Shell))
 	}
 
 	if len(bad) > 0 {

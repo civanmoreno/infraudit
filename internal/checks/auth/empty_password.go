@@ -1,9 +1,7 @@
 package auth
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -22,35 +20,18 @@ func (c *emptyPassword) Severity() check.Severity { return check.Critical }
 func (c *emptyPassword) Description() string    { return "Ensure no user accounts have an empty password field" }
 
 func (c *emptyPassword) Run() check.Result {
-	f, err := os.Open("/etc/shadow")
+	entries, err := check.ParseShadow()
 	if err != nil {
 		return check.Result{
 			Status:  check.Error,
 			Message: "Could not read /etc/shadow: " + err.Error(),
 		}
 	}
-	defer f.Close()
 
 	var bad []string
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := scanner.Text()
-		parts := strings.Split(line, ":")
-		if len(parts) < 2 {
-			continue
-		}
-		user := parts[0]
-		hash := parts[1]
-		// Empty string means no password set (can login without password)
-		if hash == "" {
-			bad = append(bad, user)
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return check.Result{
-			Status:  check.Error,
-			Message: "Error reading /etc/shadow: " + err.Error(),
+	for _, e := range entries {
+		if e.Hash == "" {
+			bad = append(bad, e.User)
 		}
 	}
 

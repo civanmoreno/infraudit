@@ -125,25 +125,20 @@ func (c *singleUserAuth) Severity() check.Severity { return check.High }
 func (c *singleUserAuth) Description() string    { return "Verify rescue/emergency mode requires root password" }
 
 func (c *singleUserAuth) Run() check.Result {
-	// Check if root has a password set
-	data, err := os.ReadFile("/etc/shadow")
+	entries, err := check.ParseShadow()
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/shadow: " + err.Error()}
 	}
-	for _, line := range strings.Split(string(data), "\n") {
-		if strings.HasPrefix(line, "root:") {
-			parts := strings.Split(line, ":")
-			if len(parts) >= 2 {
-				hash := parts[1]
-				if hash == "" || hash == "*" || hash == "!" || hash == "!!" {
-					return check.Result{
-						Status:      check.Fail,
-						Message:     "root account has no password (single-user mode unprotected)",
-						Remediation: "Set root password: passwd root",
-					}
+	for _, e := range entries {
+		if e.User == "root" {
+			if e.Hash == "" || e.Hash == "*" || e.Hash == "!" || e.Hash == "!!" {
+				return check.Result{
+					Status:      check.Fail,
+					Message:     "root account has no password (single-user mode unprotected)",
+					Remediation: "Set root password: passwd root",
 				}
-				return check.Result{Status: check.Pass, Message: "root has a password set"}
 			}
+			return check.Result{Status: check.Pass, Message: "root has a password set"}
 		}
 	}
 	return check.Result{Status: check.Error, Message: "Could not find root entry in /etc/shadow"}

@@ -24,7 +24,7 @@ func (c *separatePartitions) Description() string {
 }
 
 func (c *separatePartitions) Run() check.Result {
-	mounts := parseMounts()
+	mounts := check.ParseMounts()
 	recommended := []string{"/tmp", "/var", "/var/log", "/var/log/audit", "/var/tmp", "/home"}
 
 	var missing []string

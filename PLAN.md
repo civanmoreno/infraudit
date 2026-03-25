@@ -300,6 +300,16 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Config expansion — added `allowed_suid` config field; FS-001 now respects user-defined SUID whitelist
 - [x] Samba pattern matching — normalized `guest ok`, `guest_ok`, and `map to guest` parsing to handle spacing variations
 
+### Phase 27: Code Consolidation ✅
+
+- [x] Adopt shared helpers — `uid_zero.go`, `empty_password.go`, `system_shell.go`, `boot.go` now use `ParsePasswd()`/`ParseShadow()` instead of duplicated parsing
+- [x] Adopt shared helpers — `mount_options.go`, `partitions.go`, `hardening.go` now use `ParseMounts()`/`HasMountOption()` instead of local functions
+- [x] Adopt shared helpers — `crypto.go` weakHash check now uses `ParseShadow()`
+- [x] Error handling — `packages.go` returns `Error` when apt/dnf commands fail instead of `Pass`
+- [x] Error handling — `nfs.go` rpcbind check uses `ServiceActive()` helper instead of raw command with ignored errors
+- [x] Unit tests — added `TestHasMountOption`, `TestParseMounts`, `TestParsePasswd` to `helpers_test.go`
+- [x] Documentation — `docs/index.html` updated with Hardening Index feature card, HTML output mention, and score in sample output
+
 ## Check Categories
 
 | Category | Prefix | Description |
