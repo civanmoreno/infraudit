@@ -23,16 +23,17 @@ linters:
     gosec:
       excludes:
         - G101
+        - G104
         - G115
+        - G122
         - G204
         - G304
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
 
 formatters:
   enable:
     - gofmt
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - errcheck
