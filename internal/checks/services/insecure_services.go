@@ -13,11 +13,13 @@ func init() {
 
 type insecureServices struct{}
 
-func (c *insecureServices) ID() string             { return "SVC-001" }
-func (c *insecureServices) Name() string           { return "No insecure services running" }
-func (c *insecureServices) Category() string       { return "services" }
+func (c *insecureServices) ID() string               { return "SVC-001" }
+func (c *insecureServices) Name() string             { return "No insecure services running" }
+func (c *insecureServices) Category() string         { return "services" }
 func (c *insecureServices) Severity() check.Severity { return check.Critical }
-func (c *insecureServices) Description() string    { return "Verify insecure services like telnet, rsh, rlogin, xinetd are not running" }
+func (c *insecureServices) Description() string {
+	return "Verify insecure services like telnet, rsh, rlogin, xinetd are not running"
+}
 
 var insecureSvcs = []string{
 	"telnet.socket", "telnetd", "rsh.socket", "rlogin.socket",

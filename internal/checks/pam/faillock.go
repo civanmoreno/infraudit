@@ -15,9 +15,9 @@ func init() {
 
 type faillock struct{}
 
-func (c *faillock) ID() string             { return "PAM-003" }
-func (c *faillock) Name() string           { return "Account lockout after failed attempts" }
-func (c *faillock) Category() string       { return "pam" }
+func (c *faillock) ID() string               { return "PAM-003" }
+func (c *faillock) Name() string             { return "Account lockout after failed attempts" }
+func (c *faillock) Category() string         { return "pam" }
 func (c *faillock) Severity() check.Severity { return check.High }
 func (c *faillock) Description() string {
 	return "Verify pam_faillock is configured to lock accounts after failed login attempts"
@@ -108,4 +108,3 @@ func parseFaillockConf() map[string]string {
 	}
 	return conf
 }
-

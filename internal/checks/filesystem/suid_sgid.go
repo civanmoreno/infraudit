@@ -14,11 +14,11 @@ func init() {
 
 type suidSgid struct{}
 
-func (c *suidSgid) ID() string             { return "FS-001" }
-func (c *suidSgid) Name() string           { return "No unnecessary SUID/SGID files" }
-func (c *suidSgid) Category() string       { return "filesystem" }
+func (c *suidSgid) ID() string               { return "FS-001" }
+func (c *suidSgid) Name() string             { return "No unnecessary SUID/SGID files" }
+func (c *suidSgid) Category() string         { return "filesystem" }
 func (c *suidSgid) Severity() check.Severity { return check.High }
-func (c *suidSgid) Description() string    { return "Find SUID/SGID files for review" }
+func (c *suidSgid) Description() string      { return "Find SUID/SGID files for review" }
 
 // Known safe SUID binaries
 var knownSUID = map[string]bool{

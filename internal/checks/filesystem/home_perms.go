@@ -14,11 +14,13 @@ func init() {
 
 type homePerms struct{}
 
-func (c *homePerms) ID() string             { return "FS-006" }
-func (c *homePerms) Name() string           { return "Home directories not world-readable" }
-func (c *homePerms) Category() string       { return "filesystem" }
+func (c *homePerms) ID() string               { return "FS-006" }
+func (c *homePerms) Name() string             { return "Home directories not world-readable" }
+func (c *homePerms) Category() string         { return "filesystem" }
 func (c *homePerms) Severity() check.Severity { return check.Medium }
-func (c *homePerms) Description() string    { return "Verify user home directories are not world-readable or writable" }
+func (c *homePerms) Description() string {
+	return "Verify user home directories are not world-readable or writable"
+}
 
 func (c *homePerms) Run() check.Result {
 	entries, err := os.ReadDir("/home")

@@ -13,11 +13,11 @@ func init() {
 
 type snmpUnused struct{}
 
-func (c *snmpUnused) ID() string             { return "NET-011" }
-func (c *snmpUnused) Name() string           { return "SNMP removed if unused" }
-func (c *snmpUnused) Category() string       { return "network" }
+func (c *snmpUnused) ID() string               { return "NET-011" }
+func (c *snmpUnused) Name() string             { return "SNMP removed if unused" }
+func (c *snmpUnused) Category() string         { return "network" }
 func (c *snmpUnused) Severity() check.Severity { return check.Low }
-func (c *snmpUnused) Description() string    { return "Verify SNMP daemon is not installed if not needed" }
+func (c *snmpUnused) Description() string      { return "Verify SNMP daemon is not installed if not needed" }
 
 func (c *snmpUnused) Run() check.Result {
 	// Check if snmpd config exists

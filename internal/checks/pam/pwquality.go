@@ -16,9 +16,9 @@ func init() {
 
 type pwquality struct{}
 
-func (c *pwquality) ID() string             { return "PAM-001" }
-func (c *pwquality) Name() string           { return "Password quality enforced via pam_pwquality" }
-func (c *pwquality) Category() string       { return "pam" }
+func (c *pwquality) ID() string               { return "PAM-001" }
+func (c *pwquality) Name() string             { return "Password quality enforced via pam_pwquality" }
+func (c *pwquality) Category() string         { return "pam" }
 func (c *pwquality) Severity() check.Severity { return check.Medium }
 func (c *pwquality) Description() string {
 	return "Verify pam_pwquality is configured with adequate password complexity requirements"

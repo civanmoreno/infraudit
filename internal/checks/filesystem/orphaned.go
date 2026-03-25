@@ -13,11 +13,11 @@ func init() {
 
 type orphanedFiles struct{}
 
-func (c *orphanedFiles) ID() string             { return "FS-007" }
-func (c *orphanedFiles) Name() string           { return "No orphaned files" }
-func (c *orphanedFiles) Category() string       { return "filesystem" }
+func (c *orphanedFiles) ID() string               { return "FS-007" }
+func (c *orphanedFiles) Name() string             { return "No orphaned files" }
+func (c *orphanedFiles) Category() string         { return "filesystem" }
 func (c *orphanedFiles) Severity() check.Severity { return check.Low }
-func (c *orphanedFiles) Description() string    { return "Find files without a valid owner or group" }
+func (c *orphanedFiles) Description() string      { return "Find files without a valid owner or group" }
 
 func (c *orphanedFiles) Run() check.Result {
 	out, _ := check.RunCmd(check.LongCmdTimeout, "find", "/usr", "/etc", "/var",

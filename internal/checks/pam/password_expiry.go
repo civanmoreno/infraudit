@@ -15,9 +15,9 @@ func init() {
 
 type passwordExpiry struct{}
 
-func (c *passwordExpiry) ID() string             { return "PAM-005" }
-func (c *passwordExpiry) Name() string           { return "Password expiration configured" }
-func (c *passwordExpiry) Category() string       { return "pam" }
+func (c *passwordExpiry) ID() string               { return "PAM-005" }
+func (c *passwordExpiry) Name() string             { return "Password expiration configured" }
+func (c *passwordExpiry) Category() string         { return "pam" }
 func (c *passwordExpiry) Severity() check.Severity { return check.Low }
 func (c *passwordExpiry) Description() string {
 	return "Verify password aging is configured in /etc/login.defs (PASS_MAX_DAYS, PASS_MIN_DAYS, PASS_WARN_AGE)"

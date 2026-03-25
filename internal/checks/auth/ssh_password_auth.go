@@ -12,11 +12,13 @@ func init() {
 
 type sshPasswordAuth struct{}
 
-func (c *sshPasswordAuth) ID() string          { return "AUTH-002" }
-func (c *sshPasswordAuth) Name() string        { return "SSH password authentication disabled" }
-func (c *sshPasswordAuth) Category() string    { return "auth" }
+func (c *sshPasswordAuth) ID() string               { return "AUTH-002" }
+func (c *sshPasswordAuth) Name() string             { return "SSH password authentication disabled" }
+func (c *sshPasswordAuth) Category() string         { return "auth" }
 func (c *sshPasswordAuth) Severity() check.Severity { return check.High }
-func (c *sshPasswordAuth) Description() string { return "Verify that password authentication is disabled in SSH" }
+func (c *sshPasswordAuth) Description() string {
+	return "Verify that password authentication is disabled in SSH"
+}
 
 func (c *sshPasswordAuth) Run() check.Result {
 	val, err := sshdConfigValue("PasswordAuthentication")

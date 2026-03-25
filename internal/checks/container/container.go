@@ -47,11 +47,11 @@ func runtimeAvailable() string {
 // CTR-001
 type dockerDetect struct{}
 
-func (c *dockerDetect) ID() string             { return "CTR-001" }
-func (c *dockerDetect) Name() string           { return "Docker/Podman detected" }
-func (c *dockerDetect) Category() string       { return "container" }
+func (c *dockerDetect) ID() string               { return "CTR-001" }
+func (c *dockerDetect) Name() string             { return "Docker/Podman detected" }
+func (c *dockerDetect) Category() string         { return "container" }
 func (c *dockerDetect) Severity() check.Severity { return check.Info }
-func (c *dockerDetect) Description() string    { return "Detect if Docker or Podman is installed" }
+func (c *dockerDetect) Description() string      { return "Detect if Docker or Podman is installed" }
 
 func (c *dockerDetect) Run() check.Result {
 	rt := runtimeAvailable()
@@ -64,11 +64,13 @@ func (c *dockerDetect) Run() check.Result {
 // CTR-002
 type dockerDaemonConfig struct{}
 
-func (c *dockerDaemonConfig) ID() string             { return "CTR-002" }
-func (c *dockerDaemonConfig) Name() string           { return "Docker daemon configuration reviewed" }
-func (c *dockerDaemonConfig) Category() string       { return "container" }
+func (c *dockerDaemonConfig) ID() string               { return "CTR-002" }
+func (c *dockerDaemonConfig) Name() string             { return "Docker daemon configuration reviewed" }
+func (c *dockerDaemonConfig) Category() string         { return "container" }
 func (c *dockerDaemonConfig) Severity() check.Severity { return check.Medium }
-func (c *dockerDaemonConfig) Description() string    { return "Verify Docker daemon.json has security settings" }
+func (c *dockerDaemonConfig) Description() string {
+	return "Verify Docker daemon.json has security settings"
+}
 
 func (c *dockerDaemonConfig) Run() check.Result {
 	if !dockerAvailable() {
@@ -94,11 +96,13 @@ func (c *dockerDaemonConfig) Run() check.Result {
 // CTR-003
 type dockerSocketPerms struct{}
 
-func (c *dockerSocketPerms) ID() string             { return "CTR-003" }
-func (c *dockerSocketPerms) Name() string           { return "Docker socket permissions restricted" }
-func (c *dockerSocketPerms) Category() string       { return "container" }
+func (c *dockerSocketPerms) ID() string               { return "CTR-003" }
+func (c *dockerSocketPerms) Name() string             { return "Docker socket permissions restricted" }
+func (c *dockerSocketPerms) Category() string         { return "container" }
 func (c *dockerSocketPerms) Severity() check.Severity { return check.High }
-func (c *dockerSocketPerms) Description() string    { return "Verify /var/run/docker.sock is not world-accessible" }
+func (c *dockerSocketPerms) Description() string {
+	return "Verify /var/run/docker.sock is not world-accessible"
+}
 
 func (c *dockerSocketPerms) Run() check.Result {
 	if !dockerAvailable() {
@@ -124,11 +128,11 @@ func (c *dockerSocketPerms) Run() check.Result {
 // CTR-004
 type rootContainers struct{}
 
-func (c *rootContainers) ID() string             { return "CTR-004" }
-func (c *rootContainers) Name() string           { return "No containers running as root" }
-func (c *rootContainers) Category() string       { return "container" }
+func (c *rootContainers) ID() string               { return "CTR-004" }
+func (c *rootContainers) Name() string             { return "No containers running as root" }
+func (c *rootContainers) Category() string         { return "container" }
 func (c *rootContainers) Severity() check.Severity { return check.High }
-func (c *rootContainers) Description() string    { return "Check for containers running as root user" }
+func (c *rootContainers) Description() string      { return "Check for containers running as root user" }
 
 func (c *rootContainers) Run() check.Result {
 	rt := runtimeAvailable()
@@ -174,11 +178,13 @@ func (c *rootContainers) Run() check.Result {
 // CTR-005
 type privilegedContainers struct{}
 
-func (c *privilegedContainers) ID() string             { return "CTR-005" }
-func (c *privilegedContainers) Name() string           { return "No privileged containers" }
-func (c *privilegedContainers) Category() string       { return "container" }
+func (c *privilegedContainers) ID() string               { return "CTR-005" }
+func (c *privilegedContainers) Name() string             { return "No privileged containers" }
+func (c *privilegedContainers) Category() string         { return "container" }
 func (c *privilegedContainers) Severity() check.Severity { return check.Critical }
-func (c *privilegedContainers) Description() string    { return "Check for containers running in privileged mode" }
+func (c *privilegedContainers) Description() string {
+	return "Check for containers running in privileged mode"
+}
 
 func (c *privilegedContainers) Run() check.Result {
 	rt := runtimeAvailable()
@@ -214,11 +220,11 @@ func (c *privilegedContainers) Run() check.Result {
 // CTR-006
 type resourceLimits struct{}
 
-func (c *resourceLimits) ID() string             { return "CTR-006" }
-func (c *resourceLimits) Name() string           { return "Container resource limits set" }
-func (c *resourceLimits) Category() string       { return "container" }
+func (c *resourceLimits) ID() string               { return "CTR-006" }
+func (c *resourceLimits) Name() string             { return "Container resource limits set" }
+func (c *resourceLimits) Category() string         { return "container" }
 func (c *resourceLimits) Severity() check.Severity { return check.Medium }
-func (c *resourceLimits) Description() string    { return "Verify containers have CPU and memory limits" }
+func (c *resourceLimits) Description() string      { return "Verify containers have CPU and memory limits" }
 
 func (c *resourceLimits) Run() check.Result {
 	rt := runtimeAvailable()
@@ -255,11 +261,11 @@ func (c *resourceLimits) Run() check.Result {
 // CTR-007
 type contentTrust struct{}
 
-func (c *contentTrust) ID() string             { return "CTR-007" }
-func (c *contentTrust) Name() string           { return "Docker content trust enabled" }
-func (c *contentTrust) Category() string       { return "container" }
+func (c *contentTrust) ID() string               { return "CTR-007" }
+func (c *contentTrust) Name() string             { return "Docker content trust enabled" }
+func (c *contentTrust) Category() string         { return "container" }
 func (c *contentTrust) Severity() check.Severity { return check.Medium }
-func (c *contentTrust) Description() string    { return "Verify DOCKER_CONTENT_TRUST is enabled" }
+func (c *contentTrust) Description() string      { return "Verify DOCKER_CONTENT_TRUST is enabled" }
 
 func (c *contentTrust) Run() check.Result {
 	if !dockerAvailable() {
@@ -277,11 +283,11 @@ func (c *contentTrust) Run() check.Result {
 // CTR-008
 type iccDisabled struct{}
 
-func (c *iccDisabled) ID() string             { return "CTR-008" }
-func (c *iccDisabled) Name() string           { return "Inter-container communication restricted" }
-func (c *iccDisabled) Category() string       { return "container" }
+func (c *iccDisabled) ID() string               { return "CTR-008" }
+func (c *iccDisabled) Name() string             { return "Inter-container communication restricted" }
+func (c *iccDisabled) Category() string         { return "container" }
 func (c *iccDisabled) Severity() check.Severity { return check.Medium }
-func (c *iccDisabled) Description() string    { return "Verify ICC is disabled on default bridge network" }
+func (c *iccDisabled) Description() string      { return "Verify ICC is disabled on default bridge network" }
 
 func (c *iccDisabled) Run() check.Result {
 	if !dockerAvailable() {
@@ -310,11 +316,13 @@ func (c *iccDisabled) Run() check.Result {
 // CTR-009
 type readonlyRootfs struct{}
 
-func (c *readonlyRootfs) ID() string             { return "CTR-009" }
-func (c *readonlyRootfs) Name() string           { return "Read-only root filesystem in containers" }
-func (c *readonlyRootfs) Category() string       { return "container" }
+func (c *readonlyRootfs) ID() string               { return "CTR-009" }
+func (c *readonlyRootfs) Name() string             { return "Read-only root filesystem in containers" }
+func (c *readonlyRootfs) Category() string         { return "container" }
 func (c *readonlyRootfs) Severity() check.Severity { return check.Low }
-func (c *readonlyRootfs) Description() string    { return "Check if containers use read-only root filesystem" }
+func (c *readonlyRootfs) Description() string {
+	return "Check if containers use read-only root filesystem"
+}
 
 func (c *readonlyRootfs) Run() check.Result {
 	rt := runtimeAvailable()
@@ -350,11 +358,11 @@ func (c *readonlyRootfs) Run() check.Result {
 // CTR-010
 type loggingDriver struct{}
 
-func (c *loggingDriver) ID() string             { return "CTR-010" }
-func (c *loggingDriver) Name() string           { return "Docker logging driver configured" }
-func (c *loggingDriver) Category() string       { return "container" }
+func (c *loggingDriver) ID() string               { return "CTR-010" }
+func (c *loggingDriver) Name() string             { return "Docker logging driver configured" }
+func (c *loggingDriver) Category() string         { return "container" }
 func (c *loggingDriver) Severity() check.Severity { return check.Low }
-func (c *loggingDriver) Description() string    { return "Verify Docker logging driver is set" }
+func (c *loggingDriver) Description() string      { return "Verify Docker logging driver is set" }
 
 func (c *loggingDriver) Run() check.Result {
 	if !dockerAvailable() {
@@ -379,11 +387,13 @@ func (c *loggingDriver) Run() check.Result {
 // CTR-011
 type trustedRegistries struct{}
 
-func (c *trustedRegistries) ID() string             { return "CTR-011" }
-func (c *trustedRegistries) Name() string           { return "Images from trusted registries" }
-func (c *trustedRegistries) Category() string       { return "container" }
+func (c *trustedRegistries) ID() string               { return "CTR-011" }
+func (c *trustedRegistries) Name() string             { return "Images from trusted registries" }
+func (c *trustedRegistries) Category() string         { return "container" }
 func (c *trustedRegistries) Severity() check.Severity { return check.Medium }
-func (c *trustedRegistries) Description() string    { return "Check if container images come from trusted registries" }
+func (c *trustedRegistries) Description() string {
+	return "Check if container images come from trusted registries"
+}
 
 func (c *trustedRegistries) Run() check.Result {
 	rt := runtimeAvailable()

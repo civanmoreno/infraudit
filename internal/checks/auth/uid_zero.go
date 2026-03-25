@@ -13,11 +13,11 @@ func init() {
 
 type uidZero struct{}
 
-func (c *uidZero) ID() string             { return "AUTH-003" }
-func (c *uidZero) Name() string           { return "Only root has UID 0" }
-func (c *uidZero) Category() string       { return "auth" }
+func (c *uidZero) ID() string               { return "AUTH-003" }
+func (c *uidZero) Name() string             { return "Only root has UID 0" }
+func (c *uidZero) Category() string         { return "auth" }
 func (c *uidZero) Severity() check.Severity { return check.Critical }
-func (c *uidZero) Description() string    { return "Ensure no user besides root has UID 0" }
+func (c *uidZero) Description() string      { return "Ensure no user besides root has UID 0" }
 
 func (c *uidZero) Run() check.Result {
 	entries, err := check.ParsePasswd()

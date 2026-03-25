@@ -12,11 +12,13 @@ func init() {
 
 type firewallActive struct{}
 
-func (c *firewallActive) ID() string             { return "NET-001" }
-func (c *firewallActive) Name() string           { return "Firewall is active" }
-func (c *firewallActive) Category() string       { return "network" }
+func (c *firewallActive) ID() string               { return "NET-001" }
+func (c *firewallActive) Name() string             { return "Firewall is active" }
+func (c *firewallActive) Category() string         { return "network" }
 func (c *firewallActive) Severity() check.Severity { return check.Critical }
-func (c *firewallActive) Description() string    { return "Verify a firewall (iptables, nftables, or ufw) is active" }
+func (c *firewallActive) Description() string {
+	return "Verify a firewall (iptables, nftables, or ufw) is active"
+}
 
 func (c *firewallActive) Run() check.Result {
 	// Check ufw

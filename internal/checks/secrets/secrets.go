@@ -26,11 +26,13 @@ var secretPatterns = []string{
 // SEC-001
 type envSecrets struct{}
 
-func (c *envSecrets) ID() string             { return "SEC-001" }
-func (c *envSecrets) Name() string           { return "No secrets in environment variables" }
-func (c *envSecrets) Category() string       { return "secrets" }
+func (c *envSecrets) ID() string               { return "SEC-001" }
+func (c *envSecrets) Name() string             { return "No secrets in environment variables" }
+func (c *envSecrets) Category() string         { return "secrets" }
 func (c *envSecrets) Severity() check.Severity { return check.High }
-func (c *envSecrets) Description() string    { return "Check for secrets in /etc/environment, /etc/profile.d/, .bashrc" }
+func (c *envSecrets) Description() string {
+	return "Check for secrets in /etc/environment, /etc/profile.d/, .bashrc"
+}
 
 func (c *envSecrets) Run() check.Result {
 	paths := []string{"/etc/environment"}
@@ -83,11 +85,13 @@ func scanForSecrets(path string) bool {
 // SEC-002
 type historySecrets struct{}
 
-func (c *historySecrets) ID() string             { return "SEC-002" }
-func (c *historySecrets) Name() string           { return "No passwords in shell history" }
-func (c *historySecrets) Category() string       { return "secrets" }
+func (c *historySecrets) ID() string               { return "SEC-002" }
+func (c *historySecrets) Name() string             { return "No passwords in shell history" }
+func (c *historySecrets) Category() string         { return "secrets" }
 func (c *historySecrets) Severity() check.Severity { return check.High }
-func (c *historySecrets) Description() string    { return "Check shell history files for password-like commands" }
+func (c *historySecrets) Description() string {
+	return "Check shell history files for password-like commands"
+}
 
 var historyPatterns = []string{
 	"mysql -u", "psql -U", "curl.*password",
@@ -148,11 +152,13 @@ func scanHistoryFile(path string) bool {
 // SEC-003
 type worldReadableCreds struct{}
 
-func (c *worldReadableCreds) ID() string             { return "SEC-003" }
-func (c *worldReadableCreds) Name() string           { return "No credentials in world-readable files" }
-func (c *worldReadableCreds) Category() string       { return "secrets" }
+func (c *worldReadableCreds) ID() string               { return "SEC-003" }
+func (c *worldReadableCreds) Name() string             { return "No credentials in world-readable files" }
+func (c *worldReadableCreds) Category() string         { return "secrets" }
 func (c *worldReadableCreds) Severity() check.Severity { return check.Critical }
-func (c *worldReadableCreds) Description() string    { return "Check for credential files that are world-readable" }
+func (c *worldReadableCreds) Description() string {
+	return "Check for credential files that are world-readable"
+}
 
 func (c *worldReadableCreds) Run() check.Result {
 	credFiles := []string{
@@ -184,11 +190,11 @@ func (c *worldReadableCreds) Run() check.Result {
 // SEC-004
 type credFilePerms struct{}
 
-func (c *credFilePerms) ID() string             { return "SEC-004" }
-func (c *credFilePerms) Name() string           { return "Credential file permissions correct" }
-func (c *credFilePerms) Category() string       { return "secrets" }
+func (c *credFilePerms) ID() string               { return "SEC-004" }
+func (c *credFilePerms) Name() string             { return "Credential file permissions correct" }
+func (c *credFilePerms) Category() string         { return "secrets" }
 func (c *credFilePerms) Severity() check.Severity { return check.High }
-func (c *credFilePerms) Description() string    { return "Verify .pgpass, .my.cnf, .netrc are 0600" }
+func (c *credFilePerms) Description() string      { return "Verify .pgpass, .my.cnf, .netrc are 0600" }
 
 func (c *credFilePerms) Run() check.Result {
 	credFiles := []string{".pgpass", ".my.cnf", ".netrc", ".aws/credentials"}

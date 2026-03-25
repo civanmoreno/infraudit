@@ -42,11 +42,13 @@ func moduleBlacklisted(mod string) bool {
 // HARD-001
 type loginBanner struct{}
 
-func (c *loginBanner) ID() string             { return "HARD-001" }
-func (c *loginBanner) Name() string           { return "Login banner configured" }
-func (c *loginBanner) Category() string       { return "hardening" }
+func (c *loginBanner) ID() string               { return "HARD-001" }
+func (c *loginBanner) Name() string             { return "Login banner configured" }
+func (c *loginBanner) Category() string         { return "hardening" }
 func (c *loginBanner) Severity() check.Severity { return check.Low }
-func (c *loginBanner) Description() string    { return "Verify /etc/issue and /etc/issue.net have a warning banner" }
+func (c *loginBanner) Description() string {
+	return "Verify /etc/issue and /etc/issue.net have a warning banner"
+}
 
 func (c *loginBanner) Run() check.Result {
 	var issues []string
@@ -68,11 +70,11 @@ func (c *loginBanner) Run() check.Result {
 // HARD-002
 type coreDumps struct{}
 
-func (c *coreDumps) ID() string             { return "HARD-002" }
-func (c *coreDumps) Name() string           { return "Core dumps disabled" }
-func (c *coreDumps) Category() string       { return "hardening" }
+func (c *coreDumps) ID() string               { return "HARD-002" }
+func (c *coreDumps) Name() string             { return "Core dumps disabled" }
+func (c *coreDumps) Category() string         { return "hardening" }
 func (c *coreDumps) Severity() check.Severity { return check.Medium }
-func (c *coreDumps) Description() string    { return "Verify core dumps are disabled" }
+func (c *coreDumps) Description() string      { return "Verify core dumps are disabled" }
 
 func (c *coreDumps) Run() check.Result {
 	val := check.ReadSysctl("/proc/sys/kernel/core_pattern")
@@ -97,11 +99,11 @@ func (c *coreDumps) Run() check.Result {
 // HARD-003
 type aslr struct{}
 
-func (c *aslr) ID() string             { return "HARD-003" }
-func (c *aslr) Name() string           { return "ASLR enabled" }
-func (c *aslr) Category() string       { return "hardening" }
+func (c *aslr) ID() string               { return "HARD-003" }
+func (c *aslr) Name() string             { return "ASLR enabled" }
+func (c *aslr) Category() string         { return "hardening" }
 func (c *aslr) Severity() check.Severity { return check.High }
-func (c *aslr) Description() string    { return "Verify ASLR is set to 2 (full randomization)" }
+func (c *aslr) Description() string      { return "Verify ASLR is set to 2 (full randomization)" }
 
 func (c *aslr) Run() check.Result {
 	val := check.ReadSysctl("/proc/sys/kernel/randomize_va_space")
@@ -117,11 +119,11 @@ func (c *aslr) Run() check.Result {
 // HARD-004
 type dmesgRestrict struct{}
 
-func (c *dmesgRestrict) ID() string             { return "HARD-004" }
-func (c *dmesgRestrict) Name() string           { return "dmesg restricted" }
-func (c *dmesgRestrict) Category() string       { return "hardening" }
+func (c *dmesgRestrict) ID() string               { return "HARD-004" }
+func (c *dmesgRestrict) Name() string             { return "dmesg restricted" }
+func (c *dmesgRestrict) Category() string         { return "hardening" }
 func (c *dmesgRestrict) Severity() check.Severity { return check.Medium }
-func (c *dmesgRestrict) Description() string    { return "Verify kernel.dmesg_restrict = 1" }
+func (c *dmesgRestrict) Description() string      { return "Verify kernel.dmesg_restrict = 1" }
 
 func (c *dmesgRestrict) Run() check.Result {
 	val := check.ReadSysctl("/proc/sys/kernel/dmesg_restrict")
@@ -137,11 +139,11 @@ func (c *dmesgRestrict) Run() check.Result {
 // HARD-005
 type ptraceScope struct{}
 
-func (c *ptraceScope) ID() string             { return "HARD-005" }
-func (c *ptraceScope) Name() string           { return "ptrace restricted" }
-func (c *ptraceScope) Category() string       { return "hardening" }
+func (c *ptraceScope) ID() string               { return "HARD-005" }
+func (c *ptraceScope) Name() string             { return "ptrace restricted" }
+func (c *ptraceScope) Category() string         { return "hardening" }
 func (c *ptraceScope) Severity() check.Severity { return check.Medium }
-func (c *ptraceScope) Description() string    { return "Verify kernel.yama.ptrace_scope >= 1" }
+func (c *ptraceScope) Description() string      { return "Verify kernel.yama.ptrace_scope >= 1" }
 
 func (c *ptraceScope) Run() check.Result {
 	val := check.ReadSysctl("/proc/sys/kernel/yama/ptrace_scope")
@@ -160,11 +162,11 @@ func (c *ptraceScope) Run() check.Result {
 // HARD-006
 type procHardening struct{}
 
-func (c *procHardening) ID() string             { return "HARD-006" }
-func (c *procHardening) Name() string           { return "/proc hardened" }
-func (c *procHardening) Category() string       { return "hardening" }
+func (c *procHardening) ID() string               { return "HARD-006" }
+func (c *procHardening) Name() string             { return "/proc hardened" }
+func (c *procHardening) Category() string         { return "hardening" }
 func (c *procHardening) Severity() check.Severity { return check.Medium }
-func (c *procHardening) Description() string    { return "Verify /proc is mounted with hidepid" }
+func (c *procHardening) Description() string      { return "Verify /proc is mounted with hidepid" }
 
 func (c *procHardening) Run() check.Result {
 	mounts := check.ParseMounts()
@@ -187,11 +189,11 @@ func (c *procHardening) Run() check.Result {
 // HARD-007
 type swapEncrypted struct{}
 
-func (c *swapEncrypted) ID() string             { return "HARD-007" }
-func (c *swapEncrypted) Name() string           { return "Swap encrypted or absent" }
-func (c *swapEncrypted) Category() string       { return "hardening" }
+func (c *swapEncrypted) ID() string               { return "HARD-007" }
+func (c *swapEncrypted) Name() string             { return "Swap encrypted or absent" }
+func (c *swapEncrypted) Category() string         { return "hardening" }
 func (c *swapEncrypted) Severity() check.Severity { return check.Low }
-func (c *swapEncrypted) Description() string    { return "Verify swap is encrypted or not in use" }
+func (c *swapEncrypted) Description() string      { return "Verify swap is encrypted or not in use" }
 
 func (c *swapEncrypted) Run() check.Result {
 	data, err := os.ReadFile("/proc/swaps")
@@ -222,11 +224,13 @@ func (c *swapEncrypted) Run() check.Result {
 // HARD-008
 type fsModules struct{}
 
-func (c *fsModules) ID() string             { return "HARD-008" }
-func (c *fsModules) Name() string           { return "Unused filesystem modules blacklisted" }
-func (c *fsModules) Category() string       { return "hardening" }
+func (c *fsModules) ID() string               { return "HARD-008" }
+func (c *fsModules) Name() string             { return "Unused filesystem modules blacklisted" }
+func (c *fsModules) Category() string         { return "hardening" }
 func (c *fsModules) Severity() check.Severity { return check.Medium }
-func (c *fsModules) Description() string    { return "Verify cramfs, hfs, hfsplus, squashfs, udf, freevxfs, jffs2 are blacklisted" }
+func (c *fsModules) Description() string {
+	return "Verify cramfs, hfs, hfsplus, squashfs, udf, freevxfs, jffs2 are blacklisted"
+}
 
 func (c *fsModules) Run() check.Result {
 	mods := []string{"cramfs", "freevxfs", "hfs", "hfsplus", "jffs2", "squashfs", "udf"}
@@ -250,11 +254,11 @@ func (c *fsModules) Run() check.Result {
 // HARD-009
 type usbStorage struct{}
 
-func (c *usbStorage) ID() string             { return "HARD-009" }
-func (c *usbStorage) Name() string           { return "USB storage disabled if not needed" }
-func (c *usbStorage) Category() string       { return "hardening" }
+func (c *usbStorage) ID() string               { return "HARD-009" }
+func (c *usbStorage) Name() string             { return "USB storage disabled if not needed" }
+func (c *usbStorage) Category() string         { return "hardening" }
 func (c *usbStorage) Severity() check.Severity { return check.Medium }
-func (c *usbStorage) Description() string    { return "Verify usb-storage module is blacklisted" }
+func (c *usbStorage) Description() string      { return "Verify usb-storage module is blacklisted" }
 
 func (c *usbStorage) Run() check.Result {
 	if moduleBlacklisted("usb-storage") {
@@ -269,11 +273,13 @@ func (c *usbStorage) Run() check.Result {
 // HARD-010
 type wirelessModules struct{}
 
-func (c *wirelessModules) ID() string             { return "HARD-010" }
-func (c *wirelessModules) Name() string           { return "Wireless modules disabled if not needed" }
-func (c *wirelessModules) Category() string       { return "hardening" }
+func (c *wirelessModules) ID() string               { return "HARD-010" }
+func (c *wirelessModules) Name() string             { return "Wireless modules disabled if not needed" }
+func (c *wirelessModules) Category() string         { return "hardening" }
 func (c *wirelessModules) Severity() check.Severity { return check.Low }
-func (c *wirelessModules) Description() string    { return "Verify wireless drivers are not loaded on servers" }
+func (c *wirelessModules) Description() string {
+	return "Verify wireless drivers are not loaded on servers"
+}
 
 func (c *wirelessModules) Run() check.Result {
 	// Check if any wireless interfaces exist
@@ -293,11 +299,13 @@ func (c *wirelessModules) Run() check.Result {
 // HARD-011
 type firewireDMA struct{}
 
-func (c *firewireDMA) ID() string             { return "HARD-011" }
-func (c *firewireDMA) Name() string           { return "Firewire/Thunderbolt DMA disabled" }
-func (c *firewireDMA) Category() string       { return "hardening" }
+func (c *firewireDMA) ID() string               { return "HARD-011" }
+func (c *firewireDMA) Name() string             { return "Firewire/Thunderbolt DMA disabled" }
+func (c *firewireDMA) Category() string         { return "hardening" }
 func (c *firewireDMA) Severity() check.Severity { return check.Medium }
-func (c *firewireDMA) Description() string    { return "Verify firewire-core and thunderbolt modules are blacklisted" }
+func (c *firewireDMA) Description() string {
+	return "Verify firewire-core and thunderbolt modules are blacklisted"
+}
 
 func (c *firewireDMA) Run() check.Result {
 	mods := []string{"firewire-core", "thunderbolt"}
@@ -320,11 +328,11 @@ func (c *firewireDMA) Run() check.Result {
 // HARD-012
 type bluetooth struct{}
 
-func (c *bluetooth) ID() string             { return "HARD-012" }
-func (c *bluetooth) Name() string           { return "Bluetooth disabled if not needed" }
-func (c *bluetooth) Category() string       { return "hardening" }
+func (c *bluetooth) ID() string               { return "HARD-012" }
+func (c *bluetooth) Name() string             { return "Bluetooth disabled if not needed" }
+func (c *bluetooth) Category() string         { return "hardening" }
 func (c *bluetooth) Severity() check.Severity { return check.Low }
-func (c *bluetooth) Description() string    { return "Verify bluetooth is disabled on servers" }
+func (c *bluetooth) Description() string      { return "Verify bluetooth is disabled on servers" }
 
 func (c *bluetooth) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "bluetooth")

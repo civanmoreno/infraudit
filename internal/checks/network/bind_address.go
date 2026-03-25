@@ -15,11 +15,13 @@ func init() {
 
 type bindAddress struct{}
 
-func (c *bindAddress) ID() string             { return "NET-004" }
-func (c *bindAddress) Name() string           { return "Services not bound to 0.0.0.0 unnecessarily" }
-func (c *bindAddress) Category() string       { return "network" }
+func (c *bindAddress) ID() string               { return "NET-004" }
+func (c *bindAddress) Name() string             { return "Services not bound to 0.0.0.0 unnecessarily" }
+func (c *bindAddress) Category() string         { return "network" }
 func (c *bindAddress) Severity() check.Severity { return check.Medium }
-func (c *bindAddress) Description() string    { return "Identify services listening on all interfaces (0.0.0.0) that could be restricted" }
+func (c *bindAddress) Description() string {
+	return "Identify services listening on all interfaces (0.0.0.0) that could be restricted"
+}
 
 func (c *bindAddress) Run() check.Result {
 	// 0.0.0.0 in hex is 00000000

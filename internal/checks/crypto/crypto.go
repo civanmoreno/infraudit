@@ -27,11 +27,13 @@ func init() {
 // CRYPTO-001
 type cryptoPolicy struct{}
 
-func (c *cryptoPolicy) ID() string             { return "CRYPTO-001" }
-func (c *cryptoPolicy) Name() string           { return "System crypto policy is not LEGACY" }
-func (c *cryptoPolicy) Category() string       { return "crypto" }
+func (c *cryptoPolicy) ID() string               { return "CRYPTO-001" }
+func (c *cryptoPolicy) Name() string             { return "System crypto policy is not LEGACY" }
+func (c *cryptoPolicy) Category() string         { return "crypto" }
 func (c *cryptoPolicy) Severity() check.Severity { return check.High }
-func (c *cryptoPolicy) Description() string    { return "Verify system-wide crypto policy is not set to LEGACY" }
+func (c *cryptoPolicy) Description() string {
+	return "Verify system-wide crypto policy is not set to LEGACY"
+}
 
 func (c *cryptoPolicy) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "update-crypto-policies", "--show")
@@ -51,11 +53,13 @@ func (c *cryptoPolicy) Run() check.Result {
 // CRYPTO-002
 type certExpiry struct{}
 
-func (c *certExpiry) ID() string             { return "CRYPTO-002" }
-func (c *certExpiry) Name() string           { return "No expired or soon-to-expire certificates" }
-func (c *certExpiry) Category() string       { return "crypto" }
+func (c *certExpiry) ID() string               { return "CRYPTO-002" }
+func (c *certExpiry) Name() string             { return "No expired or soon-to-expire certificates" }
+func (c *certExpiry) Category() string         { return "crypto" }
 func (c *certExpiry) Severity() check.Severity { return check.High }
-func (c *certExpiry) Description() string    { return "Check for expired certificates in /etc/ssl and /etc/pki" }
+func (c *certExpiry) Description() string {
+	return "Check for expired certificates in /etc/ssl and /etc/pki"
+}
 
 func (c *certExpiry) Run() check.Result {
 	var expired, expiring []string
@@ -127,11 +131,11 @@ func (c *certExpiry) Run() check.Result {
 // CRYPTO-003
 type selfSigned struct{}
 
-func (c *selfSigned) ID() string             { return "CRYPTO-003" }
-func (c *selfSigned) Name() string           { return "No self-signed certificates in production" }
-func (c *selfSigned) Category() string       { return "crypto" }
+func (c *selfSigned) ID() string               { return "CRYPTO-003" }
+func (c *selfSigned) Name() string             { return "No self-signed certificates in production" }
+func (c *selfSigned) Category() string         { return "crypto" }
 func (c *selfSigned) Severity() check.Severity { return check.Medium }
-func (c *selfSigned) Description() string    { return "Flag self-signed certificates for review" }
+func (c *selfSigned) Description() string      { return "Flag self-signed certificates for review" }
 
 func (c *selfSigned) Run() check.Result {
 	// Check common service cert locations
@@ -149,8 +153,8 @@ func (c *selfSigned) Run() check.Result {
 
 	if len(found) > 0 {
 		return check.Result{
-			Status:  check.Warn,
-			Message: "Self-signed/snakeoil certificates found: " + strings.Join(found, ", "),
+			Status:      check.Warn,
+			Message:     "Self-signed/snakeoil certificates found: " + strings.Join(found, ", "),
 			Remediation: "Replace with certificates from a trusted CA",
 		}
 	}
@@ -160,11 +164,11 @@ func (c *selfSigned) Run() check.Result {
 // CRYPTO-004
 type tlsVersion struct{}
 
-func (c *tlsVersion) ID() string             { return "CRYPTO-004" }
-func (c *tlsVersion) Name() string           { return "TLS 1.0 and 1.1 disabled" }
-func (c *tlsVersion) Category() string       { return "crypto" }
+func (c *tlsVersion) ID() string               { return "CRYPTO-004" }
+func (c *tlsVersion) Name() string             { return "TLS 1.0 and 1.1 disabled" }
+func (c *tlsVersion) Category() string         { return "crypto" }
 func (c *tlsVersion) Severity() check.Severity { return check.High }
-func (c *tlsVersion) Description() string    { return "Verify TLS 1.0 and 1.1 are disabled system-wide" }
+func (c *tlsVersion) Description() string      { return "Verify TLS 1.0 and 1.1 are disabled system-wide" }
 
 func (c *tlsVersion) Run() check.Result {
 	// Check OpenSSL default config
@@ -189,11 +193,13 @@ func (c *tlsVersion) Run() check.Result {
 // CRYPTO-005
 type weakCiphers struct{}
 
-func (c *weakCiphers) ID() string             { return "CRYPTO-005" }
-func (c *weakCiphers) Name() string           { return "No weak cipher suites" }
-func (c *weakCiphers) Category() string       { return "crypto" }
+func (c *weakCiphers) ID() string               { return "CRYPTO-005" }
+func (c *weakCiphers) Name() string             { return "No weak cipher suites" }
+func (c *weakCiphers) Category() string         { return "crypto" }
 func (c *weakCiphers) Severity() check.Severity { return check.High }
-func (c *weakCiphers) Description() string    { return "Verify no RC4, DES, 3DES, or NULL ciphers are available" }
+func (c *weakCiphers) Description() string {
+	return "Verify no RC4, DES, 3DES, or NULL ciphers are available"
+}
 
 func (c *weakCiphers) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "openssl", "ciphers", "-v", "ALL")
@@ -228,11 +234,13 @@ func (c *weakCiphers) Run() check.Result {
 // CRYPTO-006
 type certChain struct{}
 
-func (c *certChain) ID() string             { return "CRYPTO-006" }
-func (c *certChain) Name() string           { return "Certificate chains complete" }
-func (c *certChain) Category() string       { return "crypto" }
+func (c *certChain) ID() string               { return "CRYPTO-006" }
+func (c *certChain) Name() string             { return "Certificate chains complete" }
+func (c *certChain) Category() string         { return "crypto" }
 func (c *certChain) Severity() check.Severity { return check.Medium }
-func (c *certChain) Description() string    { return "Verify certificate chains are complete for common services" }
+func (c *certChain) Description() string {
+	return "Verify certificate chains are complete for common services"
+}
 
 func (c *certChain) Run() check.Result {
 	// Basic check - verify ca-certificates is installed
@@ -251,11 +259,11 @@ func (c *certChain) Run() check.Result {
 // CRYPTO-007
 type privateKeyPerms struct{}
 
-func (c *privateKeyPerms) ID() string             { return "CRYPTO-007" }
-func (c *privateKeyPerms) Name() string           { return "Private key file permissions" }
-func (c *privateKeyPerms) Category() string       { return "crypto" }
+func (c *privateKeyPerms) ID() string               { return "CRYPTO-007" }
+func (c *privateKeyPerms) Name() string             { return "Private key file permissions" }
+func (c *privateKeyPerms) Category() string         { return "crypto" }
 func (c *privateKeyPerms) Severity() check.Severity { return check.Critical }
-func (c *privateKeyPerms) Description() string    { return "Verify private keys are 0600 or 0400" }
+func (c *privateKeyPerms) Description() string      { return "Verify private keys are 0600 or 0400" }
 
 func (c *privateKeyPerms) Run() check.Result {
 	keyDirs := []string{"/etc/ssl/private", "/etc/pki/tls/private"}
@@ -287,11 +295,11 @@ func (c *privateKeyPerms) Run() check.Result {
 // CRYPTO-008
 type fipsMode struct{}
 
-func (c *fipsMode) ID() string             { return "CRYPTO-008" }
-func (c *fipsMode) Name() string           { return "FIPS mode enabled if required" }
-func (c *fipsMode) Category() string       { return "crypto" }
+func (c *fipsMode) ID() string               { return "CRYPTO-008" }
+func (c *fipsMode) Name() string             { return "FIPS mode enabled if required" }
+func (c *fipsMode) Category() string         { return "crypto" }
 func (c *fipsMode) Severity() check.Severity { return check.Medium }
-func (c *fipsMode) Description() string    { return "Check if FIPS mode is enabled" }
+func (c *fipsMode) Description() string      { return "Check if FIPS mode is enabled" }
 
 func (c *fipsMode) Run() check.Result {
 	data, err := os.ReadFile("/proc/sys/crypto/fips_enabled")
@@ -310,11 +318,13 @@ func (c *fipsMode) Run() check.Result {
 // CRYPTO-009
 type weakHash struct{}
 
-func (c *weakHash) ID() string             { return "CRYPTO-009" }
-func (c *weakHash) Name() string           { return "No MD5/SHA1 in authentication" }
-func (c *weakHash) Category() string       { return "crypto" }
+func (c *weakHash) ID() string               { return "CRYPTO-009" }
+func (c *weakHash) Name() string             { return "No MD5/SHA1 in authentication" }
+func (c *weakHash) Category() string         { return "crypto" }
 func (c *weakHash) Severity() check.Severity { return check.High }
-func (c *weakHash) Description() string    { return "Verify MD5 and SHA1 are not used for password hashing" }
+func (c *weakHash) Description() string {
+	return "Verify MD5 and SHA1 are not used for password hashing"
+}
 
 func (c *weakHash) Run() check.Result {
 	entries, err := check.ParseShadow()

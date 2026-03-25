@@ -15,11 +15,13 @@ func init() {
 
 type sshHardening struct{}
 
-func (c *sshHardening) ID() string             { return "SVC-002" }
-func (c *sshHardening) Name() string           { return "SSH ciphers and timeouts hardened" }
-func (c *sshHardening) Category() string       { return "services" }
+func (c *sshHardening) ID() string               { return "SVC-002" }
+func (c *sshHardening) Name() string             { return "SSH ciphers and timeouts hardened" }
+func (c *sshHardening) Category() string         { return "services" }
 func (c *sshHardening) Severity() check.Severity { return check.High }
-func (c *sshHardening) Description() string    { return "Verify SSH uses strong ciphers, MACs, and has idle timeout configured" }
+func (c *sshHardening) Description() string {
+	return "Verify SSH uses strong ciphers, MACs, and has idle timeout configured"
+}
 
 var weakCiphers = []string{"3des-cbc", "arcfour", "blowfish-cbc", "cast128-cbc"}
 var weakMACs = []string{"hmac-md5", "hmac-sha1-96", "hmac-md5-96"}

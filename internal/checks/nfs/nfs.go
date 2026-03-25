@@ -18,11 +18,13 @@ func init() {
 // NFS-001
 type nfsExports struct{}
 
-func (c *nfsExports) ID() string             { return "NFS-001" }
-func (c *nfsExports) Name() string           { return "NFS exports reviewed" }
-func (c *nfsExports) Category() string       { return "nfs" }
+func (c *nfsExports) ID() string               { return "NFS-001" }
+func (c *nfsExports) Name() string             { return "NFS exports reviewed" }
+func (c *nfsExports) Category() string         { return "nfs" }
 func (c *nfsExports) Severity() check.Severity { return check.High }
-func (c *nfsExports) Description() string    { return "Verify NFS exports are not world-exported and use root_squash" }
+func (c *nfsExports) Description() string {
+	return "Verify NFS exports are not world-exported and use root_squash"
+}
 
 func (c *nfsExports) Run() check.Result {
 	f, err := os.Open("/etc/exports")
@@ -59,11 +61,11 @@ func (c *nfsExports) Run() check.Result {
 // NFS-002
 type nfsv3Disabled struct{}
 
-func (c *nfsv3Disabled) ID() string             { return "NFS-002" }
-func (c *nfsv3Disabled) Name() string           { return "NFSv3 disabled if NFSv4 available" }
-func (c *nfsv3Disabled) Category() string       { return "nfs" }
+func (c *nfsv3Disabled) ID() string               { return "NFS-002" }
+func (c *nfsv3Disabled) Name() string             { return "NFSv3 disabled if NFSv4 available" }
+func (c *nfsv3Disabled) Category() string         { return "nfs" }
 func (c *nfsv3Disabled) Severity() check.Severity { return check.Medium }
-func (c *nfsv3Disabled) Description() string    { return "Verify NFSv3 is disabled in favor of NFSv4" }
+func (c *nfsv3Disabled) Description() string      { return "Verify NFSv3 is disabled in favor of NFSv4" }
 
 func (c *nfsv3Disabled) Run() check.Result {
 	// Check if NFS server is running
@@ -90,11 +92,11 @@ func (c *nfsv3Disabled) Run() check.Result {
 // NFS-003
 type sambaConfig struct{}
 
-func (c *sambaConfig) ID() string             { return "NFS-003" }
-func (c *sambaConfig) Name() string           { return "Samba config reviewed" }
-func (c *sambaConfig) Category() string       { return "nfs" }
+func (c *sambaConfig) ID() string               { return "NFS-003" }
+func (c *sambaConfig) Name() string             { return "Samba config reviewed" }
+func (c *sambaConfig) Category() string         { return "nfs" }
 func (c *sambaConfig) Severity() check.Severity { return check.Medium }
-func (c *sambaConfig) Description() string    { return "Verify Samba does not allow guest access" }
+func (c *sambaConfig) Description() string      { return "Verify Samba does not allow guest access" }
 
 func (c *sambaConfig) Run() check.Result {
 	f, err := os.Open("/etc/samba/smb.conf")
@@ -111,7 +113,7 @@ func (c *sambaConfig) Run() check.Result {
 		}
 		// Normalize: remove spaces around '=' for consistent parsing
 		normalized := strings.ReplaceAll(line, " ", "")
-		if (strings.Contains(normalized, "guestok=yes") || strings.Contains(normalized, "guest_ok=yes")) {
+		if strings.Contains(normalized, "guestok=yes") || strings.Contains(normalized, "guest_ok=yes") {
 			return check.Result{
 				Status:      check.Warn,
 				Message:     "Samba allows guest access",
@@ -132,11 +134,13 @@ func (c *sambaConfig) Run() check.Result {
 // NFS-004
 type rpcbindDisabled struct{}
 
-func (c *rpcbindDisabled) ID() string             { return "NFS-004" }
-func (c *rpcbindDisabled) Name() string           { return "rpcbind disabled if NFS not in use" }
-func (c *rpcbindDisabled) Category() string       { return "nfs" }
+func (c *rpcbindDisabled) ID() string               { return "NFS-004" }
+func (c *rpcbindDisabled) Name() string             { return "rpcbind disabled if NFS not in use" }
+func (c *rpcbindDisabled) Category() string         { return "nfs" }
 func (c *rpcbindDisabled) Severity() check.Severity { return check.Medium }
-func (c *rpcbindDisabled) Description() string    { return "Verify rpcbind is not running if NFS is not needed" }
+func (c *rpcbindDisabled) Description() string {
+	return "Verify rpcbind is not running if NFS is not needed"
+}
 
 func (c *rpcbindDisabled) Run() check.Result {
 	rpcActive := check.ServiceActive("rpcbind")

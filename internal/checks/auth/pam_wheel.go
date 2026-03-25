@@ -14,11 +14,13 @@ func init() {
 
 type pamWheel struct{}
 
-func (c *pamWheel) ID() string             { return "AUTH-008" }
-func (c *pamWheel) Name() string           { return "su restricted via pam_wheel" }
-func (c *pamWheel) Category() string       { return "auth" }
+func (c *pamWheel) ID() string               { return "AUTH-008" }
+func (c *pamWheel) Name() string             { return "su restricted via pam_wheel" }
+func (c *pamWheel) Category() string         { return "auth" }
 func (c *pamWheel) Severity() check.Severity { return check.Medium }
-func (c *pamWheel) Description() string    { return "Ensure su command is restricted to an authorized group via pam_wheel.so" }
+func (c *pamWheel) Description() string {
+	return "Ensure su command is restricted to an authorized group via pam_wheel.so"
+}
 
 func (c *pamWheel) Run() check.Result {
 	f, err := os.Open("/etc/pam.d/su")

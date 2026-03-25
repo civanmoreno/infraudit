@@ -14,9 +14,9 @@ func init() {
 
 type sensitiveFilePerms struct{}
 
-func (c *sensitiveFilePerms) ID() string             { return "AUTH-007" }
-func (c *sensitiveFilePerms) Name() string           { return "Sensitive auth files have correct permissions" }
-func (c *sensitiveFilePerms) Category() string       { return "auth" }
+func (c *sensitiveFilePerms) ID() string               { return "AUTH-007" }
+func (c *sensitiveFilePerms) Name() string             { return "Sensitive auth files have correct permissions" }
+func (c *sensitiveFilePerms) Category() string         { return "auth" }
 func (c *sensitiveFilePerms) Severity() check.Severity { return check.High }
 func (c *sensitiveFilePerms) Description() string {
 	return "Verify /etc/passwd, /etc/shadow, and /etc/group have secure permissions"

@@ -17,11 +17,13 @@ func init() {
 // SVC-009: MTA local-only
 type mtaLocalOnly struct{}
 
-func (c *mtaLocalOnly) ID() string             { return "SVC-009" }
-func (c *mtaLocalOnly) Name() string           { return "MTA configured as local-only" }
-func (c *mtaLocalOnly) Category() string       { return "services" }
+func (c *mtaLocalOnly) ID() string               { return "SVC-009" }
+func (c *mtaLocalOnly) Name() string             { return "MTA configured as local-only" }
+func (c *mtaLocalOnly) Category() string         { return "services" }
 func (c *mtaLocalOnly) Severity() check.Severity { return check.High }
-func (c *mtaLocalOnly) Description() string    { return "Verify Postfix inet_interfaces is set to loopback-only" }
+func (c *mtaLocalOnly) Description() string {
+	return "Verify Postfix inet_interfaces is set to loopback-only"
+}
 
 func (c *mtaLocalOnly) Run() check.Result {
 	val := postfixMainCfValue("inet_interfaces")
@@ -51,11 +53,13 @@ func (c *mtaLocalOnly) Run() check.Result {
 // SVC-010: Not an open relay
 type mtaOpenRelay struct{}
 
-func (c *mtaOpenRelay) ID() string             { return "SVC-010" }
-func (c *mtaOpenRelay) Name() string           { return "MTA is not an open relay" }
-func (c *mtaOpenRelay) Category() string       { return "services" }
+func (c *mtaOpenRelay) ID() string               { return "SVC-010" }
+func (c *mtaOpenRelay) Name() string             { return "MTA is not an open relay" }
+func (c *mtaOpenRelay) Category() string         { return "services" }
 func (c *mtaOpenRelay) Severity() check.Severity { return check.Critical }
-func (c *mtaOpenRelay) Description() string    { return "Verify Postfix does not relay mail for untrusted networks" }
+func (c *mtaOpenRelay) Description() string {
+	return "Verify Postfix does not relay mail for untrusted networks"
+}
 
 func (c *mtaOpenRelay) Run() check.Result {
 	if !check.ServiceActive("postfix") {
@@ -85,11 +89,11 @@ func (c *mtaOpenRelay) Run() check.Result {
 // SVC-011: Root mail alias
 type mtaRootAlias struct{}
 
-func (c *mtaRootAlias) ID() string             { return "SVC-011" }
-func (c *mtaRootAlias) Name() string           { return "Root mail forwarded to monitored account" }
-func (c *mtaRootAlias) Category() string       { return "services" }
+func (c *mtaRootAlias) ID() string               { return "SVC-011" }
+func (c *mtaRootAlias) Name() string             { return "Root mail forwarded to monitored account" }
+func (c *mtaRootAlias) Category() string         { return "services" }
 func (c *mtaRootAlias) Severity() check.Severity { return check.Low }
-func (c *mtaRootAlias) Description() string    { return "Verify root mail is forwarded via /etc/aliases" }
+func (c *mtaRootAlias) Description() string      { return "Verify root mail is forwarded via /etc/aliases" }
 
 func (c *mtaRootAlias) Run() check.Result {
 	f, err := os.Open("/etc/aliases")

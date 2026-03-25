@@ -14,11 +14,13 @@ func init() {
 // SVC-012: No desktop environment
 type desktopEnv struct{}
 
-func (c *desktopEnv) ID() string             { return "SVC-012" }
-func (c *desktopEnv) Name() string           { return "No desktop environment installed" }
-func (c *desktopEnv) Category() string       { return "services" }
+func (c *desktopEnv) ID() string               { return "SVC-012" }
+func (c *desktopEnv) Name() string             { return "No desktop environment installed" }
+func (c *desktopEnv) Category() string         { return "services" }
 func (c *desktopEnv) Severity() check.Severity { return check.Medium }
-func (c *desktopEnv) Description() string    { return "Verify no GUI desktop environment is installed on the server" }
+func (c *desktopEnv) Description() string {
+	return "Verify no GUI desktop environment is installed on the server"
+}
 
 func (c *desktopEnv) Run() check.Result {
 	// Check if gdm, lightdm, or sddm is active
@@ -51,11 +53,11 @@ func (c *desktopEnv) Run() check.Result {
 // SVC-013: Automount disabled
 type automount struct{}
 
-func (c *automount) ID() string             { return "SVC-013" }
-func (c *automount) Name() string           { return "Automount (autofs) disabled" }
-func (c *automount) Category() string       { return "services" }
+func (c *automount) ID() string               { return "SVC-013" }
+func (c *automount) Name() string             { return "Automount (autofs) disabled" }
+func (c *automount) Category() string         { return "services" }
 func (c *automount) Severity() check.Severity { return check.Medium }
-func (c *automount) Description() string    { return "Verify autofs is not running" }
+func (c *automount) Description() string      { return "Verify autofs is not running" }
 
 func (c *automount) Run() check.Result {
 	if check.ServiceActive("autofs") {

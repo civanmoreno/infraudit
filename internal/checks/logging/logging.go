@@ -24,11 +24,11 @@ func init() {
 // LOG-001
 type syslogActive struct{}
 
-func (c *syslogActive) ID() string             { return "LOG-001" }
-func (c *syslogActive) Name() string           { return "Syslog/journald active" }
-func (c *syslogActive) Category() string       { return "logging" }
+func (c *syslogActive) ID() string               { return "LOG-001" }
+func (c *syslogActive) Name() string             { return "Syslog/journald active" }
+func (c *syslogActive) Category() string         { return "logging" }
 func (c *syslogActive) Severity() check.Severity { return check.Critical }
-func (c *syslogActive) Description() string    { return "Verify logging service is running" }
+func (c *syslogActive) Description() string      { return "Verify logging service is running" }
 
 func (c *syslogActive) Run() check.Result {
 	for _, svc := range []string{"rsyslog", "syslog-ng", "systemd-journald"} {
@@ -45,11 +45,11 @@ func (c *syslogActive) Run() check.Result {
 // LOG-002
 type auditdRunning struct{}
 
-func (c *auditdRunning) ID() string             { return "LOG-002" }
-func (c *auditdRunning) Name() string           { return "auditd installed and running" }
-func (c *auditdRunning) Category() string       { return "logging" }
+func (c *auditdRunning) ID() string               { return "LOG-002" }
+func (c *auditdRunning) Name() string             { return "auditd installed and running" }
+func (c *auditdRunning) Category() string         { return "logging" }
 func (c *auditdRunning) Severity() check.Severity { return check.High }
-func (c *auditdRunning) Description() string    { return "Verify auditd is installed and active" }
+func (c *auditdRunning) Description() string      { return "Verify auditd is installed and active" }
 
 func (c *auditdRunning) Run() check.Result {
 	if check.ServiceActive("auditd") {
@@ -64,11 +64,13 @@ func (c *auditdRunning) Run() check.Result {
 // LOG-003
 type auditRules struct{}
 
-func (c *auditRules) ID() string             { return "LOG-003" }
-func (c *auditRules) Name() string           { return "Audit rules for sensitive files" }
-func (c *auditRules) Category() string       { return "logging" }
+func (c *auditRules) ID() string               { return "LOG-003" }
+func (c *auditRules) Name() string             { return "Audit rules for sensitive files" }
+func (c *auditRules) Category() string         { return "logging" }
 func (c *auditRules) Severity() check.Severity { return check.High }
-func (c *auditRules) Description() string    { return "Verify audit rules watch /etc/passwd, /etc/shadow, sudoers" }
+func (c *auditRules) Description() string {
+	return "Verify audit rules watch /etc/passwd, /etc/shadow, sudoers"
+}
 
 func (c *auditRules) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "auditctl", "-l")
@@ -87,8 +89,8 @@ func (c *auditRules) Run() check.Result {
 
 	if len(missing) > 0 {
 		return check.Result{
-			Status:  check.Warn,
-			Message: "No audit rules for: " + strings.Join(missing, ", "),
+			Status:      check.Warn,
+			Message:     "No audit rules for: " + strings.Join(missing, ", "),
 			Remediation: "Add watch rules: auditctl -w /etc/passwd -p wa -k identity",
 		}
 	}
@@ -98,11 +100,11 @@ func (c *auditRules) Run() check.Result {
 // LOG-004
 type logRotation struct{}
 
-func (c *logRotation) ID() string             { return "LOG-004" }
-func (c *logRotation) Name() string           { return "Log rotation configured" }
-func (c *logRotation) Category() string       { return "logging" }
+func (c *logRotation) ID() string               { return "LOG-004" }
+func (c *logRotation) Name() string             { return "Log rotation configured" }
+func (c *logRotation) Category() string         { return "logging" }
 func (c *logRotation) Severity() check.Severity { return check.Medium }
-func (c *logRotation) Description() string    { return "Verify logrotate is installed and configured" }
+func (c *logRotation) Description() string      { return "Verify logrotate is installed and configured" }
 
 func (c *logRotation) Run() check.Result {
 	if _, err := os.Stat("/etc/logrotate.conf"); err == nil {
@@ -117,11 +119,11 @@ func (c *logRotation) Run() check.Result {
 // LOG-005
 type logPerms struct{}
 
-func (c *logPerms) ID() string             { return "LOG-005" }
-func (c *logPerms) Name() string           { return "Log files not world-readable" }
-func (c *logPerms) Category() string       { return "logging" }
+func (c *logPerms) ID() string               { return "LOG-005" }
+func (c *logPerms) Name() string             { return "Log files not world-readable" }
+func (c *logPerms) Category() string         { return "logging" }
 func (c *logPerms) Severity() check.Severity { return check.Medium }
-func (c *logPerms) Description() string    { return "Verify log files in /var/log are not world-readable" }
+func (c *logPerms) Description() string      { return "Verify log files in /var/log are not world-readable" }
 
 func (c *logPerms) Run() check.Result {
 	entries, err := os.ReadDir("/var/log")
@@ -156,11 +158,13 @@ func (c *logPerms) Run() check.Result {
 // LOG-006
 type aideInstalled struct{}
 
-func (c *aideInstalled) ID() string             { return "LOG-006" }
-func (c *aideInstalled) Name() string           { return "AIDE or file integrity tool installed" }
-func (c *aideInstalled) Category() string       { return "logging" }
+func (c *aideInstalled) ID() string               { return "LOG-006" }
+func (c *aideInstalled) Name() string             { return "AIDE or file integrity tool installed" }
+func (c *aideInstalled) Category() string         { return "logging" }
 func (c *aideInstalled) Severity() check.Severity { return check.High }
-func (c *aideInstalled) Description() string    { return "Verify a file integrity monitoring tool is installed" }
+func (c *aideInstalled) Description() string {
+	return "Verify a file integrity monitoring tool is installed"
+}
 
 func (c *aideInstalled) Run() check.Result {
 	for _, tool := range []string{"aide", "tripwire", "samhain", "ossec-control"} {
@@ -177,11 +181,11 @@ func (c *aideInstalled) Run() check.Result {
 // LOG-007
 type aideDB struct{}
 
-func (c *aideDB) ID() string             { return "LOG-007" }
-func (c *aideDB) Name() string           { return "AIDE database initialized" }
-func (c *aideDB) Category() string       { return "logging" }
+func (c *aideDB) ID() string               { return "LOG-007" }
+func (c *aideDB) Name() string             { return "AIDE database initialized" }
+func (c *aideDB) Category() string         { return "logging" }
 func (c *aideDB) Severity() check.Severity { return check.Medium }
-func (c *aideDB) Description() string    { return "Verify AIDE database has been initialized" }
+func (c *aideDB) Description() string      { return "Verify AIDE database has been initialized" }
 
 func (c *aideDB) Run() check.Result {
 	paths := []string{"/var/lib/aide/aide.db", "/var/lib/aide/aide.db.gz", "/var/lib/aide/aide.db.new"}
@@ -202,11 +206,11 @@ func (c *aideDB) Run() check.Result {
 // LOG-008
 type aideCron struct{}
 
-func (c *aideCron) ID() string             { return "LOG-008" }
-func (c *aideCron) Name() string           { return "AIDE checks scheduled via cron" }
-func (c *aideCron) Category() string       { return "logging" }
+func (c *aideCron) ID() string               { return "LOG-008" }
+func (c *aideCron) Name() string             { return "AIDE checks scheduled via cron" }
+func (c *aideCron) Category() string         { return "logging" }
 func (c *aideCron) Severity() check.Severity { return check.Medium }
-func (c *aideCron) Description() string    { return "Verify AIDE integrity checks are scheduled" }
+func (c *aideCron) Description() string      { return "Verify AIDE integrity checks are scheduled" }
 
 func (c *aideCron) Run() check.Result {
 	if _, err := exec.LookPath("aide"); err != nil {
@@ -242,11 +246,13 @@ func (c *aideCron) Run() check.Result {
 // LOG-009
 type aidePaths struct{}
 
-func (c *aidePaths) ID() string             { return "LOG-009" }
-func (c *aidePaths) Name() string           { return "AIDE covers critical paths" }
-func (c *aidePaths) Category() string       { return "logging" }
+func (c *aidePaths) ID() string               { return "LOG-009" }
+func (c *aidePaths) Name() string             { return "AIDE covers critical paths" }
+func (c *aidePaths) Category() string         { return "logging" }
 func (c *aidePaths) Severity() check.Severity { return check.Medium }
-func (c *aidePaths) Description() string    { return "Verify AIDE monitors /bin, /sbin, /lib, /etc, /boot" }
+func (c *aidePaths) Description() string {
+	return "Verify AIDE monitors /bin, /sbin, /lib, /etc, /boot"
+}
 
 func (c *aidePaths) Run() check.Result {
 	confPath := "/etc/aide/aide.conf"
@@ -277,8 +283,8 @@ func (c *aidePaths) Run() check.Result {
 
 	if len(missing) > 0 {
 		return check.Result{
-			Status:  check.Warn,
-			Message: "AIDE may not cover: " + strings.Join(missing, ", "),
+			Status:      check.Warn,
+			Message:     "AIDE may not cover: " + strings.Join(missing, ", "),
 			Remediation: "Add missing paths to AIDE config",
 		}
 	}

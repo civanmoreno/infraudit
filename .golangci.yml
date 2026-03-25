@@ -22,3 +22,27 @@ issues:
     - path: _test\.go
       linters:
         - errcheck
+    # defer f.Close() on read-only files is standard Go
+    - linters:
+        - errcheck
+      source: "defer.*\\.Close\\(\\)"
+    # fmt.Fprint/Fprintf/Fprintln to io.Writer — errors handled by caller
+    - linters:
+        - errcheck
+      source: "fmt\\.Fprint"
+    # RunCmd intentionally executes external commands by name
+    - linters:
+        - gosec
+      text: "G204"
+    # Opening files by variable path is core functionality
+    - linters:
+        - gosec
+      text: "G304"
+    # Integer conversion for term.IsTerminal is safe
+    - linters:
+        - gosec
+      text: "G115"
+    # categoryLabels is not credentials
+    - linters:
+        - gosec
+      text: "G101"

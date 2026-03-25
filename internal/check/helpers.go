@@ -81,13 +81,13 @@ func ParsePasswd() ([]PasswdEntry, error) {
 			if len(parts) < 7 {
 				return nil
 			}
-			uid, err := fmt.Sscanf(parts[2], "%d", new(int))
-			if uid == 0 || err != nil {
+			var uidNum, gidNum int
+			if _, err := fmt.Sscanf(parts[2], "%d", &uidNum); err != nil {
 				return nil
 			}
-			var uidNum, gidNum int
-			fmt.Sscanf(parts[2], "%d", &uidNum)
-			fmt.Sscanf(parts[3], "%d", &gidNum)
+			if _, err := fmt.Sscanf(parts[3], "%d", &gidNum); err != nil {
+				return nil
+			}
 			return &PasswdEntry{User: parts[0], UID: uidNum, GID: gidNum, Home: parts[5], Shell: parts[6]}
 		})
 	})

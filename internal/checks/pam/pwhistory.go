@@ -15,9 +15,9 @@ func init() {
 
 type pwhistory struct{}
 
-func (c *pwhistory) ID() string             { return "PAM-002" }
-func (c *pwhistory) Name() string           { return "Password reuse prevention configured" }
-func (c *pwhistory) Category() string       { return "pam" }
+func (c *pwhistory) ID() string               { return "PAM-002" }
+func (c *pwhistory) Name() string             { return "Password reuse prevention configured" }
+func (c *pwhistory) Category() string         { return "pam" }
 func (c *pwhistory) Severity() check.Severity { return check.Medium }
 func (c *pwhistory) Description() string {
 	return "Verify pam_pwhistory or pam_unix remember prevents password reuse (>= 5)"

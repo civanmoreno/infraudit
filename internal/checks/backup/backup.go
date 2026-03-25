@@ -20,11 +20,11 @@ func init() {
 // BAK-001
 type backupSchedule struct{}
 
-func (c *backupSchedule) ID() string             { return "BAK-001" }
-func (c *backupSchedule) Name() string           { return "Backup schedule exists and ran recently" }
-func (c *backupSchedule) Category() string       { return "backup" }
+func (c *backupSchedule) ID() string               { return "BAK-001" }
+func (c *backupSchedule) Name() string             { return "Backup schedule exists and ran recently" }
+func (c *backupSchedule) Category() string         { return "backup" }
 func (c *backupSchedule) Severity() check.Severity { return check.High }
-func (c *backupSchedule) Description() string    { return "Verify backup jobs are scheduled and running" }
+func (c *backupSchedule) Description() string      { return "Verify backup jobs are scheduled and running" }
 
 func (c *backupSchedule) Run() check.Result {
 	// Check common backup tools
@@ -64,8 +64,8 @@ func (c *backupSchedule) Run() check.Result {
 
 	if len(installed) > 0 {
 		return check.Result{
-			Status:  check.Warn,
-			Message: "Backup tools installed (" + strings.Join(installed, ", ") + ") but no schedule found",
+			Status:      check.Warn,
+			Message:     "Backup tools installed (" + strings.Join(installed, ", ") + ") but no schedule found",
 			Remediation: "Configure a backup schedule via cron or systemd timer",
 		}
 	}
@@ -79,11 +79,11 @@ func (c *backupSchedule) Run() check.Result {
 // BAK-002
 type backupEncrypted struct{}
 
-func (c *backupEncrypted) ID() string             { return "BAK-002" }
-func (c *backupEncrypted) Name() string           { return "Backups are encrypted" }
-func (c *backupEncrypted) Category() string       { return "backup" }
+func (c *backupEncrypted) ID() string               { return "BAK-002" }
+func (c *backupEncrypted) Name() string             { return "Backups are encrypted" }
+func (c *backupEncrypted) Category() string         { return "backup" }
 func (c *backupEncrypted) Severity() check.Severity { return check.Medium }
-func (c *backupEncrypted) Description() string    { return "Check if backup solution uses encryption" }
+func (c *backupEncrypted) Description() string      { return "Check if backup solution uses encryption" }
 
 func (c *backupEncrypted) Run() check.Result {
 	// Check borg repo (encryption is configured at init)
@@ -102,11 +102,13 @@ func (c *backupEncrypted) Run() check.Result {
 // BAK-003
 type backupPerms struct{}
 
-func (c *backupPerms) ID() string             { return "BAK-003" }
-func (c *backupPerms) Name() string           { return "Backup files not world-readable" }
-func (c *backupPerms) Category() string       { return "backup" }
+func (c *backupPerms) ID() string               { return "BAK-003" }
+func (c *backupPerms) Name() string             { return "Backup files not world-readable" }
+func (c *backupPerms) Category() string         { return "backup" }
 func (c *backupPerms) Severity() check.Severity { return check.High }
-func (c *backupPerms) Description() string    { return "Verify backup directories have restrictive permissions" }
+func (c *backupPerms) Description() string {
+	return "Verify backup directories have restrictive permissions"
+}
 
 func (c *backupPerms) Run() check.Result {
 	backupDirs := []string{"/var/backups", "/backup", "/srv/backup"}
@@ -148,11 +150,13 @@ func (c *backupPerms) Run() check.Result {
 // BAK-004
 type backupOffsite struct{}
 
-func (c *backupOffsite) ID() string             { return "BAK-004" }
-func (c *backupOffsite) Name() string           { return "Off-site/off-host backup exists" }
-func (c *backupOffsite) Category() string       { return "backup" }
+func (c *backupOffsite) ID() string               { return "BAK-004" }
+func (c *backupOffsite) Name() string             { return "Off-site/off-host backup exists" }
+func (c *backupOffsite) Category() string         { return "backup" }
 func (c *backupOffsite) Severity() check.Severity { return check.Medium }
-func (c *backupOffsite) Description() string    { return "Verify backups are sent off-site or to a remote host" }
+func (c *backupOffsite) Description() string {
+	return "Verify backups are sent off-site or to a remote host"
+}
 
 func (c *backupOffsite) Run() check.Result {
 	// Check for remote backup config patterns
