@@ -24,7 +24,7 @@ jobs:
         run: go build -o infraudit .
 
       - name: Test with coverage
-        run: go test -race -count=1 -coverprofile=coverage.out ./...
+        run: go test -race -count=1 -coverprofile=coverage.out -coverpkg=./... ./...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
