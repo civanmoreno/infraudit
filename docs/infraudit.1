@@ -27,6 +27,11 @@ it matters, CIS/STIG standard mapping, and remediation steps. Use
 .B \-\-run
 to also execute the check and display the live result.
 .TP
+.B top
+Show the most critical findings sorted by severity. Use
+.BI \-n " count"
+to limit results (default: 10).
+.TP
 .B list
 Display all registered checks with their ID, category, severity, and name.
 .TP
@@ -47,7 +52,8 @@ Output format:
 .BR console " (default),"
 .BR json ", "
 .BR yaml ", "
-.BR html .
+.BR html ", "
+.BR markdown .
 .TP
 .BI \-\-output " file"
 Write report to file instead of stdout.

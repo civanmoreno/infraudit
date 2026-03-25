@@ -42,7 +42,7 @@ Use --format to change output format (console, json, yaml).`,
 
 func init() {
 	auditCmd.Flags().StringVar(&categoryFlag, "category", "", "Filter by category (comma-separated: auth,network,crypto)")
-	auditCmd.Flags().StringVar(&formatFlag, "format", "console", "Output format: console, json, yaml, html")
+	auditCmd.Flags().StringVar(&formatFlag, "format", "console", "Output format: console, json, yaml, html, markdown")
 	auditCmd.Flags().StringVar(&outputFlag, "output", "", "Write report to file")
 	auditCmd.Flags().StringVar(&profileFlag, "profile", "", "Server profile: web-server, db-server, container-host, minimal")
 	auditCmd.Flags().StringSliceVar(&skipFlag, "skip", nil, "Skip specific check IDs (comma-separated)")
@@ -52,6 +52,12 @@ func init() {
 	auditCmd.Flags().StringVar(&checkFlag, "check", "", "Run a single check by ID (e.g. AUTH-001)")
 	auditCmd.Flags().StringVar(&statusFlag, "status", "", "Show only results with these statuses (comma-separated: pass,warn,fail,error)")
 	auditCmd.Flags().BoolVar(&ignoreErrors, "ignore-errors", false, "Don't count errors toward exit code 2")
+	_ = auditCmd.RegisterFlagCompletionFunc("check", completeCheckIDFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("category", completeCategoryFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("profile", completeProfileFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("format", completeFormatFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("severity-min", completeSeverityFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("status", completeStatusFlag)
 	rootCmd.AddCommand(auditCmd)
 }
 
@@ -247,6 +253,8 @@ func runAudit(cmd *cobra.Command, args []string) {
 		writeErr = report.WriteYAML(w, rpt)
 	case "html":
 		writeErr = report.WriteHTML(w, rpt)
+	case "markdown", "md":
+		writeErr = report.WriteMarkdown(w, rpt)
 	default:
 		report.WriteConsole(w, rpt)
 	}

@@ -31,13 +31,30 @@ var explainCmd = &cobra.Command{
 why it matters, how to remediate, and which compliance standard it maps to.
 
 Use --run to also execute the check and show the current result.`,
-	Args: cobra.ExactArgs(1),
-	Run:  runExplain,
+	Args:              cobra.ExactArgs(1),
+	Run:               runExplain,
+	ValidArgsFunction: completeCheckIDs,
 }
 
 func init() {
 	explainCmd.Flags().BoolVar(&explainRun, "run", false, "Also execute the check and show the result")
 	rootCmd.AddCommand(explainCmd)
+}
+
+// completeCheckIDs provides shell completion for check IDs.
+func completeCheckIDs(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	if len(args) > 0 {
+		return nil, cobra.ShellCompDirectiveNoFileComp
+	}
+	upper := strings.ToUpper(toComplete)
+	var matches []string
+	for _, c := range check.All() {
+		id := c.ID()
+		if strings.HasPrefix(id, upper) {
+			matches = append(matches, id+"\t"+c.Name())
+		}
+	}
+	return matches, cobra.ShellCompDirectiveNoFileComp
 }
 
 // cisMapping maps check IDs to CIS Benchmark control references.

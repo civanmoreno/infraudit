@@ -345,6 +345,14 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] "Why it matters" explanations for high-impact checks (AUTH, NET, FS, LOG, BOOT, CRYPTO, CTR, HARD)
 - [x] Severity breakdown in console summary — shows count of findings by severity (critical, high, medium, low)
 
+### Phase 32: Top Command, Markdown Output & Shell Completion ✅
+
+- [x] `infraudit top` — shows the N most critical findings sorted by severity (`-n` flag, default 10)
+- [x] `--format markdown` (or `md`) — Markdown table output for tickets and wikis
+- [x] Shell completion for check IDs in `explain` and `--check` flag
+- [x] Shell completion for `--category`, `--profile`, `--format`, `--severity-min`, `--status` flags
+- [x] Completions show check names as descriptions (e.g., `AUTH-001\tSSH root login disabled`)
+
 ## Check Categories
 
 | Category | Prefix | Description |

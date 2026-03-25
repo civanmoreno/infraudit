@@ -182,6 +182,7 @@ The score appears in console, JSON, YAML, and HTML output.
 | Command | Description |
 |:--------|:------------|
 | `infraudit audit` | Run security checks and generate a report |
+| `infraudit top` | Show the most critical findings (`-n 10`) |
 | `infraudit explain <ID>` | Explain a check in detail (CIS mapping, why it matters) |
 | `infraudit list` | Show all available checks (filterable) |
 | `infraudit categories` | Show available categories with check counts |
@@ -193,7 +194,7 @@ The score appears in console, JSON, YAML, and HTML output.
 |:-----|:--------|:------------|
 | `--category` | *(all)* | Filter by categories (comma-separated: `auth,network`) |
 | `--check` | *(none)* | Run a single check by ID (`AUTH-001`) |
-| `--format` | `console` | Output format: `console`, `json`, `yaml`, `html` |
+| `--format` | `console` | Output format: `console`, `json`, `yaml`, `html`, `markdown` |
 | `--output` | *(stdout)* | Write report to file |
 | `--profile` | *(none)* | Server profile to apply |
 | `--skip` | *(none)* | Comma-separated check IDs to skip |
