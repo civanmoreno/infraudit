@@ -15,11 +15,13 @@ func init() {
 
 type sudoersNopasswd struct{}
 
-func (c *sudoersNopasswd) ID() string             { return "AUTH-006" }
-func (c *sudoersNopasswd) Name() string           { return "No excessive NOPASSWD in sudoers" }
-func (c *sudoersNopasswd) Category() string       { return "auth" }
+func (c *sudoersNopasswd) ID() string               { return "AUTH-006" }
+func (c *sudoersNopasswd) Name() string             { return "No excessive NOPASSWD in sudoers" }
+func (c *sudoersNopasswd) Category() string         { return "auth" }
 func (c *sudoersNopasswd) Severity() check.Severity { return check.High }
-func (c *sudoersNopasswd) Description() string    { return "Check for excessive use of NOPASSWD in sudoers configuration" }
+func (c *sudoersNopasswd) Description() string {
+	return "Check for excessive use of NOPASSWD in sudoers configuration"
+}
 
 func (c *sudoersNopasswd) Run() check.Result {
 	paths := []string{"/etc/sudoers"}

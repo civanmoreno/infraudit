@@ -13,11 +13,13 @@ func init() {
 
 type ipv6Config struct{}
 
-func (c *ipv6Config) ID() string             { return "NET-008" }
-func (c *ipv6Config) Name() string           { return "IPv6 disabled or properly configured" }
-func (c *ipv6Config) Category() string       { return "network" }
+func (c *ipv6Config) ID() string               { return "NET-008" }
+func (c *ipv6Config) Name() string             { return "IPv6 disabled or properly configured" }
+func (c *ipv6Config) Category() string         { return "network" }
 func (c *ipv6Config) Severity() check.Severity { return check.Medium }
-func (c *ipv6Config) Description() string    { return "Verify IPv6 is either disabled or properly configured" }
+func (c *ipv6Config) Description() string {
+	return "Verify IPv6 is either disabled or properly configured"
+}
 
 func (c *ipv6Config) Run() check.Result {
 	disableAll := check.ReadSysctl("/proc/sys/net/ipv6/conf/all/disable_ipv6")

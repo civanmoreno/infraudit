@@ -13,11 +13,13 @@ func init() {
 
 type worldWritable struct{}
 
-func (c *worldWritable) ID() string             { return "FS-002" }
-func (c *worldWritable) Name() string           { return "No world-writable files outside /tmp" }
-func (c *worldWritable) Category() string       { return "filesystem" }
+func (c *worldWritable) ID() string               { return "FS-002" }
+func (c *worldWritable) Name() string             { return "No world-writable files outside /tmp" }
+func (c *worldWritable) Category() string         { return "filesystem" }
 func (c *worldWritable) Severity() check.Severity { return check.High }
-func (c *worldWritable) Description() string    { return "Find world-writable files outside temporary directories" }
+func (c *worldWritable) Description() string {
+	return "Find world-writable files outside temporary directories"
+}
 
 func (c *worldWritable) Run() check.Result {
 	out, err := check.RunCmd(check.LongCmdTimeout, "find", "/", "-xdev",

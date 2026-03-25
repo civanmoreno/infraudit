@@ -15,11 +15,13 @@ func init() {
 
 type snmpCommunity struct{}
 
-func (c *snmpCommunity) ID() string             { return "NET-010" }
-func (c *snmpCommunity) Name() string           { return "Default SNMP community strings removed" }
-func (c *snmpCommunity) Category() string       { return "network" }
+func (c *snmpCommunity) ID() string               { return "NET-010" }
+func (c *snmpCommunity) Name() string             { return "Default SNMP community strings removed" }
+func (c *snmpCommunity) Category() string         { return "network" }
 func (c *snmpCommunity) Severity() check.Severity { return check.Critical }
-func (c *snmpCommunity) Description() string    { return "Verify default SNMP community strings (public, private) are not in use" }
+func (c *snmpCommunity) Description() string {
+	return "Verify default SNMP community strings (public, private) are not in use"
+}
 
 func (c *snmpCommunity) Run() check.Result {
 	confPath := "/etc/snmp/snmpd.conf"

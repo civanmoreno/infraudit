@@ -27,10 +27,10 @@ func TestComputeScore_AllFail(t *testing.T) {
 
 func TestComputeScore_Mixed(t *testing.T) {
 	entries := []Entry{
-		{Severity: "CRITICAL", Status: "PASS"},  // 10/10
-		{Severity: "HIGH", Status: "WARN"},       // 2/5
-		{Severity: "MEDIUM", Status: "FAIL"},     // 0/3
-		{Severity: "LOW", Status: "PASS"},        // 1/1
+		{Severity: "CRITICAL", Status: "PASS"}, // 10/10
+		{Severity: "HIGH", Status: "WARN"},     // 2/5
+		{Severity: "MEDIUM", Status: "FAIL"},   // 0/3
+		{Severity: "LOW", Status: "PASS"},      // 1/1
 	}
 	// earned=13, possible=19 → 13*100/19 = 68
 	score := ComputeScore(entries)

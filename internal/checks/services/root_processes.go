@@ -17,11 +17,11 @@ func init() {
 
 type rootProcesses struct{}
 
-func (c *rootProcesses) ID() string             { return "SVC-008" }
-func (c *rootProcesses) Name() string           { return "No unnecessary processes running as root" }
-func (c *rootProcesses) Category() string       { return "services" }
+func (c *rootProcesses) ID() string               { return "SVC-008" }
+func (c *rootProcesses) Name() string             { return "No unnecessary processes running as root" }
+func (c *rootProcesses) Category() string         { return "services" }
 func (c *rootProcesses) Severity() check.Severity { return check.Medium }
-func (c *rootProcesses) Description() string    { return "List processes running as root for review" }
+func (c *rootProcesses) Description() string      { return "List processes running as root for review" }
 
 // Processes expected to run as root
 var expectedRoot = map[string]bool{

@@ -14,11 +14,13 @@ func init() {
 
 type snmpVersion struct{}
 
-func (c *snmpVersion) ID() string             { return "NET-009" }
-func (c *snmpVersion) Name() string           { return "SNMP v1/v2c disabled" }
-func (c *snmpVersion) Category() string       { return "network" }
+func (c *snmpVersion) ID() string               { return "NET-009" }
+func (c *snmpVersion) Name() string             { return "SNMP v1/v2c disabled" }
+func (c *snmpVersion) Category() string         { return "network" }
 func (c *snmpVersion) Severity() check.Severity { return check.High }
-func (c *snmpVersion) Description() string    { return "Verify SNMP v1/v2c is disabled (only SNMPv3 if needed)" }
+func (c *snmpVersion) Description() string {
+	return "Verify SNMP v1/v2c is disabled (only SNMPv3 if needed)"
+}
 
 func (c *snmpVersion) Run() check.Result {
 	// Check if snmpd is installed

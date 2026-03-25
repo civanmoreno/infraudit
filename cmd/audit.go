@@ -17,17 +17,17 @@ import (
 )
 
 var (
-	categoryFlag   string
-	formatFlag     string
-	outputFlag     string
-	profileFlag    string
-	skipFlag       []string
-	parallelFlag   int
-	quietFlag      bool
+	categoryFlag    string
+	formatFlag      string
+	outputFlag      string
+	profileFlag     string
+	skipFlag        []string
+	parallelFlag    int
+	quietFlag       bool
 	severityMinFlag string
-	checkFlag      string
-	statusFlag     string
-	ignoreErrors   bool
+	checkFlag       string
+	statusFlag      string
+	ignoreErrors    bool
 )
 
 var auditCmd = &cobra.Command{
@@ -106,16 +106,15 @@ func runAudit(cmd *cobra.Command, args []string) {
 
 	// Get checks
 	var checks []check.Check
-	if checkFlag != "" {
-		// Single check mode
+	switch {
+	case checkFlag != "":
 		c := check.ByID(checkFlag)
 		if c == nil {
 			fmt.Fprintf(os.Stderr, "Check not found: %s\n", checkFlag)
 			os.Exit(1)
 		}
 		checks = []check.Check{c}
-	} else if categoryFlag != "" {
-		// Multi-category support
+	case categoryFlag != "":
 		cats := strings.Split(categoryFlag, ",")
 		for i := range cats {
 			cats[i] = strings.TrimSpace(cats[i])
@@ -125,16 +124,17 @@ func runAudit(cmd *cobra.Command, args []string) {
 		} else {
 			checks = check.ByCategories(cats)
 		}
-	} else {
+	default:
 		checks = check.All()
 	}
 
 	if len(checks) == 0 {
-		if checkFlag != "" {
+		switch {
+		case checkFlag != "":
 			fmt.Fprintf(os.Stderr, "Check not found: %s\n", checkFlag)
-		} else if categoryFlag != "" {
+		case categoryFlag != "":
 			fmt.Fprintf(os.Stderr, "No checks found for category: %s\n", categoryFlag)
-		} else {
+		default:
 			fmt.Fprintln(os.Stderr, "No checks registered.")
 		}
 		os.Exit(1)
@@ -261,7 +261,10 @@ func runAudit(cmd *cobra.Command, args []string) {
 
 	// Close output file before any exit
 	if outFile != nil {
-		outFile.Close()
+		if err := outFile.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error closing output file: %s\n", err)
+			os.Exit(1)
+		}
 		fmt.Fprintf(os.Stderr, "Report written to %s\n", outputFlag)
 	}
 

@@ -22,11 +22,11 @@ func init() {
 // BOOT-001
 type grubPassword struct{}
 
-func (c *grubPassword) ID() string             { return "BOOT-001" }
-func (c *grubPassword) Name() string           { return "GRUB bootloader password set" }
-func (c *grubPassword) Category() string       { return "boot" }
+func (c *grubPassword) ID() string               { return "BOOT-001" }
+func (c *grubPassword) Name() string             { return "GRUB bootloader password set" }
+func (c *grubPassword) Category() string         { return "boot" }
 func (c *grubPassword) Severity() check.Severity { return check.High }
-func (c *grubPassword) Description() string    { return "Verify GRUB has a password configured" }
+func (c *grubPassword) Description() string      { return "Verify GRUB has a password configured" }
 
 func (c *grubPassword) Run() check.Result {
 	paths := []string{
@@ -59,11 +59,11 @@ func (c *grubPassword) Run() check.Result {
 // BOOT-002
 type grubPerms struct{}
 
-func (c *grubPerms) ID() string             { return "BOOT-002" }
-func (c *grubPerms) Name() string           { return "Bootloader config permissions" }
-func (c *grubPerms) Category() string       { return "boot" }
+func (c *grubPerms) ID() string               { return "BOOT-002" }
+func (c *grubPerms) Name() string             { return "Bootloader config permissions" }
+func (c *grubPerms) Category() string         { return "boot" }
 func (c *grubPerms) Severity() check.Severity { return check.High }
-func (c *grubPerms) Description() string    { return "Verify grub.cfg is 0600 owned by root" }
+func (c *grubPerms) Description() string      { return "Verify grub.cfg is 0600 owned by root" }
 
 func (c *grubPerms) Run() check.Result {
 	paths := []string{"/boot/grub/grub.cfg", "/boot/grub2/grub.cfg"}
@@ -88,11 +88,11 @@ func (c *grubPerms) Run() check.Result {
 // BOOT-003
 type secureBoot struct{}
 
-func (c *secureBoot) ID() string             { return "BOOT-003" }
-func (c *secureBoot) Name() string           { return "UEFI Secure Boot enabled" }
-func (c *secureBoot) Category() string       { return "boot" }
+func (c *secureBoot) ID() string               { return "BOOT-003" }
+func (c *secureBoot) Name() string             { return "UEFI Secure Boot enabled" }
+func (c *secureBoot) Category() string         { return "boot" }
 func (c *secureBoot) Severity() check.Severity { return check.Medium }
-func (c *secureBoot) Description() string    { return "Check if Secure Boot is enabled" }
+func (c *secureBoot) Description() string      { return "Check if Secure Boot is enabled" }
 
 func (c *secureBoot) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "mokutil", "--sb-state")
@@ -118,11 +118,13 @@ func (c *secureBoot) Run() check.Result {
 // BOOT-004
 type singleUserAuth struct{}
 
-func (c *singleUserAuth) ID() string             { return "BOOT-004" }
-func (c *singleUserAuth) Name() string           { return "Single-user mode requires authentication" }
-func (c *singleUserAuth) Category() string       { return "boot" }
+func (c *singleUserAuth) ID() string               { return "BOOT-004" }
+func (c *singleUserAuth) Name() string             { return "Single-user mode requires authentication" }
+func (c *singleUserAuth) Category() string         { return "boot" }
 func (c *singleUserAuth) Severity() check.Severity { return check.High }
-func (c *singleUserAuth) Description() string    { return "Verify rescue/emergency mode requires root password" }
+func (c *singleUserAuth) Description() string {
+	return "Verify rescue/emergency mode requires root password"
+}
 
 func (c *singleUserAuth) Run() check.Result {
 	entries, err := check.ParseShadow()
@@ -147,11 +149,13 @@ func (c *singleUserAuth) Run() check.Result {
 // BOOT-005
 type macInstalled struct{}
 
-func (c *macInstalled) ID() string             { return "BOOT-005" }
-func (c *macInstalled) Name() string           { return "SELinux or AppArmor installed and enabled" }
-func (c *macInstalled) Category() string       { return "boot" }
+func (c *macInstalled) ID() string               { return "BOOT-005" }
+func (c *macInstalled) Name() string             { return "SELinux or AppArmor installed and enabled" }
+func (c *macInstalled) Category() string         { return "boot" }
 func (c *macInstalled) Severity() check.Severity { return check.High }
-func (c *macInstalled) Description() string    { return "Verify a mandatory access control system is active" }
+func (c *macInstalled) Description() string {
+	return "Verify a mandatory access control system is active"
+}
 
 func (c *macInstalled) Run() check.Result {
 	// Check AppArmor
@@ -181,11 +185,13 @@ func (c *macInstalled) Run() check.Result {
 // BOOT-006
 type macEnforcing struct{}
 
-func (c *macEnforcing) ID() string             { return "BOOT-006" }
-func (c *macEnforcing) Name() string           { return "MAC in enforcing mode" }
-func (c *macEnforcing) Category() string       { return "boot" }
+func (c *macEnforcing) ID() string               { return "BOOT-006" }
+func (c *macEnforcing) Name() string             { return "MAC in enforcing mode" }
+func (c *macEnforcing) Category() string         { return "boot" }
 func (c *macEnforcing) Severity() check.Severity { return check.High }
-func (c *macEnforcing) Description() string    { return "Verify SELinux is Enforcing or AppArmor profiles are in enforce mode" }
+func (c *macEnforcing) Description() string {
+	return "Verify SELinux is Enforcing or AppArmor profiles are in enforce mode"
+}
 
 func (c *macEnforcing) Run() check.Result {
 	// AppArmor
@@ -218,11 +224,11 @@ func (c *macEnforcing) Run() check.Result {
 // BOOT-007
 type unconfinedProcs struct{}
 
-func (c *unconfinedProcs) ID() string             { return "BOOT-007" }
-func (c *unconfinedProcs) Name() string           { return "No unconfined processes" }
-func (c *unconfinedProcs) Category() string       { return "boot" }
+func (c *unconfinedProcs) ID() string               { return "BOOT-007" }
+func (c *unconfinedProcs) Name() string             { return "No unconfined processes" }
+func (c *unconfinedProcs) Category() string         { return "boot" }
 func (c *unconfinedProcs) Severity() check.Severity { return check.Medium }
-func (c *unconfinedProcs) Description() string    { return "Check for processes without MAC confinement" }
+func (c *unconfinedProcs) Description() string      { return "Check for processes without MAC confinement" }
 
 func (c *unconfinedProcs) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "aa-unconfined")
@@ -248,11 +254,11 @@ func (c *unconfinedProcs) Run() check.Result {
 // BOOT-008
 type macDenials struct{}
 
-func (c *macDenials) ID() string             { return "BOOT-008" }
-func (c *macDenials) Name() string           { return "No MAC denials in logs" }
-func (c *macDenials) Category() string       { return "boot" }
+func (c *macDenials) ID() string               { return "BOOT-008" }
+func (c *macDenials) Name() string             { return "No MAC denials in logs" }
+func (c *macDenials) Category() string         { return "boot" }
 func (c *macDenials) Severity() check.Severity { return check.Low }
-func (c *macDenials) Description() string    { return "Check for recent SELinux/AppArmor denials" }
+func (c *macDenials) Description() string      { return "Check for recent SELinux/AppArmor denials" }
 
 func (c *macDenials) Run() check.Result {
 	// Check AppArmor denials in dmesg
@@ -267,8 +273,8 @@ func (c *macDenials) Run() check.Result {
 
 	if denials > 0 {
 		return check.Result{
-			Status:  check.Warn,
-			Message: fmt.Sprintf("%d MAC denial(s) found in dmesg", denials),
+			Status:      check.Warn,
+			Message:     fmt.Sprintf("%d MAC denial(s) found in dmesg", denials),
 			Remediation: "Review and fix MAC policy denials",
 		}
 	}

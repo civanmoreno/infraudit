@@ -22,11 +22,11 @@ func init() {
 // CRON-001
 type cronRunning struct{}
 
-func (c *cronRunning) ID() string             { return "CRON-001" }
-func (c *cronRunning) Name() string           { return "Cron daemon enabled and running" }
-func (c *cronRunning) Category() string       { return "cron" }
+func (c *cronRunning) ID() string               { return "CRON-001" }
+func (c *cronRunning) Name() string             { return "Cron daemon enabled and running" }
+func (c *cronRunning) Category() string         { return "cron" }
 func (c *cronRunning) Severity() check.Severity { return check.Low }
-func (c *cronRunning) Description() string    { return "Verify cron service is active" }
+func (c *cronRunning) Description() string      { return "Verify cron service is active" }
 
 func (c *cronRunning) Run() check.Result {
 	if check.ServiceActive("cron") || check.ServiceActive("crond") {
@@ -41,11 +41,11 @@ func (c *cronRunning) Run() check.Result {
 // CRON-002
 type crontabPerms struct{}
 
-func (c *crontabPerms) ID() string             { return "CRON-002" }
-func (c *crontabPerms) Name() string           { return "/etc/crontab permissions" }
-func (c *crontabPerms) Category() string       { return "cron" }
+func (c *crontabPerms) ID() string               { return "CRON-002" }
+func (c *crontabPerms) Name() string             { return "/etc/crontab permissions" }
+func (c *crontabPerms) Category() string         { return "cron" }
 func (c *crontabPerms) Severity() check.Severity { return check.Medium }
-func (c *crontabPerms) Description() string    { return "Verify /etc/crontab is 0600 root:root" }
+func (c *crontabPerms) Description() string      { return "Verify /etc/crontab is 0600 root:root" }
 
 func (c *crontabPerms) Run() check.Result {
 	info, err := os.Stat("/etc/crontab")
@@ -66,11 +66,11 @@ func (c *crontabPerms) Run() check.Result {
 // CRON-003
 type cronDirPerms struct{}
 
-func (c *cronDirPerms) ID() string             { return "CRON-003" }
-func (c *cronDirPerms) Name() string           { return "Cron directories permissions" }
-func (c *cronDirPerms) Category() string       { return "cron" }
+func (c *cronDirPerms) ID() string               { return "CRON-003" }
+func (c *cronDirPerms) Name() string             { return "Cron directories permissions" }
+func (c *cronDirPerms) Category() string         { return "cron" }
 func (c *cronDirPerms) Severity() check.Severity { return check.Medium }
-func (c *cronDirPerms) Description() string    { return "Verify cron directories are 0700" }
+func (c *cronDirPerms) Description() string      { return "Verify cron directories are 0700" }
 
 func (c *cronDirPerms) Run() check.Result {
 	dirs := []string{"/etc/cron.hourly", "/etc/cron.daily", "/etc/cron.weekly", "/etc/cron.monthly"}
@@ -99,11 +99,11 @@ func (c *cronDirPerms) Run() check.Result {
 // CRON-004
 type cronAllow struct{}
 
-func (c *cronAllow) ID() string             { return "CRON-004" }
-func (c *cronAllow) Name() string           { return "cron.allow exists, cron.deny removed" }
-func (c *cronAllow) Category() string       { return "cron" }
+func (c *cronAllow) ID() string               { return "CRON-004" }
+func (c *cronAllow) Name() string             { return "cron.allow exists, cron.deny removed" }
+func (c *cronAllow) Category() string         { return "cron" }
 func (c *cronAllow) Severity() check.Severity { return check.Medium }
-func (c *cronAllow) Description() string    { return "Verify whitelist approach for cron access" }
+func (c *cronAllow) Description() string      { return "Verify whitelist approach for cron access" }
 
 func (c *cronAllow) Run() check.Result {
 	_, allowErr := os.Stat("/etc/cron.allow")
@@ -131,11 +131,11 @@ func (c *cronAllow) Run() check.Result {
 // CRON-005
 type atAllow struct{}
 
-func (c *atAllow) ID() string             { return "CRON-005" }
-func (c *atAllow) Name() string           { return "at.allow exists, at.deny removed" }
-func (c *atAllow) Category() string       { return "cron" }
+func (c *atAllow) ID() string               { return "CRON-005" }
+func (c *atAllow) Name() string             { return "at.allow exists, at.deny removed" }
+func (c *atAllow) Category() string         { return "cron" }
 func (c *atAllow) Severity() check.Severity { return check.Medium }
-func (c *atAllow) Description() string    { return "Verify whitelist approach for at access" }
+func (c *atAllow) Description() string      { return "Verify whitelist approach for at access" }
 
 func (c *atAllow) Run() check.Result {
 	_, allowErr := os.Stat("/etc/at.allow")
@@ -162,11 +162,13 @@ func (c *atAllow) Run() check.Result {
 // CRON-006
 type suspiciousJobs struct{}
 
-func (c *suspiciousJobs) ID() string             { return "CRON-006" }
-func (c *suspiciousJobs) Name() string           { return "No suspicious cron jobs" }
-func (c *suspiciousJobs) Category() string       { return "cron" }
+func (c *suspiciousJobs) ID() string               { return "CRON-006" }
+func (c *suspiciousJobs) Name() string             { return "No suspicious cron jobs" }
+func (c *suspiciousJobs) Category() string         { return "cron" }
 func (c *suspiciousJobs) Severity() check.Severity { return check.High }
-func (c *suspiciousJobs) Description() string    { return "Check for cron jobs with network downloads or writable scripts" }
+func (c *suspiciousJobs) Description() string {
+	return "Check for cron jobs with network downloads or writable scripts"
+}
 
 var suspiciousPatterns = []string{"curl ", "wget ", "nc ", "ncat ", "/dev/tcp", "bash -i"}
 
@@ -227,11 +229,11 @@ func scanFileForPatterns(path string, patterns []string) bool {
 // CRON-007
 type userCrontabs struct{}
 
-func (c *userCrontabs) ID() string             { return "CRON-007" }
-func (c *userCrontabs) Name() string           { return "User crontabs reviewed" }
-func (c *userCrontabs) Category() string       { return "cron" }
+func (c *userCrontabs) ID() string               { return "CRON-007" }
+func (c *userCrontabs) Name() string             { return "User crontabs reviewed" }
+func (c *userCrontabs) Category() string         { return "cron" }
 func (c *userCrontabs) Severity() check.Severity { return check.Low }
-func (c *userCrontabs) Description() string    { return "List users with crontabs for review" }
+func (c *userCrontabs) Description() string      { return "List users with crontabs for review" }
 
 func (c *userCrontabs) Run() check.Result {
 	entries, err := os.ReadDir("/var/spool/cron/crontabs")

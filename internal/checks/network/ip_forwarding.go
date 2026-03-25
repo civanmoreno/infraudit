@@ -12,11 +12,13 @@ func init() {
 
 type ipForwarding struct{}
 
-func (c *ipForwarding) ID() string             { return "NET-003" }
-func (c *ipForwarding) Name() string           { return "IP forwarding disabled" }
-func (c *ipForwarding) Category() string       { return "network" }
+func (c *ipForwarding) ID() string               { return "NET-003" }
+func (c *ipForwarding) Name() string             { return "IP forwarding disabled" }
+func (c *ipForwarding) Category() string         { return "network" }
 func (c *ipForwarding) Severity() check.Severity { return check.Medium }
-func (c *ipForwarding) Description() string    { return "Verify IP forwarding is disabled unless the system is a router/gateway" }
+func (c *ipForwarding) Description() string {
+	return "Verify IP forwarding is disabled unless the system is a router/gateway"
+}
 
 func (c *ipForwarding) Run() check.Result {
 	v4 := check.ReadSysctl("/proc/sys/net/ipv4/ip_forward")
@@ -43,4 +45,3 @@ func (c *ipForwarding) Run() check.Result {
 		Message: "IP forwarding is disabled (IPv4 and IPv6)",
 	}
 }
-

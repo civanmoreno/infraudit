@@ -17,11 +17,11 @@ func init() {
 
 type openPorts struct{}
 
-func (c *openPorts) ID() string             { return "NET-002" }
-func (c *openPorts) Name() string           { return "No unnecessary open ports" }
-func (c *openPorts) Category() string       { return "network" }
+func (c *openPorts) ID() string               { return "NET-002" }
+func (c *openPorts) Name() string             { return "No unnecessary open ports" }
+func (c *openPorts) Category() string         { return "network" }
 func (c *openPorts) Severity() check.Severity { return check.High }
-func (c *openPorts) Description() string    { return "List all listening TCP/UDP ports for review" }
+func (c *openPorts) Description() string      { return "List all listening TCP/UDP ports for review" }
 
 func (c *openPorts) Run() check.Result {
 	cfg := config.Get()

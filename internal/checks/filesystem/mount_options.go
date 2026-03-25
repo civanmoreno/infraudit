@@ -27,11 +27,13 @@ func findMount(mounts []check.MountEntry, path string) *check.MountEntry {
 // FS-004: Sensitive partitions mount options
 type mountOptions struct{}
 
-func (c *mountOptions) ID() string             { return "FS-004" }
-func (c *mountOptions) Name() string           { return "Sensitive partitions have restrictive mount options" }
-func (c *mountOptions) Category() string       { return "filesystem" }
+func (c *mountOptions) ID() string               { return "FS-004" }
+func (c *mountOptions) Name() string             { return "Sensitive partitions have restrictive mount options" }
+func (c *mountOptions) Category() string         { return "filesystem" }
 func (c *mountOptions) Severity() check.Severity { return check.Medium }
-func (c *mountOptions) Description() string    { return "Verify /tmp, /var, /home have noexec/nosuid/nodev where appropriate" }
+func (c *mountOptions) Description() string {
+	return "Verify /tmp, /var, /home have noexec/nosuid/nodev where appropriate"
+}
 
 func (c *mountOptions) Run() check.Result {
 	mounts := check.ParseMounts()
@@ -75,11 +77,11 @@ func (c *mountOptions) Run() check.Result {
 // FS-005: /dev/shm mount options
 type devShmMount struct{}
 
-func (c *devShmMount) ID() string             { return "FS-005" }
-func (c *devShmMount) Name() string           { return "/dev/shm mounted with nodev,nosuid,noexec" }
-func (c *devShmMount) Category() string       { return "filesystem" }
+func (c *devShmMount) ID() string               { return "FS-005" }
+func (c *devShmMount) Name() string             { return "/dev/shm mounted with nodev,nosuid,noexec" }
+func (c *devShmMount) Category() string         { return "filesystem" }
 func (c *devShmMount) Severity() check.Severity { return check.Medium }
-func (c *devShmMount) Description() string    { return "Verify /dev/shm has restrictive mount options" }
+func (c *devShmMount) Description() string      { return "Verify /dev/shm has restrictive mount options" }
 
 func (c *devShmMount) Run() check.Result {
 	mounts := check.ParseMounts()
@@ -113,11 +115,11 @@ func (c *devShmMount) Run() check.Result {
 // FS-009: /tmp separate partition
 type tmpPartition struct{}
 
-func (c *tmpPartition) ID() string             { return "FS-009" }
-func (c *tmpPartition) Name() string           { return "/tmp on separate partition or tmpfs" }
-func (c *tmpPartition) Category() string       { return "filesystem" }
+func (c *tmpPartition) ID() string               { return "FS-009" }
+func (c *tmpPartition) Name() string             { return "/tmp on separate partition or tmpfs" }
+func (c *tmpPartition) Category() string         { return "filesystem" }
 func (c *tmpPartition) Severity() check.Severity { return check.Medium }
-func (c *tmpPartition) Description() string    { return "Verify /tmp is a separate partition or tmpfs" }
+func (c *tmpPartition) Description() string      { return "Verify /tmp is a separate partition or tmpfs" }
 
 func (c *tmpPartition) Run() check.Result {
 	mounts := check.ParseMounts()
@@ -139,11 +141,11 @@ func (c *tmpPartition) Run() check.Result {
 // FS-010: /var/tmp mount options
 type varTmpMount struct{}
 
-func (c *varTmpMount) ID() string             { return "FS-010" }
-func (c *varTmpMount) Name() string           { return "/var/tmp with nodev,nosuid,noexec" }
-func (c *varTmpMount) Category() string       { return "filesystem" }
+func (c *varTmpMount) ID() string               { return "FS-010" }
+func (c *varTmpMount) Name() string             { return "/var/tmp with nodev,nosuid,noexec" }
+func (c *varTmpMount) Category() string         { return "filesystem" }
 func (c *varTmpMount) Severity() check.Severity { return check.Medium }
-func (c *varTmpMount) Description() string    { return "Verify /var/tmp has restrictive mount options" }
+func (c *varTmpMount) Description() string      { return "Verify /var/tmp has restrictive mount options" }
 
 func (c *varTmpMount) Run() check.Result {
 	mounts := check.ParseMounts()
@@ -177,11 +179,13 @@ func (c *varTmpMount) Run() check.Result {
 // FS-011: tmp.mount enabled
 type tmpMount struct{}
 
-func (c *tmpMount) ID() string             { return "FS-011" }
-func (c *tmpMount) Name() string           { return "systemd tmp.mount enabled" }
-func (c *tmpMount) Category() string       { return "filesystem" }
+func (c *tmpMount) ID() string               { return "FS-011" }
+func (c *tmpMount) Name() string             { return "systemd tmp.mount enabled" }
+func (c *tmpMount) Category() string         { return "filesystem" }
 func (c *tmpMount) Severity() check.Severity { return check.Low }
-func (c *tmpMount) Description() string    { return "Verify tmp.mount is enabled if using systemd for /tmp" }
+func (c *tmpMount) Description() string {
+	return "Verify tmp.mount is enabled if using systemd for /tmp"
+}
 
 func (c *tmpMount) Run() check.Result {
 	mounts := check.ParseMounts()

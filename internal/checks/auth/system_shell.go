@@ -13,11 +13,13 @@ func init() {
 
 type systemShell struct{}
 
-func (c *systemShell) ID() string             { return "AUTH-005" }
-func (c *systemShell) Name() string           { return "System accounts have nologin shell" }
-func (c *systemShell) Category() string       { return "auth" }
+func (c *systemShell) ID() string               { return "AUTH-005" }
+func (c *systemShell) Name() string             { return "System accounts have nologin shell" }
+func (c *systemShell) Category() string         { return "auth" }
 func (c *systemShell) Severity() check.Severity { return check.High }
-func (c *systemShell) Description() string    { return "Ensure system/service accounts use /sbin/nologin or /bin/false" }
+func (c *systemShell) Description() string {
+	return "Ensure system/service accounts use /sbin/nologin or /bin/false"
+}
 
 func (c *systemShell) Run() check.Result {
 	entries, err := check.ParsePasswd()

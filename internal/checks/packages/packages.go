@@ -19,11 +19,11 @@ func init() {
 // PKG-001
 type securityUpdates struct{}
 
-func (c *securityUpdates) ID() string             { return "PKG-001" }
-func (c *securityUpdates) Name() string           { return "No pending security updates" }
-func (c *securityUpdates) Category() string       { return "packages" }
+func (c *securityUpdates) ID() string               { return "PKG-001" }
+func (c *securityUpdates) Name() string             { return "No pending security updates" }
+func (c *securityUpdates) Category() string         { return "packages" }
 func (c *securityUpdates) Severity() check.Severity { return check.High }
-func (c *securityUpdates) Description() string    { return "Check for pending security updates" }
+func (c *securityUpdates) Description() string      { return "Check for pending security updates" }
 
 func (c *securityUpdates) Run() check.Result {
 	// Try apt (Debian/Ubuntu)
@@ -72,11 +72,11 @@ func (c *securityUpdates) Run() check.Result {
 // PKG-002
 type repoHTTPS struct{}
 
-func (c *repoHTTPS) ID() string             { return "PKG-002" }
-func (c *repoHTTPS) Name() string           { return "Package repositories use HTTPS" }
-func (c *repoHTTPS) Category() string       { return "packages" }
+func (c *repoHTTPS) ID() string               { return "PKG-002" }
+func (c *repoHTTPS) Name() string             { return "Package repositories use HTTPS" }
+func (c *repoHTTPS) Category() string         { return "packages" }
 func (c *repoHTTPS) Severity() check.Severity { return check.Medium }
-func (c *repoHTTPS) Description() string    { return "Verify package repos use secure transport" }
+func (c *repoHTTPS) Description() string      { return "Verify package repos use secure transport" }
 
 func (c *repoHTTPS) Run() check.Result {
 	// Check apt sources
@@ -134,11 +134,11 @@ func (c *repoHTTPS) Run() check.Result {
 // PKG-003
 type kernelUpdate struct{}
 
-func (c *kernelUpdate) ID() string             { return "PKG-003" }
-func (c *kernelUpdate) Name() string           { return "Kernel is up to date" }
-func (c *kernelUpdate) Category() string       { return "packages" }
+func (c *kernelUpdate) ID() string               { return "PKG-003" }
+func (c *kernelUpdate) Name() string             { return "Kernel is up to date" }
+func (c *kernelUpdate) Category() string         { return "packages" }
 func (c *kernelUpdate) Severity() check.Severity { return check.High }
-func (c *kernelUpdate) Description() string    { return "Check if a newer kernel is available" }
+func (c *kernelUpdate) Description() string      { return "Check if a newer kernel is available" }
 
 func (c *kernelUpdate) Run() check.Result {
 	// Check if reboot required (kernel was updated but not rebooted)
@@ -155,11 +155,13 @@ func (c *kernelUpdate) Run() check.Result {
 // PKG-004
 type autoUpdates struct{}
 
-func (c *autoUpdates) ID() string             { return "PKG-004" }
-func (c *autoUpdates) Name() string           { return "Automatic security updates enabled" }
-func (c *autoUpdates) Category() string       { return "packages" }
+func (c *autoUpdates) ID() string               { return "PKG-004" }
+func (c *autoUpdates) Name() string             { return "Automatic security updates enabled" }
+func (c *autoUpdates) Category() string         { return "packages" }
 func (c *autoUpdates) Severity() check.Severity { return check.Medium }
-func (c *autoUpdates) Description() string    { return "Verify unattended-upgrades or dnf-automatic is configured" }
+func (c *autoUpdates) Description() string {
+	return "Verify unattended-upgrades or dnf-automatic is configured"
+}
 
 func (c *autoUpdates) Run() check.Result {
 	// Check unattended-upgrades (Debian/Ubuntu)

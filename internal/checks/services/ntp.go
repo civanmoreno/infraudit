@@ -16,11 +16,11 @@ func init() {
 // SVC-003: NTP synchronized
 type ntpSync struct{}
 
-func (c *ntpSync) ID() string             { return "SVC-003" }
-func (c *ntpSync) Name() string           { return "NTP/chrony running and synchronized" }
-func (c *ntpSync) Category() string       { return "services" }
+func (c *ntpSync) ID() string               { return "SVC-003" }
+func (c *ntpSync) Name() string             { return "NTP/chrony running and synchronized" }
+func (c *ntpSync) Category() string         { return "services" }
 func (c *ntpSync) Severity() check.Severity { return check.Medium }
-func (c *ntpSync) Description() string    { return "Verify time synchronization is active and working" }
+func (c *ntpSync) Description() string      { return "Verify time synchronization is active and working" }
 
 func (c *ntpSync) Run() check.Result {
 	// Check timedatectl
@@ -52,11 +52,11 @@ func (c *ntpSync) Run() check.Result {
 // SVC-004: NTP not running as root
 type ntpUser struct{}
 
-func (c *ntpUser) ID() string             { return "SVC-004" }
-func (c *ntpUser) Name() string           { return "NTP daemon not running as root" }
-func (c *ntpUser) Category() string       { return "services" }
+func (c *ntpUser) ID() string               { return "SVC-004" }
+func (c *ntpUser) Name() string             { return "NTP daemon not running as root" }
+func (c *ntpUser) Category() string         { return "services" }
 func (c *ntpUser) Severity() check.Severity { return check.Low }
-func (c *ntpUser) Description() string    { return "Verify NTP daemon runs as a dedicated user" }
+func (c *ntpUser) Description() string      { return "Verify NTP daemon runs as a dedicated user" }
 
 func (c *ntpUser) Run() check.Result {
 	// chrony typically runs as _chrony or chrony
@@ -95,11 +95,13 @@ func (c *ntpUser) Run() check.Result {
 // SVC-005: NTS enabled
 type ntpNTS struct{}
 
-func (c *ntpNTS) ID() string             { return "SVC-005" }
-func (c *ntpNTS) Name() string           { return "NTS (Network Time Security) enabled" }
-func (c *ntpNTS) Category() string       { return "services" }
+func (c *ntpNTS) ID() string               { return "SVC-005" }
+func (c *ntpNTS) Name() string             { return "NTS (Network Time Security) enabled" }
+func (c *ntpNTS) Category() string         { return "services" }
 func (c *ntpNTS) Severity() check.Severity { return check.Low }
-func (c *ntpNTS) Description() string    { return "Check if NTS is enabled for authenticated time synchronization" }
+func (c *ntpNTS) Description() string {
+	return "Check if NTS is enabled for authenticated time synchronization"
+}
 
 func (c *ntpNTS) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "chronyc", "authdata")
@@ -117,11 +119,13 @@ func (c *ntpNTS) Run() check.Result {
 // SVC-006: Trusted time sources
 type ntpSources struct{}
 
-func (c *ntpSources) ID() string             { return "SVC-006" }
-func (c *ntpSources) Name() string           { return "Time sources are trusted" }
-func (c *ntpSources) Category() string       { return "services" }
+func (c *ntpSources) ID() string               { return "SVC-006" }
+func (c *ntpSources) Name() string             { return "Time sources are trusted" }
+func (c *ntpSources) Category() string         { return "services" }
 func (c *ntpSources) Severity() check.Severity { return check.Low }
-func (c *ntpSources) Description() string    { return "Verify NTP time sources are configured and reachable" }
+func (c *ntpSources) Description() string {
+	return "Verify NTP time sources are configured and reachable"
+}
 
 func (c *ntpSources) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "chronyc", "sources")

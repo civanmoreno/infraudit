@@ -13,11 +13,13 @@ func init() {
 
 type emptyPassword struct{}
 
-func (c *emptyPassword) ID() string             { return "AUTH-004" }
-func (c *emptyPassword) Name() string           { return "No users with empty password" }
-func (c *emptyPassword) Category() string       { return "auth" }
+func (c *emptyPassword) ID() string               { return "AUTH-004" }
+func (c *emptyPassword) Name() string             { return "No users with empty password" }
+func (c *emptyPassword) Category() string         { return "auth" }
 func (c *emptyPassword) Severity() check.Severity { return check.Critical }
-func (c *emptyPassword) Description() string    { return "Ensure no user accounts have an empty password field" }
+func (c *emptyPassword) Description() string {
+	return "Ensure no user accounts have an empty password field"
+}
 
 func (c *emptyPassword) Run() check.Result {
 	entries, err := check.ParseShadow()

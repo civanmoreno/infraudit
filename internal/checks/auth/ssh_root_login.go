@@ -14,11 +14,13 @@ func init() {
 
 type sshRootLogin struct{}
 
-func (c *sshRootLogin) ID() string          { return "AUTH-001" }
-func (c *sshRootLogin) Name() string        { return "SSH root login disabled" }
-func (c *sshRootLogin) Category() string    { return "auth" }
+func (c *sshRootLogin) ID() string               { return "AUTH-001" }
+func (c *sshRootLogin) Name() string             { return "SSH root login disabled" }
+func (c *sshRootLogin) Category() string         { return "auth" }
 func (c *sshRootLogin) Severity() check.Severity { return check.Critical }
-func (c *sshRootLogin) Description() string { return "Verify that direct root login via SSH is disabled" }
+func (c *sshRootLogin) Description() string {
+	return "Verify that direct root login via SSH is disabled"
+}
 
 func (c *sshRootLogin) Run() check.Result {
 	val, err := sshdConfigValue("PermitRootLogin")

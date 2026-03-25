@@ -14,11 +14,13 @@ func init() {
 
 type stickyBit struct{}
 
-func (c *stickyBit) ID() string             { return "FS-003" }
-func (c *stickyBit) Name() string           { return "Sticky bit set on /tmp and /var/tmp" }
-func (c *stickyBit) Category() string       { return "filesystem" }
+func (c *stickyBit) ID() string               { return "FS-003" }
+func (c *stickyBit) Name() string             { return "Sticky bit set on /tmp and /var/tmp" }
+func (c *stickyBit) Category() string         { return "filesystem" }
 func (c *stickyBit) Severity() check.Severity { return check.High }
-func (c *stickyBit) Description() string    { return "Verify sticky bit is set on world-writable directories" }
+func (c *stickyBit) Description() string {
+	return "Verify sticky bit is set on world-writable directories"
+}
 
 func (c *stickyBit) Run() check.Result {
 	dirs := []string{"/tmp", "/var/tmp"}

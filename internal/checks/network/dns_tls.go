@@ -12,11 +12,11 @@ func init() {
 
 type dnsTLS struct{}
 
-func (c *dnsTLS) ID() string             { return "NET-007" }
-func (c *dnsTLS) Name() string           { return "DNS over TLS/HTTPS configured" }
-func (c *dnsTLS) Category() string       { return "network" }
+func (c *dnsTLS) ID() string               { return "NET-007" }
+func (c *dnsTLS) Name() string             { return "DNS over TLS/HTTPS configured" }
+func (c *dnsTLS) Category() string         { return "network" }
 func (c *dnsTLS) Severity() check.Severity { return check.Low }
-func (c *dnsTLS) Description() string    { return "Verify DNS queries are encrypted via DoT or DoH" }
+func (c *dnsTLS) Description() string      { return "Verify DNS queries are encrypted via DoT or DoH" }
 
 func (c *dnsTLS) Run() check.Result {
 	// Check systemd-resolved DNSOverTLS setting

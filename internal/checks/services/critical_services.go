@@ -13,11 +13,13 @@ func init() {
 
 type criticalServices struct{}
 
-func (c *criticalServices) ID() string             { return "SVC-007" }
-func (c *criticalServices) Name() string           { return "Critical services active" }
-func (c *criticalServices) Category() string       { return "services" }
+func (c *criticalServices) ID() string               { return "SVC-007" }
+func (c *criticalServices) Name() string             { return "Critical services active" }
+func (c *criticalServices) Category() string         { return "services" }
 func (c *criticalServices) Severity() check.Severity { return check.High }
-func (c *criticalServices) Description() string    { return "Verify sshd and intrusion prevention (fail2ban/crowdsec) are running" }
+func (c *criticalServices) Description() string {
+	return "Verify sshd and intrusion prevention (fail2ban/crowdsec) are running"
+}
 
 func (c *criticalServices) Run() check.Result {
 	var missing []string

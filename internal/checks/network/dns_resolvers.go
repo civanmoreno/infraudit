@@ -14,11 +14,13 @@ func init() {
 
 type dnsResolvers struct{}
 
-func (c *dnsResolvers) ID() string             { return "NET-005" }
-func (c *dnsResolvers) Name() string           { return "DNS resolvers configured" }
-func (c *dnsResolvers) Category() string       { return "network" }
+func (c *dnsResolvers) ID() string               { return "NET-005" }
+func (c *dnsResolvers) Name() string             { return "DNS resolvers configured" }
+func (c *dnsResolvers) Category() string         { return "network" }
 func (c *dnsResolvers) Severity() check.Severity { return check.Low }
-func (c *dnsResolvers) Description() string    { return "Verify DNS resolvers are configured in /etc/resolv.conf" }
+func (c *dnsResolvers) Description() string {
+	return "Verify DNS resolvers are configured in /etc/resolv.conf"
+}
 
 func (c *dnsResolvers) Run() check.Result {
 	f, err := os.Open("/etc/resolv.conf")

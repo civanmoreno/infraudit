@@ -14,11 +14,13 @@ func init() {
 
 type dnssec struct{}
 
-func (c *dnssec) ID() string             { return "NET-006" }
-func (c *dnssec) Name() string           { return "DNSSEC validation enabled" }
-func (c *dnssec) Category() string       { return "network" }
+func (c *dnssec) ID() string               { return "NET-006" }
+func (c *dnssec) Name() string             { return "DNSSEC validation enabled" }
+func (c *dnssec) Category() string         { return "network" }
 func (c *dnssec) Severity() check.Severity { return check.Low }
-func (c *dnssec) Description() string    { return "Verify DNSSEC validation is enabled if running a local resolver" }
+func (c *dnssec) Description() string {
+	return "Verify DNSSEC validation is enabled if running a local resolver"
+}
 
 func (c *dnssec) Run() check.Result {
 	// Check systemd-resolved

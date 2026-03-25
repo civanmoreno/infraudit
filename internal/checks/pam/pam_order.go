@@ -14,9 +14,9 @@ func init() {
 
 type pamOrder struct{}
 
-func (c *pamOrder) ID() string             { return "PAM-004" }
-func (c *pamOrder) Name() string           { return "PAM module ordering correct" }
-func (c *pamOrder) Category() string       { return "pam" }
+func (c *pamOrder) ID() string               { return "PAM-004" }
+func (c *pamOrder) Name() string             { return "PAM module ordering correct" }
+func (c *pamOrder) Category() string         { return "pam" }
 func (c *pamOrder) Severity() check.Severity { return check.Medium }
 func (c *pamOrder) Description() string {
 	return "Verify pam_faillock appears before pam_unix in auth stack"
