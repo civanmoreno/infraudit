@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   timeout: 5m
 
@@ -10,6 +12,10 @@ linters:
     - govet
     - ineffassign
     - unused
+
+formatters:
+  enable:
+    - gofmt
 
 issues:
   exclude-rules:

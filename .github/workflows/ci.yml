@@ -42,7 +42,8 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          version: v2.1
+          args: run
 
       - name: Verify binary
         run: ./infraudit --version
