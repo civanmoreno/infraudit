@@ -197,6 +197,7 @@ The score appears in console, JSON, YAML, and HTML output.
 | `--profile` | *(none)* | Server profile to apply |
 | `--skip` | *(none)* | Comma-separated check IDs to skip |
 | `--severity-min` | *(none)* | Show only results at or above this severity |
+| `--status` | *(all)* | Show only results with these statuses (`fail,warn,error`) |
 | `--parallel` | `0` | Run checks in parallel with N workers |
 | `-q, --quiet` | `false` | Suppress progress output |
 | `--ignore-errors` | `false` | Don't count errors toward exit code 2 |

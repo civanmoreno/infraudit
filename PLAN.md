@@ -321,6 +321,13 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
   - Thread-safe via `sync.Once` — safe with `--parallel`
   - `ResetCache()` available for tests
 
+### Phase 29: Status Filter ✅
+
+- [x] `--status` flag — filter displayed results by status (comma-separated: pass, warn, fail, error)
+- [x] Summary and score always reflect the full audit (filters only affect displayed entries)
+- [x] `AllEntries` field in Report struct to preserve unfiltered results for score computation
+- [x] Validation of status values with clear error message
+
 ## Check Categories
 
 | Category | Prefix | Description |

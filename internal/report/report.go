@@ -25,8 +25,9 @@ type Entry struct {
 
 // Report holds the full audit report.
 type Report struct {
-	Entries []Entry `json:"checks" yaml:"checks"`
-	Summary Summary `json:"summary" yaml:"summary"`
+	Entries    []Entry `json:"checks" yaml:"checks"`
+	AllEntries []Entry `json:"-" yaml:"-"` // All entries before display filters (for score computation)
+	Summary    Summary `json:"summary" yaml:"summary"`
 }
 
 // Summary holds aggregate counts.
