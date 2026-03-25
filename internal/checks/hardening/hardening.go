@@ -24,10 +24,15 @@ func init() {
 }
 
 func moduleBlacklisted(mod string) bool {
-	// Check modprobe blacklist
+	// First check if the module is explicitly blacklisted in modprobe config
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "modprobe", "-n", "--show-depends", mod)
 	if err != nil {
-		return true // Module doesn't exist or is blocked
+		// Distinguish between "module not found" (blacklisted/absent) and other errors
+		errMsg := string(out) + err.Error()
+		if strings.Contains(errMsg, "not found") || strings.Contains(errMsg, "Module") {
+			return true // Module genuinely doesn't exist
+		}
+		return false // Permission denied or other error — assume not blacklisted
 	}
 	return strings.Contains(string(out), "install /bin/true") ||
 		strings.Contains(string(out), "install /bin/false") ||
@@ -162,14 +167,13 @@ func (c *procHardening) Severity() check.Severity { return check.Medium }
 func (c *procHardening) Description() string    { return "Verify /proc is mounted with hidepid" }
 
 func (c *procHardening) Run() check.Result {
-	data, err := os.ReadFile("/proc/mounts")
-	if err != nil {
+	mounts := check.ParseMounts()
+	if mounts == nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /proc/mounts"}
 	}
-	for _, line := range strings.Split(string(data), "\n") {
-		fields := strings.Fields(line)
-		if len(fields) >= 4 && fields[1] == "/proc" {
-			if strings.Contains(fields[3], "hidepid=") {
+	for _, m := range mounts {
+		if m.Mount == "/proc" {
+			if strings.Contains(m.Options, "hidepid=") {
 				return check.Result{Status: check.Pass, Message: "/proc mounted with hidepid"}
 			}
 		}

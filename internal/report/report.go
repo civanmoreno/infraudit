@@ -25,8 +25,9 @@ type Entry struct {
 
 // Report holds the full audit report.
 type Report struct {
-	Entries []Entry `json:"checks" yaml:"checks"`
-	Summary Summary `json:"summary" yaml:"summary"`
+	Entries    []Entry `json:"checks" yaml:"checks"`
+	AllEntries []Entry `json:"-" yaml:"-"` // All entries before display filters (for score computation)
+	Summary    Summary `json:"summary" yaml:"summary"`
 }
 
 // Summary holds aggregate counts.
@@ -36,6 +37,8 @@ type Summary struct {
 	Warnings int     `json:"warnings" yaml:"warnings"`
 	Failures int     `json:"failures" yaml:"failures"`
 	Errors   int     `json:"errors" yaml:"errors"`
+	Score    int     `json:"score" yaml:"score"`
+	Grade    string  `json:"grade" yaml:"grade"`
 	Duration float64 `json:"duration_seconds,omitempty" yaml:"duration_seconds,omitempty"`
 }
 
@@ -360,6 +363,30 @@ func writeSummaryBox(w io.Writer, r *Report) {
 	fmt.Fprintf(w, "    %s! %d Warnings%s", yellow, s.Warnings, rst)
 	fmt.Fprintf(w, "    %s✗ %d Failures%s", red, s.Failures, rst)
 	fmt.Fprintf(w, "    %s? %d Errors%s\n", magenta, s.Errors, rst)
+
+	// Severity breakdown for non-pass findings
+	sevCounts := severityBreakdown(r.AllEntries)
+	if sevCounts.critical+sevCounts.high+sevCounts.medium+sevCounts.low > 0 {
+		fmt.Fprintf(w, "\n  %sFindings by severity:%s ", dim, rst)
+		var parts []string
+		if sevCounts.critical > 0 {
+			parts = append(parts, fmt.Sprintf("%s%d critical%s", red+bold, sevCounts.critical, rst))
+		}
+		if sevCounts.high > 0 {
+			parts = append(parts, fmt.Sprintf("%s%d high%s", yellow, sevCounts.high, rst))
+		}
+		if sevCounts.medium > 0 {
+			parts = append(parts, fmt.Sprintf("%s%d medium%s", cyan, sevCounts.medium, rst))
+		}
+		if sevCounts.low > 0 {
+			parts = append(parts, fmt.Sprintf("%s%d low%s", blue, sevCounts.low, rst))
+		}
+		fmt.Fprintln(w, strings.Join(parts, "  "))
+	}
+
+	fmt.Fprintln(w)
+	fmt.Fprintf(w, "  %sHardening Index:%s %s%d/100 (%s)%s\n",
+		bold, rst, scoreColor(s.Score), s.Score, s.Grade, rst)
 	if s.Duration > 0 {
 		fmt.Fprintf(w, "\n  %sCompleted in %.1fs%s\n", dim, s.Duration, rst)
 	}
@@ -382,6 +409,8 @@ func WriteYAML(w io.Writer, r *Report) error {
 	fmt.Fprintf(w, "  warnings: %d\n", r.Summary.Warnings)
 	fmt.Fprintf(w, "  failures: %d\n", r.Summary.Failures)
 	fmt.Fprintf(w, "  errors: %d\n", r.Summary.Errors)
+	fmt.Fprintf(w, "  score: %d\n", r.Summary.Score)
+	fmt.Fprintf(w, "  grade: %s\n", r.Summary.Grade)
 	if r.Summary.Duration > 0 {
 		fmt.Fprintf(w, "  duration_seconds: %.1f\n", r.Summary.Duration)
 	}
@@ -404,6 +433,47 @@ func WriteYAML(w io.Writer, r *Report) error {
 		}
 	}
 	return nil
+}
+
+type sevCounts struct {
+	critical, high, medium, low int
+}
+
+// severityBreakdown counts non-pass findings by severity level.
+func severityBreakdown(entries []Entry) sevCounts {
+	var c sevCounts
+	for _, e := range entries {
+		if e.Status == "PASS" {
+			continue
+		}
+		switch e.Severity {
+		case "CRITICAL":
+			c.critical++
+		case "HIGH":
+			c.high++
+		case "MEDIUM":
+			c.medium++
+		case "LOW":
+			c.low++
+		}
+	}
+	return c
+}
+
+// scoreColor returns an ANSI color based on the hardening index.
+func scoreColor(score int) string {
+	switch {
+	case score >= 90:
+		return green + bold
+	case score >= 80:
+		return cyan + bold
+	case score >= 70:
+		return yellow + bold
+	case score >= 60:
+		return yellow
+	default:
+		return red + bold
+	}
 }
 
 func yamlEscape(s string) string {

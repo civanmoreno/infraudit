@@ -179,6 +179,12 @@ infraudit completion fish &gt; ~/.config/fish/completions/infraudit.fish</code><
                     <td><code>["sshd", "nginx"]</code></td>
                 </tr>
                 <tr>
+                    <td><code>allowed_suid</code></td>
+                    <td>string array</td>
+                    <td>SUID/SGID binaries to ignore for FS-001</td>
+                    <td><code>["/opt/myapp/bin/helper"]</code></td>
+                </tr>
+                <tr>
                     <td><code>command_timeout</code></td>
                     <td>int</td>
                     <td>Override default timeout (seconds) for external commands</td>
@@ -201,6 +207,7 @@ infraudit completion fish &gt; ~/.config/fish/completions/infraudit.fish</code><
   ],
   "allowed_ports": [22, 80, 443],
   "allowed_root_processes": ["sshd", "nginx", "fail2ban"],
+  "allowed_suid": ["/opt/myapp/bin/helper"],
   "command_timeout": 30
 }</code></pre>
 

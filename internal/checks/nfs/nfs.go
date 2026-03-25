@@ -109,17 +109,20 @@ func (c *sambaConfig) Run() check.Result {
 		if strings.HasPrefix(line, ";") || strings.HasPrefix(line, "#") {
 			continue
 		}
-		if strings.Contains(line, "guest ok") && strings.Contains(line, "yes") {
+		// Normalize: remove spaces around '=' for consistent parsing
+		normalized := strings.ReplaceAll(line, " ", "")
+		if (strings.Contains(normalized, "guestok=yes") || strings.Contains(normalized, "guest_ok=yes")) {
 			return check.Result{
 				Status:      check.Warn,
 				Message:     "Samba allows guest access",
 				Remediation: "Set 'guest ok = no' in /etc/samba/smb.conf",
 			}
 		}
-		if strings.Contains(line, "map to guest") {
+		if strings.Contains(normalized, "maptoguest=") && !strings.Contains(normalized, "maptoguest=never") {
 			return check.Result{
-				Status:  check.Warn,
-				Message: "Samba maps failed logins to guest",
+				Status:      check.Warn,
+				Message:     "Samba maps failed logins to guest",
+				Remediation: "Set 'map to guest = Never' in /etc/samba/smb.conf",
 			}
 		}
 	}
@@ -136,11 +139,8 @@ func (c *rpcbindDisabled) Severity() check.Severity { return check.Medium }
 func (c *rpcbindDisabled) Description() string    { return "Verify rpcbind is not running if NFS is not needed" }
 
 func (c *rpcbindDisabled) Run() check.Result {
-	rpcOut, _ := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "rpcbind")
-	rpcActive := strings.TrimSpace(string(rpcOut)) == "active"
-
-	nfsOut, _ := check.RunCmd(check.DefaultCmdTimeout, "systemctl", "is-active", "nfs-server")
-	nfsActive := strings.TrimSpace(string(nfsOut)) == "active"
+	rpcActive := check.ServiceActive("rpcbind")
+	nfsActive := check.ServiceActive("nfs-server")
 
 	if rpcActive && !nfsActive {
 		return check.Result{

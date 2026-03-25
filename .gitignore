@@ -25,3 +25,5 @@ Thumbs.db
 
 # Reports (generated output)
 report.*
+report2.*
+*.sarif

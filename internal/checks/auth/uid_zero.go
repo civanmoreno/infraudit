@@ -1,9 +1,7 @@
 package auth
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -22,34 +20,18 @@ func (c *uidZero) Severity() check.Severity { return check.Critical }
 func (c *uidZero) Description() string    { return "Ensure no user besides root has UID 0" }
 
 func (c *uidZero) Run() check.Result {
-	f, err := os.Open("/etc/passwd")
+	entries, err := check.ParsePasswd()
 	if err != nil {
 		return check.Result{
 			Status:  check.Error,
 			Message: "Could not read /etc/passwd: " + err.Error(),
 		}
 	}
-	defer f.Close()
 
 	var bad []string
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := scanner.Text()
-		parts := strings.Split(line, ":")
-		if len(parts) < 3 {
-			continue
-		}
-		user := parts[0]
-		uid := parts[2]
-		if uid == "0" && user != "root" {
-			bad = append(bad, user)
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return check.Result{
-			Status:  check.Error,
-			Message: "Error reading /etc/passwd: " + err.Error(),
+	for _, e := range entries {
+		if e.UID == 0 && e.User != "root" {
+			bad = append(bad, e.User)
 		}
 	}
 

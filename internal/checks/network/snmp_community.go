@@ -58,6 +58,7 @@ func (c *snmpCommunity) Run() check.Result {
 			Status:      check.Fail,
 			Message:     "Default SNMP community strings in use: " + strings.Join(found, ", "),
 			Remediation: "Remove default community strings 'public' and 'private' from /etc/snmp/snmpd.conf",
+			Details:     map[string]string{"community_strings": strings.Join(found, "\n")},
 		}
 	}
 

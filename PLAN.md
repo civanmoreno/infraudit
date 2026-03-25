@@ -277,6 +277,82 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Responsive design (mobile + print-friendly via @media print)
 - [x] Autocontenido — single .html file with embedded CSS, Google Fonts
 
+### Phase 25: Hardening Index (Scoring) ✅
+
+- [x] Scoring algorithm — weighted by severity: CRITICAL=10, HIGH=5, MEDIUM=3, LOW=1, INFO=0
+- [x] PASS earns full points, WARN earns half, FAIL earns zero, ERROR excluded
+- [x] Score = (earned / possible) × 100, range 0–100
+- [x] Letter grade: A (≥90), B (≥80), C (≥70), D (≥60), F (<60)
+- [x] `Score` and `Grade` fields in `Summary` struct (JSON/YAML output)
+- [x] Console output — Hardening Index with color-coded score and grade in summary box
+- [x] HTML report — score circle card with grade, color-coded by rating
+- [x] Unit tests for `ComputeScore` and `ScoreGrade` (all pass, all fail, mixed, errors excluded, info ignored, empty)
+
+### Phase 26: Quality Hardening ✅
+
+- [x] Fix: UID comparison bug — `system_shell.go` used string comparison (`uid >= "1000"`) instead of numeric, replaced with `strconv.Atoi`
+- [x] Fix: `moduleBlacklisted()` — distinguished "module not found" from permission errors to avoid false positives
+- [x] Fix: Certificate check — surface parse errors as warnings instead of silently swallowing, add Details with affected filenames
+- [x] SUID scan expanded — added `/opt` and `/usr/local` to search paths, added `-xdev` to prevent crossing filesystem boundaries
+- [x] SSH config parser — handle both `Key Value` and `Key=Value` formats
+- [x] Check details — added `Details` map to SNMP, container root, privileged, resource limits, read-only rootfs, and cert expiry checks
+- [x] Shared helpers — `ParsePasswd()`, `ParseShadow()`, `ParseMounts()`, `HasMountOption()` in `check/helpers.go` to reduce code duplication
+- [x] Config expansion — added `allowed_suid` config field; FS-001 now respects user-defined SUID whitelist
+- [x] Samba pattern matching — normalized `guest ok`, `guest_ok`, and `map to guest` parsing to handle spacing variations
+
+### Phase 27: Code Consolidation ✅
+
+- [x] Adopt shared helpers — `uid_zero.go`, `empty_password.go`, `system_shell.go`, `boot.go` now use `ParsePasswd()`/`ParseShadow()` instead of duplicated parsing
+- [x] Adopt shared helpers — `mount_options.go`, `partitions.go`, `hardening.go` now use `ParseMounts()`/`HasMountOption()` instead of local functions
+- [x] Adopt shared helpers — `crypto.go` weakHash check now uses `ParseShadow()`
+- [x] Error handling — `packages.go` returns `Error` when apt/dnf commands fail instead of `Pass`
+- [x] Error handling — `nfs.go` rpcbind check uses `ServiceActive()` helper instead of raw command with ignored errors
+- [x] Unit tests — added `TestHasMountOption`, `TestParseMounts`, `TestParsePasswd` to `helpers_test.go`
+- [x] Documentation — `docs/index.html` updated with Hardening Index feature card, HTML output mention, and score in sample output
+
+### Phase 28: Check Validation Tests & Performance Cache ✅
+
+- [x] Registry validation test suite — 8 tests validating all 132 registered checks:
+  - No duplicate IDs, ID format (PREFIX-NNN), valid categories, valid severities
+  - Non-empty fields (ID, Name, Description), all 17 categories covered
+  - ID prefix matches category (AUTH-xxx → auth, NET-xxx → network, etc.)
+- [x] Performance: `sync.Once` cache for `ParsePasswd()`, `ParseShadow()`, `ParseMounts()`
+  - Each file read once per audit instead of 3–6 times
+  - Thread-safe via `sync.Once` — safe with `--parallel`
+  - `ResetCache()` available for tests
+
+### Phase 29: Status Filter ✅
+
+- [x] `--status` flag — filter displayed results by status (comma-separated: pass, warn, fail, error)
+- [x] Summary and score always reflect the full audit (filters only affect displayed entries)
+- [x] `AllEntries` field in Report struct to preserve unfiltered results for score computation
+- [x] Validation of status values with clear error message
+
+### Phase 30: Man Page ✅
+
+- [x] `docs/infraudit.1` — full man page in roff format
+- [x] Sections: NAME, SYNOPSIS, DESCRIPTION, COMMANDS, AUDIT/LIST/CATEGORIES FLAGS
+- [x] Sections: CHECK CATEGORIES, SEVERITY LEVELS, HARDENING INDEX, EXIT CODES
+- [x] Sections: CONFIGURATION, SERVER PROFILES, EXAMPLES, FILES, STANDARDS, SEE ALSO
+- [x] `make install-man` target in Makefile
+- [x] Man page installation in `install.sh`
+
+### Phase 31: Explain Command & Severity Breakdown ✅
+
+- [x] `infraudit explain <CHECK-ID>` — detailed check information: name, category, severity, description, CIS/STIG mapping, why it matters
+- [x] `--run` flag to execute the check and show the live result with remediation and details
+- [x] CIS Benchmark mapping for 50+ checks, DISA STIG mapping for container checks
+- [x] "Why it matters" explanations for high-impact checks (AUTH, NET, FS, LOG, BOOT, CRYPTO, CTR, HARD)
+- [x] Severity breakdown in console summary — shows count of findings by severity (critical, high, medium, low)
+
+### Phase 32: Top Command, Markdown Output & Shell Completion ✅
+
+- [x] `infraudit top` — shows the N most critical findings sorted by severity (`-n` flag, default 10)
+- [x] `--format markdown` (or `md`) — Markdown table output for tickets and wikis
+- [x] Shell completion for check IDs in `explain` and `--check` flag
+- [x] Shell completion for `--category`, `--profile`, `--format`, `--severity-min`, `--status` flags
+- [x] Completions show check names as descriptions (e.g., `AUTH-001\tSSH root login disabled`)
+
 ## Check Categories
 
 | Category | Prefix | Description |

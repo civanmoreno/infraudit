@@ -115,6 +115,8 @@ infraudit categories
   SUMMARY
   █████████████████████████████████████████  5/8 checks
   ✓ 5 Passed    ! 2 Warnings    ✗ 1 Failures    0 Errors
+
+  Hardening Index: 72/100 (C)
 ```
 
 ---
@@ -155,6 +157,22 @@ infraudit categories
 | 🔵 **LOW** | Recommended improvement | Backlog |
 | ⚪ **INFO** | Informational | No action needed |
 
+### Hardening Index
+
+Every audit produces a **Hardening Index** (0–100) that summarizes your system's security posture in a single number. Each check is weighted by severity:
+
+| Severity | Weight | PASS | WARN | FAIL |
+|:---------|:-------|:-----|:-----|:-----|
+| CRITICAL | 10 pts | +10 | +5 | 0 |
+| HIGH | 5 pts | +5 | +2 | 0 |
+| MEDIUM | 3 pts | +3 | +1 | 0 |
+| LOW | 1 pt | +1 | +0 | 0 |
+| INFO | 0 pts | — | — | — |
+
+ERROR checks are excluded. The score maps to a letter grade: **A** (≥90), **B** (≥80), **C** (≥70), **D** (≥60), **F** (<60).
+
+The score appears in console, JSON, YAML, and HTML output.
+
 ---
 
 ## 🖥️ Commands & Flags
@@ -164,6 +182,8 @@ infraudit categories
 | Command | Description |
 |:--------|:------------|
 | `infraudit audit` | Run security checks and generate a report |
+| `infraudit top` | Show the most critical findings (`-n 10`) |
+| `infraudit explain <ID>` | Explain a check in detail (CIS mapping, why it matters) |
 | `infraudit list` | Show all available checks (filterable) |
 | `infraudit categories` | Show available categories with check counts |
 | `infraudit completion` | Generate shell autocompletion (bash, zsh, fish) |
@@ -174,11 +194,12 @@ infraudit categories
 |:-----|:--------|:------------|
 | `--category` | *(all)* | Filter by categories (comma-separated: `auth,network`) |
 | `--check` | *(none)* | Run a single check by ID (`AUTH-001`) |
-| `--format` | `console` | Output format: `console`, `json`, `yaml`, `html` |
+| `--format` | `console` | Output format: `console`, `json`, `yaml`, `html`, `markdown` |
 | `--output` | *(stdout)* | Write report to file |
 | `--profile` | *(none)* | Server profile to apply |
 | `--skip` | *(none)* | Comma-separated check IDs to skip |
 | `--severity-min` | *(none)* | Show only results at or above this severity |
+| `--status` | *(all)* | Show only results with these statuses (`fail,warn,error`) |
 | `--parallel` | `0` | Run checks in parallel with N workers |
 | `-q, --quiet` | `false` | Suppress progress output |
 | `--ignore-errors` | `false` | Don't count errors toward exit code 2 |
@@ -213,6 +234,7 @@ Create a config file for persistent settings:
   "skip_categories": ["container", "nfs"],
   "allowed_ports": [22, 80, 443],
   "allowed_root_processes": ["sshd", "nginx", "fail2ban"],
+  "allowed_suid": ["/opt/myapp/bin/helper"],
   "command_timeout": 30
 }
 ```
@@ -238,6 +260,7 @@ make lint        # Run golangci-lint
 make vet         # Run go vet
 make cover       # Test coverage report
 make release     # Cross-compile for amd64/arm64
+make install-man # Install man page to /usr/share/man/man1
 make docker      # Build Docker image
 make clean       # Remove build artifacts
 ```

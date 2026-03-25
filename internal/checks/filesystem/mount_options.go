@@ -1,9 +1,7 @@
 package filesystem
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
@@ -17,51 +15,13 @@ func init() {
 	check.Register(&tmpMount{})
 }
 
-type mountEntry struct {
-	device  string
-	mount   string
-	fstype  string
-	options string
-}
-
-func parseMounts() []mountEntry {
-	f, err := os.Open("/proc/mounts")
-	if err != nil {
-		return nil
-	}
-	defer f.Close()
-
-	var mounts []mountEntry
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		fields := strings.Fields(scanner.Text())
-		if len(fields) < 4 {
-			continue
-		}
-		mounts = append(mounts, mountEntry{
-			device: fields[0], mount: fields[1],
-			fstype: fields[2], options: fields[3],
-		})
-	}
-	return mounts
-}
-
-func findMount(mounts []mountEntry, path string) *mountEntry {
+func findMount(mounts []check.MountEntry, path string) *check.MountEntry {
 	for i := range mounts {
-		if mounts[i].mount == path {
+		if mounts[i].Mount == path {
 			return &mounts[i]
 		}
 	}
 	return nil
-}
-
-func hasOption(opts, opt string) bool {
-	for _, o := range strings.Split(opts, ",") {
-		if o == opt {
-			return true
-		}
-	}
-	return false
 }
 
 // FS-004: Sensitive partitions mount options
@@ -74,7 +34,7 @@ func (c *mountOptions) Severity() check.Severity { return check.Medium }
 func (c *mountOptions) Description() string    { return "Verify /tmp, /var, /home have noexec/nosuid/nodev where appropriate" }
 
 func (c *mountOptions) Run() check.Result {
-	mounts := parseMounts()
+	mounts := check.ParseMounts()
 	type req struct {
 		path string
 		opts []string
@@ -92,7 +52,7 @@ func (c *mountOptions) Run() check.Result {
 			continue // Not a separate partition
 		}
 		for _, opt := range r.opts {
-			if !hasOption(m.options, opt) {
+			if !check.HasMountOption(m.Options, opt) {
 				issues = append(issues, fmt.Sprintf("%s missing %s", r.path, opt))
 			}
 		}
@@ -122,7 +82,7 @@ func (c *devShmMount) Severity() check.Severity { return check.Medium }
 func (c *devShmMount) Description() string    { return "Verify /dev/shm has restrictive mount options" }
 
 func (c *devShmMount) Run() check.Result {
-	mounts := parseMounts()
+	mounts := check.ParseMounts()
 	m := findMount(mounts, "/dev/shm")
 	if m == nil {
 		return check.Result{Status: check.Warn, Message: "/dev/shm is not mounted as a separate filesystem"}
@@ -131,7 +91,7 @@ func (c *devShmMount) Run() check.Result {
 	required := []string{"nodev", "nosuid", "noexec"}
 	var missing []string
 	for _, opt := range required {
-		if !hasOption(m.options, opt) {
+		if !check.HasMountOption(m.Options, opt) {
 			missing = append(missing, opt)
 		}
 	}
@@ -160,7 +120,7 @@ func (c *tmpPartition) Severity() check.Severity { return check.Medium }
 func (c *tmpPartition) Description() string    { return "Verify /tmp is a separate partition or tmpfs" }
 
 func (c *tmpPartition) Run() check.Result {
-	mounts := parseMounts()
+	mounts := check.ParseMounts()
 	m := findMount(mounts, "/tmp")
 	if m == nil {
 		return check.Result{
@@ -172,7 +132,7 @@ func (c *tmpPartition) Run() check.Result {
 
 	return check.Result{
 		Status:  check.Pass,
-		Message: fmt.Sprintf("/tmp is mounted as %s (%s)", m.fstype, m.device),
+		Message: fmt.Sprintf("/tmp is mounted as %s (%s)", m.FSType, m.Device),
 	}
 }
 
@@ -186,7 +146,7 @@ func (c *varTmpMount) Severity() check.Severity { return check.Medium }
 func (c *varTmpMount) Description() string    { return "Verify /var/tmp has restrictive mount options" }
 
 func (c *varTmpMount) Run() check.Result {
-	mounts := parseMounts()
+	mounts := check.ParseMounts()
 	m := findMount(mounts, "/var/tmp")
 	if m == nil {
 		return check.Result{
@@ -198,7 +158,7 @@ func (c *varTmpMount) Run() check.Result {
 	required := []string{"nodev", "nosuid", "noexec"}
 	var missing []string
 	for _, opt := range required {
-		if !hasOption(m.options, opt) {
+		if !check.HasMountOption(m.Options, opt) {
 			missing = append(missing, opt)
 		}
 	}
@@ -224,7 +184,7 @@ func (c *tmpMount) Severity() check.Severity { return check.Low }
 func (c *tmpMount) Description() string    { return "Verify tmp.mount is enabled if using systemd for /tmp" }
 
 func (c *tmpMount) Run() check.Result {
-	mounts := parseMounts()
+	mounts := check.ParseMounts()
 	m := findMount(mounts, "/tmp")
 	if m != nil {
 		return check.Result{Status: check.Pass, Message: "/tmp is already a separate mount"}

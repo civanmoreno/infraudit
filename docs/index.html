@@ -54,7 +54,10 @@ sudo infraudit audit --category auth
 sudo infraudit audit --profile web-server
 
 <span class="comment"># Export as JSON for CI/CD</span>
-sudo infraudit audit --format json --output report.json</code></pre>
+sudo infraudit audit --format json --output report.json
+
+<span class="comment"># Full command reference</span>
+man infraudit</code></pre>
         </section>
 
         <!-- ── Features ── -->
@@ -78,8 +81,12 @@ sudo infraudit audit --format json --output report.json</code></pre>
                     <p>Written in Go. No dependencies, no runtime, no agents. Just copy and run on any Linux server.</p>
                 </div>
                 <div class="feature-card">
+                    <h3>Hardening Index</h3>
+                    <p>A 0–100 score weighted by severity with letter grades (A–F). Track your security posture over time.</p>
+                </div>
+                <div class="feature-card">
                     <h3>Multiple Output Formats</h3>
-                    <p>Console with colors, JSON for CI/CD pipelines, YAML for config management and GitOps.</p>
+                    <p>Console with colors, JSON for CI/CD pipelines, YAML for config management, and self-contained HTML reports.</p>
                 </div>
                 <div class="feature-card">
                     <h3>Server Profiles</h3>
@@ -237,8 +244,10 @@ sudo infraudit audit --format json --output report.json</code></pre>
   <span style="color:#34d399">█████████████████████████</span><span style="color:#fbbf24">██████████</span><span style="color:#f87171">█████</span>  <span style="font-weight:bold">5</span>/8 checks
 
   <span style="color:#34d399">✓ 5 Passed</span>    <span style="color:#fbbf24">! 2 Warnings</span>    <span style="color:#f87171">✗ 1 Failures</span>    0 Errors
+
+  <span style="font-weight:bold">Hardening Index:</span> <span style="color:#fbbf24;font-weight:bold">72/100 (C)</span>
   <span style="color:#6b7280">══════════════════════════════════════════════════════════════</span></code></pre>
-            <p>Also available in <strong>JSON</strong> and <strong>YAML</strong>. See <a href="output.html">Output &amp; Reports</a> for details.</p>
+            <p>Also available in <strong>JSON</strong>, <strong>YAML</strong>, and <strong>HTML</strong>. See <a href="output.html">Output &amp; Reports</a> for details.</p>
         </section>
 
         <!-- ── Severity ── -->

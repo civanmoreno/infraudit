@@ -59,6 +59,7 @@ func (c *certExpiry) Description() string    { return "Check for expired certifi
 
 func (c *certExpiry) Run() check.Result {
 	var expired, expiring []string
+	var parseErrors int
 	now := time.Now()
 	warnDays := 30 * 24 * time.Hour
 
@@ -81,6 +82,7 @@ func (c *certExpiry) Run() check.Result {
 			}
 			cert, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
+				parseErrors++
 				return nil
 			}
 			if now.After(cert.NotAfter) {
@@ -93,16 +95,30 @@ func (c *certExpiry) Run() check.Result {
 	}
 
 	if len(expired) > 0 {
+		details := map[string]string{"expired": strings.Join(expired, ", ")}
+		if parseErrors > 0 {
+			details["parse_errors"] = fmt.Sprintf("%d certificate(s) could not be parsed", parseErrors)
+		}
 		return check.Result{
 			Status:      check.Fail,
-			Message:     fmt.Sprintf("%d expired certificate(s)", len(expired)),
+			Message:     fmt.Sprintf("%d expired certificate(s): %s", len(expired), strings.Join(expired, ", ")),
 			Remediation: "Renew or remove expired certificates",
+			Details:     details,
 		}
 	}
 	if len(expiring) > 0 {
+		details := map[string]string{"expiring": strings.Join(expiring, ", ")}
 		return check.Result{
 			Status:  check.Warn,
-			Message: fmt.Sprintf("%d certificate(s) expiring within 30 days", len(expiring)),
+			Message: fmt.Sprintf("%d certificate(s) expiring within 30 days: %s", len(expiring), strings.Join(expiring, ", ")),
+			Details: details,
+		}
+	}
+	if parseErrors > 0 {
+		return check.Result{
+			Status:  check.Warn,
+			Message: fmt.Sprintf("No expired certs found, but %d certificate(s) could not be parsed", parseErrors),
+			Details: map[string]string{"parse_errors": fmt.Sprintf("%d", parseErrors)},
 		}
 	}
 	return check.Result{Status: check.Pass, Message: "No expired or expiring certificates found"}
@@ -301,20 +317,15 @@ func (c *weakHash) Severity() check.Severity { return check.High }
 func (c *weakHash) Description() string    { return "Verify MD5 and SHA1 are not used for password hashing" }
 
 func (c *weakHash) Run() check.Result {
-	data, err := os.ReadFile("/etc/shadow")
+	entries, err := check.ParseShadow()
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/shadow: " + err.Error()}
 	}
 
 	var md5Users []string
-	for _, line := range strings.Split(string(data), "\n") {
-		parts := strings.Split(line, ":")
-		if len(parts) < 2 {
-			continue
-		}
-		user, hash := parts[0], parts[1]
-		if strings.HasPrefix(hash, "$1$") {
-			md5Users = append(md5Users, user)
+	for _, e := range entries {
+		if strings.HasPrefix(e.Hash, "$1$") {
+			md5Users = append(md5Users, e.User)
 		}
 	}
 

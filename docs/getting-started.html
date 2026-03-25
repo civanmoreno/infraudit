@@ -41,7 +41,8 @@
         <pre><code>git clone https://github.com/civanmoreno/infraudit.git
 cd infraudit
 make build
-sudo mv infraudit /usr/local/bin/</code></pre>
+sudo mv infraudit /usr/local/bin/
+sudo make install-man  <span class="comment"># Install man page (optional)</span></code></pre>
 
         <h3>Option 3: Docker</h3>
         <pre><code>docker build -t infraudit .
@@ -53,6 +54,7 @@ docker run --rm --privileged -v /:/host:ro infraudit audit</code></pre>
             <thead><tr><th>Command</th><th>Description</th></tr></thead>
             <tbody>
                 <tr><td><code>infraudit audit</code></td><td>Run security checks and generate a report</td></tr>
+                <tr><td><code>infraudit explain &lt;ID&gt;</code></td><td>Explain a check in detail (CIS mapping, why it matters, --run to execute)</td></tr>
                 <tr><td><code>infraudit list</code></td><td>Show all available checks in a table</td></tr>
                 <tr><td><code>infraudit categories</code></td><td>Show available categories with check counts</td></tr>
                 <tr><td><code>infraudit completion</code></td><td>Generate shell autocompletion (bash, zsh, fish, powershell)</td></tr>
@@ -173,6 +175,11 @@ sudo infraudit audit --profile minimal</code></pre>
                     <td>Run a single check by ID</td>
                 </tr>
                 <tr>
+                    <td><code>--status &lt;statuses&gt;</code></td>
+                    <td><em>(all)</em></td>
+                    <td>Show only results with these statuses (comma-separated: <code>pass</code>, <code>warn</code>, <code>fail</code>, <code>error</code>). Summary and score reflect the full audit.</td>
+                </tr>
+                <tr>
                     <td><code>--ignore-errors</code></td>
                     <td><code>false</code></td>
                     <td>Don't count errors toward exit code 2</td>
@@ -251,6 +258,12 @@ infraudit completion fish > ~/.config/fish/completions/infraudit.fish</code></pr
   "skip_categories": ["container"],
   "allowed_ports": [22, 80, 443]
 }</code></pre>
+
+        <h2>Man Page</h2>
+        <p>infraudit includes a Unix man page with the complete command reference. After installation:</p>
+        <pre><code>man infraudit</code></pre>
+        <p>If you built from source, install it with:</p>
+        <pre><code>sudo make install-man</code></pre>
     </main>
 </body>
 </html>

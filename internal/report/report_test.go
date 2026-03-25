@@ -34,6 +34,8 @@ func sampleReport() *Report {
 			Warnings: 0,
 			Failures: 1,
 			Errors:   0,
+			Score:    50,
+			Grade:    "F",
 		},
 	}
 }
@@ -63,6 +65,12 @@ func TestWriteJSON(t *testing.T) {
 	if parsed.Entries[0].ID != "AUTH-001" {
 		t.Fatalf("expected first entry AUTH-001, got %s", parsed.Entries[0].ID)
 	}
+	if parsed.Summary.Score != 50 {
+		t.Fatalf("expected score=50, got %d", parsed.Summary.Score)
+	}
+	if parsed.Summary.Grade != "F" {
+		t.Fatalf("expected grade=F, got %s", parsed.Summary.Grade)
+	}
 }
 
 func TestWriteYAML(t *testing.T) {
@@ -83,6 +91,12 @@ func TestWriteYAML(t *testing.T) {
 	if !strings.Contains(output, "total: 2") {
 		t.Fatal("YAML output missing summary total")
 	}
+	if !strings.Contains(output, "score:") {
+		t.Fatal("YAML output missing score")
+	}
+	if !strings.Contains(output, "grade:") {
+		t.Fatal("YAML output missing grade")
+	}
 }
 
 func TestWriteConsole(t *testing.T) {
@@ -97,6 +111,12 @@ func TestWriteConsole(t *testing.T) {
 	}
 	if !strings.Contains(output, "FAIL") {
 		t.Fatal("console output missing FAIL status")
+	}
+	if !strings.Contains(output, "Hardening Index") {
+		t.Fatal("console output missing Hardening Index")
+	}
+	if !strings.Contains(output, "50/100") {
+		t.Fatal("console output missing score value")
 	}
 }
 

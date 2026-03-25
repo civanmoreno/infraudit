@@ -26,6 +26,7 @@ var (
 	quietFlag      bool
 	severityMinFlag string
 	checkFlag      string
+	statusFlag     string
 	ignoreErrors   bool
 )
 
@@ -41,7 +42,7 @@ Use --format to change output format (console, json, yaml).`,
 
 func init() {
 	auditCmd.Flags().StringVar(&categoryFlag, "category", "", "Filter by category (comma-separated: auth,network,crypto)")
-	auditCmd.Flags().StringVar(&formatFlag, "format", "console", "Output format: console, json, yaml, html")
+	auditCmd.Flags().StringVar(&formatFlag, "format", "console", "Output format: console, json, yaml, html, markdown")
 	auditCmd.Flags().StringVar(&outputFlag, "output", "", "Write report to file")
 	auditCmd.Flags().StringVar(&profileFlag, "profile", "", "Server profile: web-server, db-server, container-host, minimal")
 	auditCmd.Flags().StringSliceVar(&skipFlag, "skip", nil, "Skip specific check IDs (comma-separated)")
@@ -49,7 +50,14 @@ func init() {
 	auditCmd.Flags().BoolVarP(&quietFlag, "quiet", "q", false, "Suppress progress output")
 	auditCmd.Flags().StringVar(&severityMinFlag, "severity-min", "", "Show only results at or above this severity (low,medium,high,critical)")
 	auditCmd.Flags().StringVar(&checkFlag, "check", "", "Run a single check by ID (e.g. AUTH-001)")
+	auditCmd.Flags().StringVar(&statusFlag, "status", "", "Show only results with these statuses (comma-separated: pass,warn,fail,error)")
 	auditCmd.Flags().BoolVar(&ignoreErrors, "ignore-errors", false, "Don't count errors toward exit code 2")
+	_ = auditCmd.RegisterFlagCompletionFunc("check", completeCheckIDFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("category", completeCategoryFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("profile", completeProfileFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("format", completeFormatFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("severity-min", completeSeverityFlag)
+	_ = auditCmd.RegisterFlagCompletionFunc("status", completeStatusFlag)
 	rootCmd.AddCommand(auditCmd)
 }
 
@@ -151,6 +159,20 @@ func runAudit(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	// Parse status filter
+	var statusFilter map[string]bool
+	if statusFlag != "" {
+		statusFilter = make(map[string]bool)
+		for _, s := range strings.Split(statusFlag, ",") {
+			s = strings.ToUpper(strings.TrimSpace(s))
+			if s != "PASS" && s != "WARN" && s != "FAIL" && s != "ERROR" {
+				fmt.Fprintf(os.Stderr, "Invalid status: %s\nValid values: pass, warn, fail, error\n", s)
+				os.Exit(1)
+			}
+			statusFilter[s] = true
+		}
+	}
+
 	// Run checks and build report
 	rpt := &report.Report{}
 
@@ -189,20 +211,22 @@ func runAudit(cmd *cobra.Command, args []string) {
 		}()
 
 		for cr := range results {
-			addResult(rpt, cr.check, cr.result, minSeverity)
+			addResult(rpt, cr.check, cr.result, minSeverity, statusFilter)
 		}
 	} else {
 		for i, c := range active {
 			progress(i+1, total)
 			r := c.Run()
-			addResult(rpt, c, r, minSeverity)
+			addResult(rpt, c, r, minSeverity, statusFilter)
 		}
 	}
 
 	clearProgress()
 
-	// Set duration
+	// Set duration and hardening score (computed on ALL entries, before display filters)
 	rpt.Summary.Duration = time.Since(start).Seconds()
+	rpt.Summary.Score = report.ComputeScore(rpt.AllEntries)
+	rpt.Summary.Grade = report.ScoreGrade(rpt.Summary.Score)
 
 	// Determine output writer
 	var w *os.File
@@ -229,6 +253,8 @@ func runAudit(cmd *cobra.Command, args []string) {
 		writeErr = report.WriteYAML(w, rpt)
 	case "html":
 		writeErr = report.WriteHTML(w, rpt)
+	case "markdown", "md":
+		writeErr = report.WriteMarkdown(w, rpt)
 	default:
 		report.WriteConsole(w, rpt)
 	}
@@ -255,7 +281,7 @@ func runAudit(cmd *cobra.Command, args []string) {
 	}
 }
 
-func addResult(rpt *report.Report, c check.Check, r check.Result, minSeverity check.Severity) {
+func addResult(rpt *report.Report, c check.Check, r check.Result, minSeverity check.Severity, statusFilter map[string]bool) {
 	rpt.Summary.Total++
 	switch r.Status {
 	case check.Pass:
@@ -268,10 +294,16 @@ func addResult(rpt *report.Report, c check.Check, r check.Result, minSeverity ch
 		rpt.Summary.Errors++
 	}
 
+	entry := report.NewEntry(c, r)
+	rpt.AllEntries = append(rpt.AllEntries, entry)
+
 	// Apply severity filter to displayed entries
 	if minSeverity >= 0 && c.Severity() < minSeverity {
 		return
 	}
-	entry := report.NewEntry(c, r)
+	// Apply status filter to displayed entries
+	if statusFilter != nil && !statusFilter[r.Status.String()] {
+		return
+	}
 	rpt.Entries = append(rpt.Entries, entry)
 }

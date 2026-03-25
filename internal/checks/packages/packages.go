@@ -28,7 +28,10 @@ func (c *securityUpdates) Description() string    { return "Check for pending se
 func (c *securityUpdates) Run() check.Result {
 	// Try apt (Debian/Ubuntu)
 	if _, err := exec.LookPath("apt"); err == nil {
-		out, _ := check.RunCmd(check.DefaultCmdTimeout, "apt", "list", "--upgradable")
+		out, err := check.RunCmd(check.DefaultCmdTimeout, "apt", "list", "--upgradable")
+		if err != nil {
+			return check.Result{Status: check.Error, Message: "Failed to query apt: " + err.Error()}
+		}
 		lines := strings.Split(strings.TrimSpace(string(out)), "\n")
 		var security int
 		for _, l := range lines {
@@ -48,7 +51,11 @@ func (c *securityUpdates) Run() check.Result {
 
 	// Try dnf (RHEL/Fedora)
 	if _, err := exec.LookPath("dnf"); err == nil {
-		out, _ := check.RunCmd(check.DefaultCmdTimeout, "dnf", "check-update", "--security", "--quiet")
+		out, err := check.RunCmd(check.DefaultCmdTimeout, "dnf", "check-update", "--security", "--quiet")
+		// dnf check-update returns exit code 100 when updates available, 0 when none
+		if err != nil && strings.TrimSpace(string(out)) == "" {
+			return check.Result{Status: check.Error, Message: "Failed to query dnf: " + err.Error()}
+		}
 		if strings.TrimSpace(string(out)) != "" {
 			return check.Result{
 				Status:      check.Warn,
@@ -59,7 +66,7 @@ func (c *securityUpdates) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "No pending security updates"}
 	}
 
-	return check.Result{Status: check.Warn, Message: "Could not determine package manager"}
+	return check.Result{Status: check.Error, Message: "No supported package manager found (apt/dnf)"}
 }
 
 // PKG-002
