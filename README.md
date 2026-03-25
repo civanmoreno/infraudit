@@ -115,6 +115,8 @@ infraudit categories
   SUMMARY
   █████████████████████████████████████████  5/8 checks
   ✓ 5 Passed    ! 2 Warnings    ✗ 1 Failures    0 Errors
+
+  Hardening Index: 72/100 (C)
 ```
 
 ---
@@ -154,6 +156,22 @@ infraudit categories
 | 🟡 **MEDIUM** | Best practice not applied | Fix within weeks |
 | 🔵 **LOW** | Recommended improvement | Backlog |
 | ⚪ **INFO** | Informational | No action needed |
+
+### Hardening Index
+
+Every audit produces a **Hardening Index** (0–100) that summarizes your system's security posture in a single number. Each check is weighted by severity:
+
+| Severity | Weight | PASS | WARN | FAIL |
+|:---------|:-------|:-----|:-----|:-----|
+| CRITICAL | 10 pts | +10 | +5 | 0 |
+| HIGH | 5 pts | +5 | +2 | 0 |
+| MEDIUM | 3 pts | +3 | +1 | 0 |
+| LOW | 1 pt | +1 | +0 | 0 |
+| INFO | 0 pts | — | — | — |
+
+ERROR checks are excluded. The score maps to a letter grade: **A** (≥90), **B** (≥80), **C** (≥70), **D** (≥60), **F** (<60).
+
+The score appears in console, JSON, YAML, and HTML output.
 
 ---
 

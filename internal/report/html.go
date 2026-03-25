@@ -22,6 +22,8 @@ type htmlData struct {
 	WarnPct   int
 	FailPct   int
 	ErrPct    int
+	Score     int
+	Grade     string
 }
 
 type categoryGroup struct {
@@ -56,12 +58,28 @@ func WriteHTML(w io.Writer, r *Report) error {
 		WarnPct:   r.Summary.Warnings * 100 / total,
 		FailPct:   r.Summary.Failures * 100 / total,
 		ErrPct:    r.Summary.Errors * 100 / total,
+		Score:     r.Summary.Score,
+		Grade:     r.Summary.Grade,
 	}
 
 	funcMap := template.FuncMap{
 		"lower":    strings.ToLower,
 		"gtZero":   func(f float64) bool { return f > 0 },
 		"fmtFloat": func(f float64) string { return fmt.Sprintf("%.1f", f) },
+		"scoreClass": func(score int) string {
+			switch {
+			case score >= 90:
+				return "score-a"
+			case score >= 80:
+				return "score-b"
+			case score >= 70:
+				return "score-c"
+			case score >= 60:
+				return "score-d"
+			default:
+				return "score-f"
+			}
+		},
 	}
 	tmpl, err := template.New("report").Funcs(funcMap).Parse(htmlTemplate)
 	if err != nil {
@@ -204,6 +222,24 @@ code { font-family:'JetBrains Mono',monospace; font-size:.85em; }
 .check-fix { color:var(--text2); font-size:.8rem; margin-top:.25rem; padding:.4rem .6rem; background:var(--bg); border-radius:4px; border-left:2px solid var(--cyan); }
 .check-fix::before { content:"↳ "; color:var(--cyan); }
 
+/* Score card */
+.score-wrap { background:var(--bg2); border-radius:10px; padding:1.5rem; margin-bottom:2rem; display:flex; align-items:center; gap:1.5rem; }
+.score-circle { width:80px; height:80px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; border:4px solid var(--bg3); }
+.score-circle .score-num { font-size:1.6rem; font-weight:700; line-height:1; }
+.score-circle .score-grade { font-size:.75rem; font-weight:600; opacity:.8; }
+.score-info h3 { font-size:1rem; font-weight:600; margin-bottom:.25rem; }
+.score-info p { font-size:.85rem; color:var(--text2); }
+.score-a .score-circle { border-color:var(--green); }
+.score-a .score-num, .score-a .score-grade { color:var(--green); }
+.score-b .score-circle { border-color:var(--cyan); }
+.score-b .score-num, .score-b .score-grade { color:var(--cyan); }
+.score-c .score-circle { border-color:var(--yellow); }
+.score-c .score-num, .score-c .score-grade { color:var(--yellow); }
+.score-d .score-circle { border-color:var(--yellow); }
+.score-d .score-num, .score-d .score-grade { color:var(--yellow); }
+.score-f .score-circle { border-color:var(--red); }
+.score-f .score-num, .score-f .score-grade { color:var(--red); }
+
 /* Footer */
 .footer { text-align:center; padding:2rem 0 1rem; color:var(--text3); font-size:.8rem; border-top:1px solid var(--bg3); margin-top:1rem; }
 
@@ -254,6 +290,17 @@ code { font-family:'JetBrains Mono',monospace; font-size:.85em; }
       <div class="seg-warn" style="width:{{.WarnPct}}%"></div>
       <div class="seg-fail" style="width:{{.FailPct}}%"></div>
       <div class="seg-err"  style="width:{{.ErrPct}}%"></div>
+    </div>
+  </div>
+
+  <div class="score-wrap {{scoreClass .Score}}">
+    <div class="score-circle">
+      <div class="score-num">{{.Score}}</div>
+      <div class="score-grade">{{.Grade}}</div>
+    </div>
+    <div class="score-info">
+      <h3>Hardening Index</h3>
+      <p>Score based on check results weighted by severity. CRITICAL checks have the highest impact on the score.</p>
     </div>
   </div>
 

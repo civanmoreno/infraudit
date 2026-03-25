@@ -277,6 +277,17 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Responsive design (mobile + print-friendly via @media print)
 - [x] Autocontenido — single .html file with embedded CSS, Google Fonts
 
+### Phase 25: Hardening Index (Scoring) ✅
+
+- [x] Scoring algorithm — weighted by severity: CRITICAL=10, HIGH=5, MEDIUM=3, LOW=1, INFO=0
+- [x] PASS earns full points, WARN earns half, FAIL earns zero, ERROR excluded
+- [x] Score = (earned / possible) × 100, range 0–100
+- [x] Letter grade: A (≥90), B (≥80), C (≥70), D (≥60), F (<60)
+- [x] `Score` and `Grade` fields in `Summary` struct (JSON/YAML output)
+- [x] Console output — Hardening Index with color-coded score and grade in summary box
+- [x] HTML report — score circle card with grade, color-coded by rating
+- [x] Unit tests for `ComputeScore` and `ScoreGrade` (all pass, all fail, mixed, errors excluded, info ignored, empty)
+
 ## Check Categories
 
 | Category | Prefix | Description |

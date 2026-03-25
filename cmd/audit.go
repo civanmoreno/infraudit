@@ -201,8 +201,10 @@ func runAudit(cmd *cobra.Command, args []string) {
 
 	clearProgress()
 
-	// Set duration
+	// Set duration and hardening score
 	rpt.Summary.Duration = time.Since(start).Seconds()
+	rpt.Summary.Score = report.ComputeScore(rpt.Entries)
+	rpt.Summary.Grade = report.ScoreGrade(rpt.Summary.Score)
 
 	// Determine output writer
 	var w *os.File
