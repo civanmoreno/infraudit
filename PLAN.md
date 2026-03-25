@@ -328,6 +328,15 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] `AllEntries` field in Report struct to preserve unfiltered results for score computation
 - [x] Validation of status values with clear error message
 
+### Phase 30: Man Page ✅
+
+- [x] `docs/infraudit.1` — full man page in roff format
+- [x] Sections: NAME, SYNOPSIS, DESCRIPTION, COMMANDS, AUDIT/LIST/CATEGORIES FLAGS
+- [x] Sections: CHECK CATEGORIES, SEVERITY LEVELS, HARDENING INDEX, EXIT CODES
+- [x] Sections: CONFIGURATION, SERVER PROFILES, EXAMPLES, FILES, STANDARDS, SEE ALSO
+- [x] `make install-man` target in Makefile
+- [x] Man page installation in `install.sh`
+
 ## Check Categories
 
 | Category | Prefix | Description |

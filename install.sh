@@ -17,4 +17,15 @@ curl -sLO "https://github.com/${REPO}/releases/latest/download/infraudit-linux-$
 chmod +x "infraudit-linux-${ARCH}"
 sudo mv "infraudit-linux-${ARCH}" "${INSTALL_DIR}/infraudit"
 
+# Install man page
+MAN_DIR="/usr/share/man/man1"
+if [ -d "$(dirname "$MAN_DIR")" ]; then
+    echo "Installing man page..."
+    curl -sLO "https://raw.githubusercontent.com/${REPO}/main/docs/infraudit.1"
+    sudo install -Dm644 infraudit.1 "${MAN_DIR}/infraudit.1"
+    sudo gzip -f "${MAN_DIR}/infraudit.1"
+    rm -f infraudit.1
+fi
+
 echo "Installed: $(infraudit --version)"
+echo "Run 'man infraudit' for documentation."

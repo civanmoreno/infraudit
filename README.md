@@ -258,6 +258,7 @@ make lint        # Run golangci-lint
 make vet         # Run go vet
 make cover       # Test coverage report
 make release     # Cross-compile for amd64/arm64
+make install-man # Install man page to /usr/share/man/man1
 make docker      # Build Docker image
 make clean       # Remove build artifacts
 ```

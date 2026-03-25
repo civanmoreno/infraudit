@@ -2,7 +2,7 @@ BINARY   := infraudit
 VERSION  := $(shell grep 'Version =' internal/version/version.go | cut -d'"' -f2)
 LDFLAGS  := -s -w
 
-.PHONY: build test lint vet clean release cover docker
+.PHONY: build test lint vet clean release cover docker install-man
 
 build:
 	CGO_ENABLED=0 go build -ldflags="$(LDFLAGS)" -o $(BINARY) .
@@ -28,6 +28,10 @@ release: clean
 cover:
 	go test -race -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
+
+install-man:
+	install -Dm644 docs/infraudit.1 /usr/share/man/man1/infraudit.1
+	gzip -f /usr/share/man/man1/infraudit.1
 
 docker:
 	docker build -t $(BINARY):$(VERSION) .
