@@ -39,9 +39,13 @@ var expectedRoot = map[string]bool{
 }
 
 func (c *rootProcesses) Run() check.Result {
-	// Add user-configured allowed root processes
+	// Build local copy to avoid mutating the global map (thread safety)
+	allowed := make(map[string]bool, len(expectedRoot))
+	for k, v := range expectedRoot {
+		allowed[k] = v
+	}
 	for _, p := range config.Get().AllowedRootProcesses {
-		expectedRoot[p] = true
+		allowed[p] = true
 	}
 
 	entries, err := os.ReadDir("/proc")
@@ -71,7 +75,7 @@ func (c *rootProcesses) Run() check.Result {
 		}
 
 		name := status["Name"]
-		if name == "" || expectedRoot[name] {
+		if name == "" || allowed[name] {
 			continue
 		}
 		// Skip kernel threads (PPid 2 or kthreadd children)
