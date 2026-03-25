@@ -363,6 +363,27 @@ func writeSummaryBox(w io.Writer, r *Report) {
 	fmt.Fprintf(w, "    %s! %d Warnings%s", yellow, s.Warnings, rst)
 	fmt.Fprintf(w, "    %s✗ %d Failures%s", red, s.Failures, rst)
 	fmt.Fprintf(w, "    %s? %d Errors%s\n", magenta, s.Errors, rst)
+
+	// Severity breakdown for non-pass findings
+	sevCounts := severityBreakdown(r.AllEntries)
+	if sevCounts.critical+sevCounts.high+sevCounts.medium+sevCounts.low > 0 {
+		fmt.Fprintf(w, "\n  %sFindings by severity:%s ", dim, rst)
+		var parts []string
+		if sevCounts.critical > 0 {
+			parts = append(parts, fmt.Sprintf("%s%d critical%s", red+bold, sevCounts.critical, rst))
+		}
+		if sevCounts.high > 0 {
+			parts = append(parts, fmt.Sprintf("%s%d high%s", yellow, sevCounts.high, rst))
+		}
+		if sevCounts.medium > 0 {
+			parts = append(parts, fmt.Sprintf("%s%d medium%s", cyan, sevCounts.medium, rst))
+		}
+		if sevCounts.low > 0 {
+			parts = append(parts, fmt.Sprintf("%s%d low%s", blue, sevCounts.low, rst))
+		}
+		fmt.Fprintln(w, strings.Join(parts, "  "))
+	}
+
 	fmt.Fprintln(w)
 	fmt.Fprintf(w, "  %sHardening Index:%s %s%d/100 (%s)%s\n",
 		bold, rst, scoreColor(s.Score), s.Score, s.Grade, rst)
@@ -412,6 +433,31 @@ func WriteYAML(w io.Writer, r *Report) error {
 		}
 	}
 	return nil
+}
+
+type sevCounts struct {
+	critical, high, medium, low int
+}
+
+// severityBreakdown counts non-pass findings by severity level.
+func severityBreakdown(entries []Entry) sevCounts {
+	var c sevCounts
+	for _, e := range entries {
+		if e.Status == "PASS" {
+			continue
+		}
+		switch e.Severity {
+		case "CRITICAL":
+			c.critical++
+		case "HIGH":
+			c.high++
+		case "MEDIUM":
+			c.medium++
+		case "LOW":
+			c.low++
+		}
+	}
+	return c
 }
 
 // scoreColor returns an ANSI color based on the hardening index.

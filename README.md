@@ -182,6 +182,7 @@ The score appears in console, JSON, YAML, and HTML output.
 | Command | Description |
 |:--------|:------------|
 | `infraudit audit` | Run security checks and generate a report |
+| `infraudit explain <ID>` | Explain a check in detail (CIS mapping, why it matters) |
 | `infraudit list` | Show all available checks (filterable) |
 | `infraudit categories` | Show available categories with check counts |
 | `infraudit completion` | Generate shell autocompletion (bash, zsh, fish) |

@@ -337,6 +337,14 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] `make install-man` target in Makefile
 - [x] Man page installation in `install.sh`
 
+### Phase 31: Explain Command & Severity Breakdown ✅
+
+- [x] `infraudit explain <CHECK-ID>` — detailed check information: name, category, severity, description, CIS/STIG mapping, why it matters
+- [x] `--run` flag to execute the check and show the live result with remediation and details
+- [x] CIS Benchmark mapping for 50+ checks, DISA STIG mapping for container checks
+- [x] "Why it matters" explanations for high-impact checks (AUTH, NET, FS, LOG, BOOT, CRYPTO, CTR, HARD)
+- [x] Severity breakdown in console summary — shows count of findings by severity (critical, high, medium, low)
+
 ## Check Categories
 
 | Category | Prefix | Description |

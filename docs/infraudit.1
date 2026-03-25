@@ -21,6 +21,12 @@ summarizes the overall security posture.
 Run security audit checks against the current system. This is the primary
 command. Requires root for full coverage.
 .TP
+.BI explain " CHECK-ID"
+Show detailed information about a specific check: what it verifies, why
+it matters, CIS/STIG standard mapping, and remediation steps. Use
+.B \-\-run
+to also execute the check and display the live result.
+.TP
 .B list
 Display all registered checks with their ID, category, severity, and name.
 .TP
@@ -246,6 +252,22 @@ Run checks in parallel:
 .RS
 .nf
 sudo infraudit audit --parallel 4
+.fi
+.RE
+.PP
+Explain a check and see CIS mapping:
+.PP
+.RS
+.nf
+infraudit explain AUTH-001
+.fi
+.RE
+.PP
+Explain and run a check:
+.PP
+.RS
+.nf
+sudo infraudit explain FS-001 --run
 .fi
 .RE
 .PP
