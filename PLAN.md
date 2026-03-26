@@ -435,6 +435,15 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Services advanced: 8 checks (rpcbind, XDMCP, prelink, apport, tftp, ldap, talk, rsh)
 - [x] Docs version updated to v2.0.0
 
+### Phase 42: Remediation Coverage 100% ✅
+
+- [x] All 287 checks now have remediation text for non-PASS results
+- [x] Fixed 43 checks across 15 files that were missing remediation
+- [x] Permission errors → "Run infraudit with sudo for full results"
+- [x] Missing tools → specific install commands (apt/yum)
+- [x] Config issues → specific config file and setting changes
+- [x] Documentation updated: all docs reference 287 checks and v2.0.0
+
 ### Phase 40: Complete CIS Benchmark Coverage ✅
 
 - [x] 89 new checks added (132 → 221 total checks)
