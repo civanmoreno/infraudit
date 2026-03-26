@@ -43,7 +43,7 @@ func (c *pamOrder) Run() check.Result {
 }
 
 func checkOrder(path string) *check.Result {
-	f, err := os.Open(path)
+	f, err := os.Open(check.P(path))
 	if err != nil {
 		return nil
 	}

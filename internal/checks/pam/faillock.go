@@ -38,7 +38,7 @@ func (c *faillock) Run() check.Result {
 	}
 
 	// Also check if faillock.conf exists (newer approach)
-	if _, err := os.Stat("/etc/security/faillock.conf"); err == nil {
+	if _, err := os.Stat(check.P("/etc/security/faillock.conf")); err == nil {
 		return c.checkFaillockConf()
 	}
 
@@ -83,7 +83,7 @@ func parseFaillockConf() map[string]string {
 	conf := make(map[string]string)
 
 	// Try faillock.conf first
-	f, err := os.Open("/etc/security/faillock.conf")
+	f, err := os.Open(check.P("/etc/security/faillock.conf"))
 	if err != nil {
 		return conf
 	}

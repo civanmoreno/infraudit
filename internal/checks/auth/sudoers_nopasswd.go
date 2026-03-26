@@ -24,14 +24,14 @@ func (c *sudoersNopasswd) Description() string {
 }
 
 func (c *sudoersNopasswd) Run() check.Result {
-	paths := []string{"/etc/sudoers"}
+	paths := []string{check.P("/etc/sudoers")}
 
 	// Also check sudoers.d drop-ins
-	entries, err := os.ReadDir("/etc/sudoers.d")
+	entries, err := os.ReadDir(check.P("/etc/sudoers.d"))
 	if err == nil {
 		for _, e := range entries {
 			if !e.IsDir() && !strings.HasPrefix(e.Name(), ".") {
-				paths = append(paths, "/etc/sudoers.d/"+e.Name())
+				paths = append(paths, check.P("/etc/sudoers.d/"+e.Name()))
 			}
 		}
 	}

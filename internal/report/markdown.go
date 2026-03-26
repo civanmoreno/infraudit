@@ -13,8 +13,13 @@ func WriteMarkdown(w io.Writer, r *Report) error {
 
 	fmt.Fprintln(w, "# infraudit — Security Audit Report")
 	fmt.Fprintln(w)
-	fmt.Fprintf(w, "**%d** checks | **%d** passed | **%d** warnings | **%d** failures | **%d** errors\n\n",
+	summary := fmt.Sprintf("**%d** checks | **%d** passed | **%d** warnings | **%d** failures | **%d** errors",
 		s.Total, s.Passed, s.Warnings, s.Failures, s.Errors)
+	if s.Skipped > 0 {
+		summary += fmt.Sprintf(" | **%d** skipped", s.Skipped)
+	}
+	fmt.Fprintln(w, summary)
+	fmt.Fprintln(w)
 	fmt.Fprintf(w, "**Hardening Index: %d/100 (%s)**\n", s.Score, s.Grade)
 	if s.Duration > 0 {
 		fmt.Fprintf(w, "\nCompleted in %.1fs\n", s.Duration)
@@ -71,6 +76,8 @@ func mdStatusIcon(s string) string {
 		return "❌"
 	case "ERROR":
 		return "❓"
+	case "SKIPPED":
+		return "⏭️"
 	default:
 		return ""
 	}

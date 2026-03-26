@@ -57,14 +57,14 @@ func (c *sshRootLogin) Run() check.Result {
 // sshdConfigValue reads the effective value of a directive from sshd_config.
 // It checks /etc/ssh/sshd_config and /etc/ssh/sshd_config.d/*.conf.
 func sshdConfigValue(directive string) (string, error) {
-	paths := []string{"/etc/ssh/sshd_config"}
+	paths := []string{check.P("/etc/ssh/sshd_config")}
 
 	// Also check drop-in configs
-	entries, err := os.ReadDir("/etc/ssh/sshd_config.d")
+	entries, err := os.ReadDir(check.P("/etc/ssh/sshd_config.d"))
 	if err == nil {
 		for _, e := range entries {
 			if !e.IsDir() && strings.HasSuffix(e.Name(), ".conf") {
-				paths = append(paths, "/etc/ssh/sshd_config.d/"+e.Name())
+				paths = append(paths, check.P("/etc/ssh/sshd_config.d/"+e.Name()))
 			}
 		}
 	}

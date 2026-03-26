@@ -35,12 +35,12 @@ func (c *envSecrets) Description() string {
 }
 
 func (c *envSecrets) Run() check.Result {
-	paths := []string{"/etc/environment"}
+	paths := []string{check.P("/etc/environment")}
 
 	// Add profile.d scripts
-	entries, _ := os.ReadDir("/etc/profile.d")
+	entries, _ := os.ReadDir(check.P("/etc/profile.d"))
 	for _, e := range entries {
-		paths = append(paths, "/etc/profile.d/"+e.Name())
+		paths = append(paths, check.P("/etc/profile.d/"+e.Name()))
 	}
 
 	var found []string
@@ -103,11 +103,11 @@ func (c *historySecrets) Run() check.Result {
 	// Check /root and user home directories
 	var flagged []string
 
-	homeDirs := []string{"/root"}
-	entries, _ := os.ReadDir("/home")
+	homeDirs := []string{check.P("/root")}
+	entries, _ := os.ReadDir(check.P("/home"))
 	for _, e := range entries {
 		if e.IsDir() {
-			homeDirs = append(homeDirs, "/home/"+e.Name())
+			homeDirs = append(homeDirs, check.P("/home/"+e.Name()))
 		}
 	}
 
@@ -162,8 +162,8 @@ func (c *worldReadableCreds) Description() string {
 
 func (c *worldReadableCreds) Run() check.Result {
 	credFiles := []string{
-		"/etc/shadow", "/etc/gshadow",
-		"/etc/security/opasswd",
+		check.P("/etc/shadow"), check.P("/etc/gshadow"),
+		check.P("/etc/security/opasswd"),
 	}
 
 	var bad []string
@@ -200,11 +200,11 @@ func (c *credFilePerms) Run() check.Result {
 	credFiles := []string{".pgpass", ".my.cnf", ".netrc", ".aws/credentials"}
 	var bad []string
 
-	homeDirs := []string{"/root"}
-	entries, _ := os.ReadDir("/home")
+	homeDirs := []string{check.P("/root")}
+	entries, _ := os.ReadDir(check.P("/home"))
 	for _, e := range entries {
 		if e.IsDir() {
-			homeDirs = append(homeDirs, "/home/"+e.Name())
+			homeDirs = append(homeDirs, check.P("/home/"+e.Name()))
 		}
 	}
 

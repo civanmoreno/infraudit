@@ -121,7 +121,7 @@ var auditRuleChecks = []*auditRule{
 }
 
 func auditdConfValue(key string) string {
-	data, err := os.ReadFile("/etc/audit/auditd.conf")
+	data, err := os.ReadFile(check.P("/etc/audit/auditd.conf"))
 	if err != nil {
 		return ""
 	}

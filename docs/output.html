@@ -57,7 +57,7 @@
                 </tr>
                 <tr>
                     <td><code>status</code></td>
-                    <td>PASS, WARN, FAIL, or ERROR</td>
+                    <td>PASS, WARN, FAIL, ERROR, or SKIPPED</td>
                     <td>Outcome — did the check pass or is action required?</td>
                 </tr>
                 <tr>
@@ -97,6 +97,11 @@
                     <td><span class="badge high">ERROR</span></td>
                     <td>The check could not be executed (missing permissions, file not found)</td>
                     <td>Investigate why the check couldn't run. Common causes: not running as root, missing packages, or non-standard system configuration. Run with <code>sudo</code> for full results.</td>
+                </tr>
+                <tr>
+                    <td><span class="badge info">SKIPPED</span></td>
+                    <td>The check was skipped — platform requirements not met (OS family, init system, or package manager)</td>
+                    <td>None. This is expected on systems where the check doesn't apply. Skipped checks do not affect the hardening score. Example: RHEL-specific crypto-policy checks are skipped on Debian.</td>
                 </tr>
             </tbody>
         </table>
@@ -204,7 +209,20 @@
     "passed": 98,
     "warnings": 25,
     "failures": 7,
-    "errors": 2
+    "errors": 2,
+    "skipped": 3,
+    "score": 72,
+    "grade": "C",
+    "duration_seconds": 2.3,
+    "os": {
+      "id": "ubuntu",
+      "name": "Ubuntu",
+      "version": "24.04",
+      "family": "debian",
+      "pkg_manager": "apt",
+      "init_system": "systemd",
+      "arch": "amd64"
+    }
   }
 }</code></pre>
         <h3>JSON use cases</h3>
@@ -225,6 +243,18 @@
   warnings: 25
   failures: 7
   errors: 2
+  skipped: 3
+  score: 72
+  grade: C
+  duration_seconds: 2.3
+  os:
+    id: ubuntu
+    name: Ubuntu
+    version: "24.04"
+    family: debian
+    pkg_manager: apt
+    init_system: systemd
+    arch: amd64
 checks:
   - id: AUTH-001
     name: SSH root login disabled

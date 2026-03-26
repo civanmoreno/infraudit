@@ -37,9 +37,22 @@ type Summary struct {
 	Warnings int     `json:"warnings" yaml:"warnings"`
 	Failures int     `json:"failures" yaml:"failures"`
 	Errors   int     `json:"errors" yaml:"errors"`
+	Skipped  int     `json:"skipped" yaml:"skipped"`
 	Score    int     `json:"score" yaml:"score"`
 	Grade    string  `json:"grade" yaml:"grade"`
 	Duration float64 `json:"duration_seconds,omitempty" yaml:"duration_seconds,omitempty"`
+	OSInfo   *OSInfo `json:"os,omitempty" yaml:"os,omitempty"`
+}
+
+// OSInfo holds detected OS information for the report.
+type OSInfo struct {
+	ID         string `json:"id" yaml:"id"`
+	Name       string `json:"name" yaml:"name"`
+	Version    string `json:"version,omitempty" yaml:"version,omitempty"`
+	Family     string `json:"family" yaml:"family"`
+	PkgManager string `json:"pkg_manager" yaml:"pkg_manager"`
+	InitSystem string `json:"init_system" yaml:"init_system"`
+	Arch       string `json:"arch" yaml:"arch"`
 }
 
 // NewEntry creates a report entry from a check and its result.
@@ -85,6 +98,8 @@ func statusIcon(s string) string {
 		return red + "✗" + rst
 	case "ERROR":
 		return magenta + "?" + rst
+	case "SKIPPED":
+		return dim + "—" + rst
 	default:
 		return " "
 	}
@@ -100,6 +115,8 @@ func statusBadge(s string) string {
 		return red + bold + " FAIL  " + rst
 	case "ERROR":
 		return magenta + bold + " ERROR " + rst
+	case "SKIPPED":
+		return dim + " SKIP  " + rst
 	default:
 		return s
 	}
@@ -235,7 +252,7 @@ func WriteConsole(w io.Writer, r *Report) {
 		label := catLabel(cat)
 
 		// Count stats for this category
-		var cp, cw, cf, ce int
+		var cp, cw, cf, ce, cs int
 		for _, e := range entries {
 			switch e.Status {
 			case "PASS":
@@ -246,6 +263,8 @@ func WriteConsole(w io.Writer, r *Report) {
 				cf++
 			case "ERROR":
 				ce++
+			case "SKIPPED":
+				cs++
 			}
 		}
 
@@ -258,6 +277,9 @@ func WriteConsole(w io.Writer, r *Report) {
 		}
 		if ce > 0 {
 			catStats += fmt.Sprintf("  %s%d err%s", magenta, ce, rst)
+		}
+		if cs > 0 {
+			catStats += fmt.Sprintf("  %s%d skip%s", dim, cs, rst)
 		}
 
 		fmt.Fprintf(w, "  %s%s%s %s— %s%s   %s\n",
@@ -303,12 +325,14 @@ func WriteConsole(w io.Writer, r *Report) {
 func statusPriority(s string) int {
 	switch s {
 	case "FAIL":
-		return 4
+		return 5
 	case "ERROR":
-		return 3
+		return 4
 	case "WARN":
-		return 2
+		return 3
 	case "PASS":
+		return 2
+	case "SKIPPED":
 		return 1
 	default:
 		return 0
@@ -356,13 +380,28 @@ func writeSummaryBox(w io.Writer, r *Report) {
 
 	fmt.Fprintf(w, "  %s%s%s\n", dim, strings.Repeat("═", 78), rst)
 	fmt.Fprintf(w, "  %sSUMMARY%s\n", bold, rst)
+
+	// Show OS info if available
+	if s.OSInfo != nil {
+		osLabel := s.OSInfo.Name
+		if s.OSInfo.Version != "" {
+			osLabel += " " + s.OSInfo.Version
+		}
+		fmt.Fprintf(w, "  %sOS: %s (%s, %s, %s)%s\n",
+			dim, osLabel, s.OSInfo.Family, s.OSInfo.PkgManager, s.OSInfo.InitSystem, rst)
+	}
+
 	fmt.Fprintln(w)
 	fmt.Fprintf(w, "  %s  %s%d%s/%d checks\n", bar, bold, s.Passed, rst, total)
 	fmt.Fprintln(w)
 	fmt.Fprintf(w, "  %s✓ %d Passed%s", green, s.Passed, rst)
 	fmt.Fprintf(w, "    %s! %d Warnings%s", yellow, s.Warnings, rst)
 	fmt.Fprintf(w, "    %s✗ %d Failures%s", red, s.Failures, rst)
-	fmt.Fprintf(w, "    %s? %d Errors%s\n", magenta, s.Errors, rst)
+	fmt.Fprintf(w, "    %s? %d Errors%s", magenta, s.Errors, rst)
+	if s.Skipped > 0 {
+		fmt.Fprintf(w, "    %s— %d Skipped%s", dim, s.Skipped, rst)
+	}
+	fmt.Fprintln(w)
 
 	// Severity breakdown for non-pass findings
 	sevCounts := severityBreakdown(r.AllEntries)
@@ -409,10 +448,23 @@ func WriteYAML(w io.Writer, r *Report) error {
 	fmt.Fprintf(w, "  warnings: %d\n", r.Summary.Warnings)
 	fmt.Fprintf(w, "  failures: %d\n", r.Summary.Failures)
 	fmt.Fprintf(w, "  errors: %d\n", r.Summary.Errors)
+	fmt.Fprintf(w, "  skipped: %d\n", r.Summary.Skipped)
 	fmt.Fprintf(w, "  score: %d\n", r.Summary.Score)
 	fmt.Fprintf(w, "  grade: %s\n", r.Summary.Grade)
 	if r.Summary.Duration > 0 {
 		fmt.Fprintf(w, "  duration_seconds: %.1f\n", r.Summary.Duration)
+	}
+	if r.Summary.OSInfo != nil {
+		fmt.Fprintln(w, "  os:")
+		fmt.Fprintf(w, "    id: %s\n", r.Summary.OSInfo.ID)
+		fmt.Fprintf(w, "    name: %s\n", yamlEscape(r.Summary.OSInfo.Name))
+		if r.Summary.OSInfo.Version != "" {
+			fmt.Fprintf(w, "    version: %s\n", yamlEscape(r.Summary.OSInfo.Version))
+		}
+		fmt.Fprintf(w, "    family: %s\n", r.Summary.OSInfo.Family)
+		fmt.Fprintf(w, "    pkg_manager: %s\n", r.Summary.OSInfo.PkgManager)
+		fmt.Fprintf(w, "    init_system: %s\n", r.Summary.OSInfo.InitSystem)
+		fmt.Fprintf(w, "    arch: %s\n", r.Summary.OSInfo.Arch)
 	}
 	fmt.Fprintln(w, "checks:")
 	for _, e := range r.Entries {

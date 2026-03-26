@@ -82,6 +82,7 @@ func (c *apportDisabled) Severity() check.Severity { return check.Low }
 func (c *apportDisabled) Description() string {
 	return "Ensure apport crash reporter is disabled on servers"
 }
+func (c *apportDisabled) SupportedOS() []string { return []string{"debian"} }
 
 func (c *apportDisabled) Run() check.Result {
 	if !check.PkgInstalled("apport") {

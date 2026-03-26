@@ -107,7 +107,7 @@ func (c *logRotation) Severity() check.Severity { return check.Medium }
 func (c *logRotation) Description() string      { return "Verify logrotate is installed and configured" }
 
 func (c *logRotation) Run() check.Result {
-	if _, err := os.Stat("/etc/logrotate.conf"); err == nil {
+	if _, err := os.Stat(check.P("/etc/logrotate.conf")); err == nil {
 		return check.Result{Status: check.Pass, Message: "logrotate is configured"}
 	}
 	return check.Result{
@@ -126,7 +126,7 @@ func (c *logPerms) Severity() check.Severity { return check.Medium }
 func (c *logPerms) Description() string      { return "Verify log files in /var/log are not world-readable" }
 
 func (c *logPerms) Run() check.Result {
-	entries, err := os.ReadDir("/var/log")
+	entries, err := os.ReadDir(check.P("/var/log"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /var/log"}
 	}

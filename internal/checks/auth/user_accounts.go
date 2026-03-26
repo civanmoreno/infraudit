@@ -40,7 +40,7 @@ func (c *defaultUmask) Description() string {
 
 func (c *defaultUmask) Run() check.Result {
 	for _, path := range []string{"/etc/login.defs", "/etc/profile", "/etc/bash.bashrc"} {
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(check.P(path))
 		if err != nil {
 			continue
 		}
@@ -80,7 +80,7 @@ func (c *shellTimeout) Description() string {
 
 func (c *shellTimeout) Run() check.Result {
 	for _, path := range []string{"/etc/profile", "/etc/profile.d/timeout.sh", "/etc/bash.bashrc"} {
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(check.P(path))
 		if err != nil {
 			continue
 		}
@@ -107,7 +107,7 @@ func (c *legacyEntry) Severity() check.Severity { return check.Medium }
 func (c *legacyEntry) Description() string      { return "Ensure no legacy + entries in " + c.file }
 
 func (c *legacyEntry) Run() check.Result {
-	data, err := os.ReadFile(c.file)
+	data, err := os.ReadFile(check.P(c.file))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read " + c.file, Remediation: "Run infraudit with sudo for full results"}
 	}
@@ -142,7 +142,7 @@ func (c *homeDirsExist) Run() check.Result {
 		if e.UID < 1000 || e.Home == "" || e.Home == "/" {
 			continue
 		}
-		if _, err := os.Stat(e.Home); os.IsNotExist(err) {
+		if _, err := os.Stat(check.P(e.Home)); os.IsNotExist(err) {
 			missing = append(missing, fmt.Sprintf("%s (%s)", e.User, e.Home))
 		}
 	}
@@ -173,7 +173,7 @@ func (c *homeDirsOwned) Run() check.Result {
 		if e.UID < 1000 || e.Home == "" || e.Home == "/" {
 			continue
 		}
-		info, err := os.Stat(e.Home)
+		info, err := os.Stat(check.P(e.Home))
 		if err != nil {
 			continue
 		}
@@ -236,13 +236,13 @@ func (c *duplicateCheck) Description() string      { return c.desc }
 func (c *duplicateCheck) Run() check.Result {
 	switch c.field {
 	case "uid":
-		return checkDuplicateField("/etc/passwd", 2, "UID")
+		return checkDuplicateField(check.P("/etc/passwd"), 2, "UID")
 	case "gid":
-		return checkDuplicateField("/etc/group", 2, "GID")
+		return checkDuplicateField(check.P("/etc/group"), 2, "GID")
 	case "user":
-		return checkDuplicateField("/etc/passwd", 0, "username")
+		return checkDuplicateField(check.P("/etc/passwd"), 0, "username")
 	case "group":
-		return checkDuplicateField("/etc/group", 0, "group name")
+		return checkDuplicateField(check.P("/etc/group"), 0, "group name")
 	}
 	return check.Result{Status: check.Error, Message: "Unknown field: " + c.field}
 }

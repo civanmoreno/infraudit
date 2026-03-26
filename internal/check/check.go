@@ -41,6 +41,7 @@ const (
 	Warn
 	Fail
 	Error
+	Skipped
 )
 
 func (s Status) String() string {
@@ -53,6 +54,8 @@ func (s Status) String() string {
 		return "FAIL"
 	case Error:
 		return "ERROR"
+	case Skipped:
+		return "SKIPPED"
 	default:
 		return "UNKNOWN"
 	}
@@ -74,6 +77,28 @@ type Check interface {
 	Severity() Severity
 	Description() string
 	Run() Result
+}
+
+// OSAware is an optional interface that checks can implement to declare
+// which OS families they support. If a check does not implement this
+// interface, it is assumed to work on all systems.
+type OSAware interface {
+	// SupportedOS returns the list of OS families this check applies to.
+	// Values: "debian", "redhat", "suse", "alpine", "arch".
+	// An empty slice means "all OS families".
+	SupportedOS() []string
+}
+
+// InitAware is an optional interface that checks can implement to declare
+// which init systems they require (e.g. "systemd", "openrc", "sysvinit").
+type InitAware interface {
+	RequiredInit() string
+}
+
+// PkgAware is an optional interface that checks can implement to declare
+// which package managers they require (e.g. "apt", "dnf", "yum").
+type PkgAware interface {
+	RequiredPkgManager() string
 }
 
 // ParseSeverity converts a string to a Severity value. Returns -1 if invalid.

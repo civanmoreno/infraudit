@@ -96,7 +96,7 @@ func (c *mtaRootAlias) Severity() check.Severity { return check.Low }
 func (c *mtaRootAlias) Description() string      { return "Verify root mail is forwarded via /etc/aliases" }
 
 func (c *mtaRootAlias) Run() check.Result {
-	f, err := os.Open("/etc/aliases")
+	f, err := os.Open(check.P("/etc/aliases"))
 	if err != nil {
 		return check.Result{
 			Status:      check.Warn,
@@ -131,7 +131,7 @@ func (c *mtaRootAlias) Run() check.Result {
 }
 
 func postfixMainCfValue(key string) string {
-	f, err := os.Open("/etc/postfix/main.cf")
+	f, err := os.Open(check.P("/etc/postfix/main.cf"))
 	if err != nil {
 		return ""
 	}

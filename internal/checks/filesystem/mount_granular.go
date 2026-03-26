@@ -82,7 +82,7 @@ func (c *homeNodev) Run() check.Result {
 }
 
 func checkFilePerms(path string, maxPerm os.FileMode) check.Result {
-	info, err := os.Stat(path)
+	info, err := os.Stat(check.P(path))
 	if os.IsNotExist(err) {
 		return check.Result{Status: check.Pass, Message: path + " does not exist (OK)"}
 	}

@@ -72,7 +72,7 @@ func (c *pwquality) Run() check.Result {
 }
 
 func parsePwqualityConf() (map[string]string, error) {
-	f, err := os.Open("/etc/security/pwquality.conf")
+	f, err := os.Open(check.P("/etc/security/pwquality.conf"))
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func pamModuleEnabled(module string) bool {
 }
 
 func fileContainsActive(path, substr string) bool {
-	f, err := os.Open(path)
+	f, err := os.Open(check.P(path))
 	if err != nil {
 		return false
 	}

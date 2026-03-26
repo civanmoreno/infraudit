@@ -23,7 +23,7 @@ func (c *homePerms) Description() string {
 }
 
 func (c *homePerms) Run() check.Result {
-	entries, err := os.ReadDir("/home")
+	entries, err := os.ReadDir(check.P("/home"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /home: " + err.Error()}
 	}

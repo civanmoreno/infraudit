@@ -469,6 +469,42 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] 7 unit tests for CIS controls: levels, lookup, duplicates, field validation, category coverage
 - [x] `internal/compliance/` package with typed CIS control mappings
 
+### Phase 43: OS Detection & Check Compatibility ✅
+
+- [x] `internal/osinfo` package — detects distro, version, family, package manager, init system
+- [x] Parses `/etc/os-release` with fallback to `/usr/lib/os-release`
+- [x] Supports 6 families: Debian, RedHat, SUSE, Alpine, Arch, Unknown
+- [x] Detects package manager (apt, dnf, yum, apk, zypper, pacman)
+- [x] Detects init system (systemd, openrc, sysvinit)
+- [x] `check.OSAware` interface — checks declare supported OS families
+- [x] `check.InitAware` interface — checks declare required init system
+- [x] `check.PkgAware` interface — checks declare required package manager
+- [x] `check.Skipped` status — incompatible checks skipped with reason
+- [x] Skipped checks excluded from scoring (like ERROR)
+- [x] OS info shown in console summary, JSON, YAML, HTML, and Markdown reports
+- [x] `doctor` command shows detected OS, family, pkg manager, init system
+- [x] CRYPTO-001 annotated as RedHat-only (`SupportedOS: ["redhat"]`)
+- [x] SVC-052 (apport) annotated as Debian-only (`SupportedOS: ["debian"]`)
+- [x] 13 unit tests for OS detection (Ubuntu, RHEL, Alpine, Debian, Fedora, SUSE, Arch, unknown, caching)
+- [x] 20 unit tests for `checkOSCompat` and `addResult` with Skipped status
+
+### Phase 44: Test Coverage Expansion (10% → 36%) ✅
+
+- [x] auth: 41 tests — SSH, sudoers, UID zero, empty password, system shell, file perms, user accounts (61.6%)
+- [x] pam: 27 tests — pwquality, pwhistory, faillock, expiry, nullok, login.defs, pamOrder (61.6%)
+- [x] secrets: 10 tests — env secrets, history secrets, cred file perms, world-readable (78.6%)
+- [x] cron: 16 tests — crontab perms, cron.allow, at.allow, suspicious jobs, dir perms (59.7%)
+- [x] hardening: 36 tests — ASLR, dmesg, ptrace, core dumps, banner, swap, kernel params (49.3%)
+- [x] crypto: 18 tests — cert expiry (real x509), self-signed, TLS version, key perms, FIPS, weak hash (51.2%)
+- [x] filesystem: 38 tests — home perms, file perms, mount options, sticky bit, partitions, dot files (47.1%)
+- [x] logging: 31 tests — log rotation, perms, journald, auditd config, rsyslog (35.7%)
+- [x] network: 12 tests — IP forwarding, source route, redirects, SYN cookies (9.6%)
+- [x] services: 15 tests — SSH settings, ciphers, timeouts, MTA local-only (23.7%)
+- [x] report: 36 tests — WriteMarkdown, WriteConsole, SKIPPED status, OSInfo, YAML output (81.2%)
+- [x] cmd: 20 tests — checkOSCompat, addResult with all statuses and filters (15.7%)
+- [x] Checks updated to use `check.P()` for FSRoot-based test isolation across 20+ files
+- [x] Total: 10.3% → 35.9% coverage
+
 ## Check Categories
 
 | Category | Prefix | Description |

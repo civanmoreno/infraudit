@@ -6,10 +6,26 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 )
+
+// FSRoot is the filesystem root used by checks when resolving absolute paths.
+// In production this is empty (meaning real system root).
+// Override in tests to point to a temp directory with controlled file content.
+var FSRoot = ""
+
+// P resolves an absolute path against FSRoot.
+// When FSRoot is empty, returns the path unchanged (production behavior).
+// When FSRoot is set, joins FSRoot with the path (test behavior).
+func P(path string) string {
+	if FSRoot == "" {
+		return path
+	}
+	return filepath.Join(FSRoot, strings.TrimPrefix(path, "/"))
+}
 
 const (
 	// DefaultCmdTimeout is the default timeout for external commands.
@@ -44,7 +60,7 @@ func ServiceActive(name string) bool {
 
 // ReadSysctl reads a sysctl value from the given /proc/sys path.
 func ReadSysctl(path string) string {
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(P(path))
 	if err != nil {
 		return ""
 	}
@@ -77,7 +93,7 @@ var (
 // Results are cached for the lifetime of the process.
 func ParsePasswd() ([]PasswdEntry, error) {
 	passwdOnce.Do(func() {
-		passwdCache, passwdErr = parseColonFile("/etc/passwd", func(parts []string) *PasswdEntry {
+		passwdCache, passwdErr = parseColonFile(P("/etc/passwd"), func(parts []string) *PasswdEntry {
 			if len(parts) < 7 {
 				return nil
 			}
@@ -104,7 +120,7 @@ type ShadowEntry struct {
 // Results are cached for the lifetime of the process.
 func ParseShadow() ([]ShadowEntry, error) {
 	shadowOnce.Do(func() {
-		shadowCache, shadowErr = parseColonFile("/etc/shadow", func(parts []string) *ShadowEntry {
+		shadowCache, shadowErr = parseColonFile(P("/etc/shadow"), func(parts []string) *ShadowEntry {
 			if len(parts) < 2 {
 				return nil
 			}
@@ -148,7 +164,7 @@ type MountEntry struct {
 // Results are cached for the lifetime of the process.
 func ParseMounts() []MountEntry {
 	mountsOnce.Do(func() {
-		f, err := os.Open("/proc/mounts")
+		f, err := os.Open(P("/proc/mounts"))
 		if err != nil {
 			return
 		}
@@ -226,7 +242,7 @@ var (
 // Results are cached for the lifetime of the process.
 func ParseGroup() ([]GroupEntry, error) {
 	groupOnce.Do(func() {
-		f, err := os.Open("/etc/group")
+		f, err := os.Open(P("/etc/group"))
 		if err != nil {
 			groupErr = err
 			return

@@ -98,7 +98,7 @@ func WriteSARIF(w io.Writer, r *Report) error {
 	// Build results (only non-PASS entries)
 	var results []sarifResult
 	for _, e := range r.Entries {
-		if e.Status == "PASS" {
+		if e.Status == "PASS" || e.Status == "SKIPPED" {
 			continue
 		}
 		msg := e.Message
