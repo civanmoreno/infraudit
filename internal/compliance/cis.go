@@ -103,6 +103,22 @@ var CISControls = []CISControl{
 	{CheckID: "SVC-012", Section: "2.1.4", SectionName: "Ensure X Window System is not installed", Category: "2. Services", Level: L1},
 	{CheckID: "SVC-013", Section: "2.1.5", SectionName: "Ensure autofs (automount) is disabled", Category: "2. Services", Level: L1},
 
+	// 2.1.6-18 Unwanted Services
+	{CheckID: "SVC-014", Section: "2.1.6", SectionName: "Ensure Avahi Server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-015", Section: "2.1.7", SectionName: "Ensure CUPS is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-016", Section: "2.1.8", SectionName: "Ensure DHCP Server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-017", Section: "2.1.9", SectionName: "Ensure DNS Server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-018", Section: "2.1.10", SectionName: "Ensure FTP Server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-019", Section: "2.1.11", SectionName: "Ensure HTTP server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-020", Section: "2.1.12", SectionName: "Ensure IMAP and POP3 server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-021", Section: "2.1.13", SectionName: "Ensure Samba is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-022", Section: "2.1.14", SectionName: "Ensure HTTP Proxy Server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-023", Section: "2.1.15", SectionName: "Ensure SNMP Server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-024", Section: "2.1.16", SectionName: "Ensure telnet-server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-025", Section: "2.1.17", SectionName: "Ensure rsync service is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-026", Section: "2.1.18", SectionName: "Ensure NIS Server is not installed", Category: "2. Services", Level: L1},
+	{CheckID: "SVC-027", Section: "2.2.5", SectionName: "Ensure NIS Client is not installed", Category: "2. Services", Level: L1},
+
 	// 2.2 Service Clients
 	{CheckID: "SVC-007", Section: "2.2.1", SectionName: "Ensure intrusion detection is active", Category: "2. Services", Level: L2},
 	{CheckID: "SVC-009", Section: "2.2.2", SectionName: "Ensure MTA is configured as local-only", Category: "2. Services", Level: L1},
@@ -123,8 +139,31 @@ var CISControls = []CISControl{
 	{CheckID: "NET-003", Section: "3.1.1", SectionName: "Ensure IP forwarding is disabled", Category: "3. Network Configuration", Level: L1},
 	{CheckID: "NET-008", Section: "3.1.2", SectionName: "Ensure IPv6 is disabled or properly configured", Category: "3. Network Configuration", Level: L1},
 
-	// 3.2 Host Network Parameters
+	// 3.1.3 Wireless
+	{CheckID: "HARD-010", Section: "3.1.3", SectionName: "Ensure wireless interfaces are disabled", Category: "3. Network Configuration", Level: L1},
+
+	// 3.2 Network Kernel Parameters
 	{CheckID: "NET-004", Section: "3.2.1", SectionName: "Ensure services bind to specific addresses", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-012", Section: "3.2.2", SectionName: "Ensure packet redirect sending is disabled (all)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-013", Section: "3.2.3", SectionName: "Ensure packet redirect sending is disabled (default)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-014", Section: "3.2.4", SectionName: "Ensure ICMP redirects are not accepted (all)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-015", Section: "3.2.5", SectionName: "Ensure ICMP redirects are not accepted (default)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-016", Section: "3.2.6", SectionName: "Ensure secure ICMP redirects are not accepted (all)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-017", Section: "3.2.7", SectionName: "Ensure secure ICMP redirects are not accepted (default)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-018", Section: "3.2.8", SectionName: "Ensure suspicious packets are logged (all)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-019", Section: "3.2.9", SectionName: "Ensure suspicious packets are logged (default)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-020", Section: "3.2.10", SectionName: "Ensure broadcast ICMP requests are ignored", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-021", Section: "3.2.11", SectionName: "Ensure bogus ICMP responses are ignored", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-022", Section: "3.2.12", SectionName: "Ensure Reverse Path Filtering is enabled (all)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-023", Section: "3.2.13", SectionName: "Ensure Reverse Path Filtering is enabled (default)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-024", Section: "3.2.14", SectionName: "Ensure TCP SYN Cookies is enabled", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-025", Section: "3.2.15", SectionName: "Ensure IPv6 router advertisements are not accepted (all)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-026", Section: "3.2.16", SectionName: "Ensure IPv6 router advertisements are not accepted (default)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-027", Section: "3.2.17", SectionName: "Ensure IPv6 redirects are not accepted (all)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-028", Section: "3.2.18", SectionName: "Ensure IPv6 redirects are not accepted (default)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-029", Section: "3.2.19", SectionName: "Ensure source routed packets are not accepted (all)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-030", Section: "3.2.20", SectionName: "Ensure source routed packets are not accepted (default)", Category: "3. Network Configuration", Level: L1},
+	{CheckID: "NET-031", Section: "3.2.21", SectionName: "Ensure IPv6 source routing is not accepted", Category: "3. Network Configuration", Level: L1},
 
 	// 3.3 SNMP
 	{CheckID: "NET-009", Section: "3.3.1", SectionName: "Ensure SNMP v1/v2c is disabled", Category: "3. Network Configuration", Level: L1},
@@ -146,11 +185,29 @@ var CISControls = []CISControl{
 
 	// 4.1 Configure System Accounting (auditd)
 	{CheckID: "LOG-002", Section: "4.1.1", SectionName: "Ensure auditd is installed and running", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-010", Section: "4.1.1.1", SectionName: "Ensure audit log storage size is configured", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-011", Section: "4.1.1.2", SectionName: "Ensure system responds when audit logs are full", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-012", Section: "4.1.1.3", SectionName: "Ensure audit logs are not automatically deleted", Category: "4. Logging and Auditing", Level: L2},
 	{CheckID: "LOG-003", Section: "4.1.2", SectionName: "Ensure audit rules for sensitive operations", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-013", Section: "4.1.3", SectionName: "Ensure events that modify date/time are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-014", Section: "4.1.4", SectionName: "Ensure events that modify user/group are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-015", Section: "4.1.5", SectionName: "Ensure events that modify network environment are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-016", Section: "4.1.6", SectionName: "Ensure login and logout events are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-017", Section: "4.1.7", SectionName: "Ensure session initiation information is collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-018", Section: "4.1.8", SectionName: "Ensure DAC permission changes are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-019", Section: "4.1.9", SectionName: "Ensure unsuccessful file access attempts are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-020", Section: "4.1.10", SectionName: "Ensure use of privileged commands is collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-021", Section: "4.1.11", SectionName: "Ensure successful file system mounts are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-022", Section: "4.1.12", SectionName: "Ensure file deletion events are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-023", Section: "4.1.13", SectionName: "Ensure changes to system admin scope are collected", Category: "4. Logging and Auditing", Level: L2},
+	{CheckID: "LOG-024", Section: "4.1.14", SectionName: "Ensure kernel module loading/unloading is collected", Category: "4. Logging and Auditing", Level: L2},
 
 	// 4.2 Configure Logging
 	{CheckID: "LOG-001", Section: "4.2.1", SectionName: "Ensure rsyslog/syslog-ng is installed and running", Category: "4. Logging and Auditing", Level: L1},
+	{CheckID: "LOG-025", Section: "4.2.1.1", SectionName: "Ensure journald compresses large log files", Category: "4. Logging and Auditing", Level: L1},
+	{CheckID: "LOG-026", Section: "4.2.1.2", SectionName: "Ensure journald writes to persistent storage", Category: "4. Logging and Auditing", Level: L1},
 	{CheckID: "LOG-005", Section: "4.2.2", SectionName: "Ensure log files are not world-readable", Category: "4. Logging and Auditing", Level: L1},
+	{CheckID: "LOG-027", Section: "4.2.2.1", SectionName: "Ensure rsyslog default file permissions configured", Category: "4. Logging and Auditing", Level: L1},
 	{CheckID: "LOG-004", Section: "4.2.3", SectionName: "Ensure logrotate is configured", Category: "4. Logging and Auditing", Level: L1},
 
 	// ═══════════════════════════════════════════════════════
@@ -170,9 +227,22 @@ var CISControls = []CISControl{
 	{CheckID: "AUTH-001", Section: "5.2.1", SectionName: "Ensure SSH root login is disabled", Category: "5. Access, Authentication and Authorization", Level: L1},
 	{CheckID: "AUTH-002", Section: "5.2.2", SectionName: "Ensure SSH PasswordAuthentication is disabled", Category: "5. Access, Authentication and Authorization", Level: L1},
 	{CheckID: "SVC-002", Section: "5.2.3", SectionName: "Ensure SSH ciphers, MACs and timeouts are configured", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-028", Section: "5.2.4", SectionName: "Ensure SSH PermitEmptyPasswords is disabled", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-029", Section: "5.2.5", SectionName: "Ensure SSH MaxAuthTries is set to 4 or less", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-030", Section: "5.2.6", SectionName: "Ensure SSH IgnoreRhosts is enabled", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-031", Section: "5.2.7", SectionName: "Ensure SSH HostbasedAuthentication is disabled", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-032", Section: "5.2.8", SectionName: "Ensure SSH LoginGraceTime is set to 60 or less", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-033", Section: "5.2.9", SectionName: "Ensure SSH MaxStartups is configured", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-034", Section: "5.2.10", SectionName: "Ensure SSH MaxSessions is limited", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-035", Section: "5.2.11", SectionName: "Ensure SSH warning banner is configured", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-036", Section: "5.2.12", SectionName: "Ensure SSH AllowTcpForwarding is disabled", Category: "5. Access, Authentication and Authorization", Level: L2},
+	{CheckID: "SVC-037", Section: "5.2.13", SectionName: "Ensure SSH X11Forwarding is disabled", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-038", Section: "5.2.14", SectionName: "Ensure SSH PermitUserEnvironment is disabled", Category: "5. Access, Authentication and Authorization", Level: L1},
 
-	// 5.3 PAM
+	// 5.3 Privilege Escalation
 	{CheckID: "AUTH-006", Section: "5.3.1", SectionName: "Ensure NOPASSWD is not used in sudoers", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-040", Section: "5.3.2", SectionName: "Ensure sudo commands use pty", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "SVC-041", Section: "5.3.3", SectionName: "Ensure sudo log file exists", Category: "5. Access, Authentication and Authorization", Level: L1},
 
 	// 5.4 Password Quality
 	{CheckID: "PAM-001", Section: "5.4.1", SectionName: "Ensure password creation requirements are configured", Category: "5. Access, Authentication and Authorization", Level: L1},
@@ -180,8 +250,10 @@ var CISControls = []CISControl{
 	{CheckID: "PAM-002", Section: "5.4.3", SectionName: "Ensure password reuse is limited", Category: "5. Access, Authentication and Authorization", Level: L1},
 	{CheckID: "PAM-004", Section: "5.4.4", SectionName: "Ensure pam_faillock precedes pam_unix", Category: "5. Access, Authentication and Authorization", Level: L1},
 
-	// 5.5 Password Settings
+	// 5.5 User Accounts and Environment
 	{CheckID: "PAM-005", Section: "5.5.1", SectionName: "Ensure password expiration policies are set", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "AUTH-009", Section: "5.5.2", SectionName: "Ensure default user umask is 027 or more restrictive", Category: "5. Access, Authentication and Authorization", Level: L1},
+	{CheckID: "AUTH-010", Section: "5.5.3", SectionName: "Ensure default user shell timeout is configured", Category: "5. Access, Authentication and Authorization", Level: L1},
 
 	// 5.6 User Accounts
 	{CheckID: "AUTH-005", Section: "5.6.1", SectionName: "Ensure system accounts are secured", Category: "5. Access, Authentication and Authorization", Level: L1},
@@ -199,12 +271,38 @@ var CISControls = []CISControl{
 	{CheckID: "FS-007", Section: "6.1.4", SectionName: "Ensure no unowned or ungrouped files exist", Category: "6. System Maintenance", Level: L1},
 	{CheckID: "FS-001", Section: "6.1.5", SectionName: "Ensure SUID/SGID executables are audited", Category: "6. System Maintenance", Level: L1},
 
+	// 6.1.6
+	{CheckID: "FS-018", Section: "6.1.6", SectionName: "Ensure permissions on /etc/security/opasswd", Category: "6. System Maintenance", Level: L1},
+
 	// 6.2 User and Group Settings
 	{CheckID: "AUTH-003", Section: "6.2.1", SectionName: "Ensure root is the only UID 0 account", Category: "6. System Maintenance", Level: L1},
 	{CheckID: "FS-006", Section: "6.2.2", SectionName: "Ensure home directory permissions are 750 or more restrictive", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-011", Section: "6.2.3", SectionName: "Ensure no legacy + entries in /etc/passwd", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-012", Section: "6.2.4", SectionName: "Ensure no legacy + entries in /etc/shadow", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-013", Section: "6.2.5", SectionName: "Ensure no legacy + entries in /etc/group", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-014", Section: "6.2.6", SectionName: "Ensure all users' home directories exist", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-015", Section: "6.2.7", SectionName: "Ensure users own their home directories", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-016", Section: "6.2.8", SectionName: "Ensure root PATH integrity", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-017", Section: "6.2.9", SectionName: "Ensure no duplicate UIDs exist", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-018", Section: "6.2.10", SectionName: "Ensure no duplicate GIDs exist", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-019", Section: "6.2.11", SectionName: "Ensure no duplicate user names exist", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-020", Section: "6.2.12", SectionName: "Ensure no duplicate group names exist", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-021", Section: "6.2.13", SectionName: "Ensure all groups in /etc/passwd exist in /etc/group", Category: "6. System Maintenance", Level: L1},
+	{CheckID: "AUTH-022", Section: "6.2.14", SectionName: "Ensure shadow group is empty", Category: "6. System Maintenance", Level: L1},
 
 	// 6.3 Crypto
 	{CheckID: "CRYPTO-009", Section: "6.3.1", SectionName: "Ensure no MD5/SHA1 password hashes", Category: "6. System Maintenance", Level: L1},
+
+	// Batch 6: Section 1 additions
+	{CheckID: "FS-013", Section: "1.1.2.1", SectionName: "Ensure /var is a separate partition", Category: "1. Initial Setup", Level: L2},
+	{CheckID: "FS-014", Section: "1.1.2.2", SectionName: "Ensure /var/log is a separate partition", Category: "1. Initial Setup", Level: L2},
+	{CheckID: "FS-015", Section: "1.1.2.3", SectionName: "Ensure /var/log/audit is a separate partition", Category: "1. Initial Setup", Level: L2},
+	{CheckID: "FS-016", Section: "1.1.2.4", SectionName: "Ensure /home is a separate partition", Category: "1. Initial Setup", Level: L2},
+	{CheckID: "FS-017", Section: "1.1.2.5", SectionName: "Ensure nodev option set on /home partition", Category: "1. Initial Setup", Level: L1},
+	{CheckID: "HARD-013", Section: "1.7.2", SectionName: "Ensure GDM login banner is configured", Category: "1. Initial Setup", Level: L1},
+	{CheckID: "HARD-014", Section: "1.7.3", SectionName: "Ensure permissions on /etc/motd are configured", Category: "1. Initial Setup", Level: L1},
+	{CheckID: "HARD-015", Section: "1.7.4", SectionName: "Ensure permissions on /etc/issue are configured", Category: "1. Initial Setup", Level: L1},
+	{CheckID: "HARD-016", Section: "1.7.5", SectionName: "Ensure permissions on /etc/issue.net are configured", Category: "1. Initial Setup", Level: L1},
 }
 
 // ControlsByLevel returns controls filtered by CIS level.

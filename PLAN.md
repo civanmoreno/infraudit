@@ -422,6 +422,19 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] 13 unit tests covering all policy rules, edge cases, load/parse errors
 - [x] Tested with real audit output
 
+### Phase 40: Complete CIS Benchmark Coverage ✅
+
+- [x] 89 new checks added (132 → 221 total checks)
+- [x] 150 CIS Level 1 controls mapped, 170+ CIS Level 2 controls mapped
+- [x] Batch 1: 14 unwanted service checks (avahi, cups, dhcp, dns, ftp, http, imap, samba, squid, snmp, telnet, rsync, nis)
+- [x] Batch 2: 20 network sysctl parameter checks (redirects, martians, SYN cookies, rp_filter, IPv6 RA, source routing)
+- [x] Batch 3: 18 audit/logging checks (auditd config, 12 audit rule checks, journald, rsyslog)
+- [x] Batch 4: 13 SSH hardening checks (PermitEmptyPasswords, MaxAuthTries, IgnoreRhosts, LoginGraceTime, etc.) + 2 sudo checks
+- [x] Batch 5: 14 user account checks (umask, TMOUT, legacy entries, home dirs, duplicates, PATH integrity)
+- [x] Batch 6: 10 filesystem/banner checks (separate partitions, file permissions, GDM banner)
+- [x] New helpers: PkgInstalled(), ParseGroup() in check/helpers.go
+- [x] All CIS mappings added to internal/compliance/cis.go
+
 ### Phase 39: CIS Compliance Report ✅
 
 - [x] `infraudit compliance report.json` — generates CIS Benchmark compliance report
