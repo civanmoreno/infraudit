@@ -124,36 +124,50 @@ func TestParseHostsFileInvalidLine(t *testing.T) {
 
 func TestSSHArgs(t *testing.T) {
 	tests := []struct {
-		name  string
-		host  Host
-		extra []string
-		check func([]string) bool
+		name      string
+		host      Host
+		batchMode bool
+		extra     []string
+		check     func([]string) bool
 	}{
 		{
-			name:  "basic host",
-			host:  Host{Address: "server.com", Port: 22},
-			extra: []string{"uname", "-m"},
+			name:      "basic host with batch mode",
+			host:      Host{Address: "server.com", Port: 22},
+			batchMode: true,
+			extra:     []string{"uname", "-m"},
 			check: func(args []string) bool {
-				return contains(args, "server.com") && contains(args, "uname") && !containsFlag(args, "-p")
+				return contains(args, "server.com") && contains(args, "uname") &&
+					!containsFlag(args, "-p") && contains(args, "BatchMode=yes")
 			},
 		},
 		{
-			name: "custom port",
-			host: Host{Address: "server.com", Port: 2222},
+			name:      "no batch mode for password auth",
+			host:      Host{Address: "server.com", Port: 22},
+			batchMode: false,
+			check: func(args []string) bool {
+				return contains(args, "server.com") && !contains(args, "BatchMode=yes")
+			},
+		},
+		{
+			name:      "custom port",
+			host:      Host{Address: "server.com", Port: 2222},
+			batchMode: true,
 			check: func(args []string) bool {
 				return containsFlag(args, "-p") && contains(args, "2222")
 			},
 		},
 		{
-			name: "with user",
-			host: Host{User: "root", Address: "server.com", Port: 22},
+			name:      "with user",
+			host:      Host{User: "root", Address: "server.com", Port: 22},
+			batchMode: true,
 			check: func(args []string) bool {
 				return contains(args, "root@server.com")
 			},
 		},
 		{
-			name: "with identity",
-			host: Host{Address: "server.com", Port: 22, Identity: "/home/user/.ssh/id_rsa"},
+			name:      "with identity",
+			host:      Host{Address: "server.com", Port: 22, Identity: "/home/user/.ssh/id_rsa"},
+			batchMode: true,
 			check: func(args []string) bool {
 				return containsFlag(args, "-i") && contains(args, "/home/user/.ssh/id_rsa")
 			},
@@ -162,13 +176,9 @@ func TestSSHArgs(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			args := sshArgs(tt.host, tt.extra...)
+			args := sshArgs(tt.host, tt.batchMode, tt.extra...)
 			if !tt.check(args) {
-				t.Errorf("sshArgs(%+v, %v) = %v", tt.host, tt.extra, args)
-			}
-			// BatchMode should always be present
-			if !contains(args, "BatchMode=yes") {
-				t.Errorf("sshArgs missing BatchMode=yes: %v", args)
+				t.Errorf("sshArgs(%+v, %v, %v) = %v", tt.host, tt.batchMode, tt.extra, args)
 			}
 		})
 	}

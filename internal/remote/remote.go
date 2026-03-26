@@ -33,6 +33,7 @@ type Scanner struct {
 	AuditArgs  []string
 	UseSudo    bool
 	KeepBinary bool
+	Password   string
 }
 
 // ScanHost audits a single remote host.
@@ -119,8 +120,8 @@ func (s *Scanner) ScanHosts(hosts []Host, concurrency int) []ScanResult {
 }
 
 func (s *Scanner) detectArch(ctx context.Context, host Host) (string, error) {
-	args := sshArgs(host, "uname", "-m")
-	out, err := runSSH(ctx, args)
+	args := sshArgs(host, s.Password == "", "uname", "-m")
+	out, err := s.runCmd(ctx, "ssh", args)
 	if err != nil {
 		return "", err
 	}
@@ -169,14 +170,9 @@ func (s *Scanner) resolveBinary(remoteArch string) (string, error) {
 }
 
 func (s *Scanner) upload(ctx context.Context, host Host, localPath, remotePath string) error {
-	args := scpArgs(host, localPath, remotePath)
-	cmd := exec.CommandContext(ctx, "scp", args...)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%w: %s", err, stderr.String())
-	}
-	return nil
+	args := scpArgs(host, s.Password == "", localPath, remotePath)
+	_, err := s.runCmd(ctx, "scp", args)
+	return err
 }
 
 func (s *Scanner) executeAudit(ctx context.Context, host Host, remotePath string) ([]byte, error) {
@@ -187,8 +183,8 @@ func (s *Scanner) executeAudit(ctx context.Context, host Host, remotePath string
 	cmdParts = append(cmdParts, remotePath, "audit", "--format", "json")
 	cmdParts = append(cmdParts, s.AuditArgs...)
 
-	args := sshArgs(host, cmdParts...)
-	cmd := exec.CommandContext(ctx, "ssh", args...)
+	args := sshArgs(host, s.Password == "", cmdParts...)
+	cmd := s.buildCmd(ctx, "ssh", args)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -208,14 +204,9 @@ func (s *Scanner) executeAudit(ctx context.Context, host Host, remotePath string
 }
 
 func (s *Scanner) remoteExec(ctx context.Context, host Host, cmdParts ...string) error {
-	args := sshArgs(host, cmdParts...)
-	cmd := exec.CommandContext(ctx, "ssh", args...)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("%w: %s", err, stderr.String())
-	}
-	return nil
+	args := sshArgs(host, s.Password == "", cmdParts...)
+	_, err := s.runCmd(ctx, "ssh", args)
+	return err
 }
 
 func (s *Scanner) cleanup(ctx context.Context, host Host, remotePath string) {
@@ -226,11 +217,13 @@ func (s *Scanner) cleanup(ctx context.Context, host Host, remotePath string) {
 }
 
 // sshArgs builds the argument list for an ssh command.
-func sshArgs(host Host, extra ...string) []string {
+func sshArgs(host Host, batchMode bool, extra ...string) []string {
 	args := []string{
-		"-o", "BatchMode=yes",
 		"-o", "StrictHostKeyChecking=accept-new",
 		"-o", "ConnectTimeout=10",
+	}
+	if batchMode {
+		args = append(args, "-o", "BatchMode=yes")
 	}
 	if host.Port != 0 && host.Port != 22 {
 		args = append(args, "-p", strconv.Itoa(host.Port))
@@ -248,11 +241,13 @@ func sshArgs(host Host, extra ...string) []string {
 }
 
 // scpArgs builds the argument list for an scp command.
-func scpArgs(host Host, localPath, remotePath string) []string {
+func scpArgs(host Host, batchMode bool, localPath, remotePath string) []string {
 	args := []string{
-		"-o", "BatchMode=yes",
 		"-o", "StrictHostKeyChecking=accept-new",
 		"-o", "ConnectTimeout=10",
+	}
+	if batchMode {
+		args = append(args, "-o", "BatchMode=yes")
 	}
 	if host.Port != 0 && host.Port != 22 {
 		args = append(args, "-P", strconv.Itoa(host.Port))
@@ -266,6 +261,28 @@ func scpArgs(host Host, localPath, remotePath string) []string {
 	}
 	args = append(args, localPath, target+":"+remotePath)
 	return args
+}
+
+// buildCmd creates an exec.Cmd, wrapping with sshpass if password is set.
+func (s *Scanner) buildCmd(ctx context.Context, name string, args []string) *exec.Cmd {
+	if s.Password != "" {
+		sshpassArgs := append([]string{"-p", s.Password, name}, args...)
+		cmd := exec.CommandContext(ctx, "sshpass", sshpassArgs...)
+		return cmd
+	}
+	return exec.CommandContext(ctx, name, args...)
+}
+
+// runCmd executes a command, wrapping with sshpass if password is set.
+func (s *Scanner) runCmd(ctx context.Context, name string, args []string) ([]byte, error) {
+	cmd := s.buildCmd(ctx, name, args)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return nil, fmt.Errorf("%w: %s", err, strings.TrimSpace(stderr.String()))
+	}
+	return stdout.Bytes(), nil
 }
 
 // mapArch maps uname -m output to Go architecture names.
@@ -284,17 +301,6 @@ func remoteTmpPath() string {
 	b := make([]byte, 8)
 	_, _ = rand.Read(b)
 	return "/tmp/infraudit-scan-" + hex.EncodeToString(b)
-}
-
-func runSSH(ctx context.Context, args []string) ([]byte, error) {
-	cmd := exec.CommandContext(ctx, "ssh", args...)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("%w: %s", err, stderr.String())
-	}
-	return stdout.Bytes(), nil
 }
 
 func truncate(s string, max int) string {

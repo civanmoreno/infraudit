@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"time"
 
 	"github.com/civanmoreno/infraudit/internal/remote"
@@ -25,6 +26,7 @@ var (
 	scanProfile     string
 	scanSkip        string
 	scanKeepBinary  bool
+	scanPassword    string
 )
 
 var scanCmd = &cobra.Command{
@@ -60,6 +62,7 @@ func init() {
 	scanCmd.Flags().StringVar(&scanProfile, "profile", "", "Pass-through: server profile")
 	scanCmd.Flags().StringVar(&scanSkip, "skip", "", "Pass-through: checks to skip")
 	scanCmd.Flags().BoolVar(&scanKeepBinary, "keep-binary", false, "Don't remove binary from remote after scan")
+	scanCmd.Flags().StringVar(&scanPassword, "password", "", "SSH password (requires sshpass installed)")
 
 	rootCmd.AddCommand(scanCmd)
 }
@@ -97,6 +100,15 @@ func runScan(cmd *cobra.Command, _ []string) {
 		auditArgs = append(auditArgs, "--skip", scanSkip)
 	}
 
+	// Validate sshpass if password is used
+	if scanPassword != "" {
+		if _, err := exec.LookPath("sshpass"); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: --password requires sshpass installed.\n")
+			fmt.Fprintf(os.Stderr, "Install it: apt install sshpass (Debian/Ubuntu) or yum install sshpass (RHEL/CentOS)\n")
+			os.Exit(1)
+		}
+	}
+
 	// Create scanner
 	scanner := &remote.Scanner{
 		BinaryPath: scanBinary,
@@ -104,6 +116,7 @@ func runScan(cmd *cobra.Command, _ []string) {
 		AuditArgs:  auditArgs,
 		UseSudo:    scanSudo,
 		KeepBinary: scanKeepBinary,
+		Password:   scanPassword,
 	}
 
 	// Progress output
