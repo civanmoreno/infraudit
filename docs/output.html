@@ -279,6 +279,105 @@ sudo infraudit audit --format html --output /var/log/infraudit/audit-$(date +%F)
 <span class="comment"># Console report is still written to stdout when --output is used with console format</span>
 sudo infraudit audit --output /tmp/audit.txt</code></pre>
 
+        <h2>Comparing Reports (diff)</h2>
+        <p>Use <code>infraudit diff</code> to compare two JSON audit reports and see what changed. This is essential for tracking remediation progress and detecting regressions.</p>
+        <pre><code><span class="comment"># Run audit before remediation</span>
+sudo infraudit audit --format json --output before.json
+
+<span class="comment"># ... apply security fixes ...</span>
+
+<span class="comment"># Run audit after remediation</span>
+sudo infraudit audit --format json --output after.json
+
+<span class="comment"># Compare the two reports</span>
+infraudit diff before.json after.json</code></pre>
+        <h3>What the diff shows</h3>
+        <p>The diff output is organized into sections, ordered by priority:</p>
+        <table>
+            <thead><tr><th>Section</th><th>Meaning</th><th>Example</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span style="color:#f85149;font-weight:bold">Regressions</span></td>
+                    <td>Checks that got worse (e.g. PASS → FAIL, PASS → WARN)</td>
+                    <td>A firewall was disabled, a service was exposed</td>
+                </tr>
+                <tr>
+                    <td><span style="color:#3fb950;font-weight:bold">Improvements</span></td>
+                    <td>Checks that got better (e.g. FAIL → PASS, WARN → PASS)</td>
+                    <td>SSH root login was disabled, permissions were fixed</td>
+                </tr>
+                <tr>
+                    <td><span style="color:#58a6ff;font-weight:bold">New checks</span></td>
+                    <td>Checks present in the after report but not in before</td>
+                    <td>A new version of infraudit added checks</td>
+                </tr>
+                <tr>
+                    <td><span style="color:#8b949e;font-weight:bold">Removed checks</span></td>
+                    <td>Checks present in before but not in after</td>
+                    <td>Checks were skipped or a category was excluded</td>
+                </tr>
+            </tbody>
+        </table>
+        <p>The report also shows the <strong>Hardening Index delta</strong> — the score change between the two reports (e.g. <code>42 (F) → 78 (C) +36</code>).</p>
+
+        <h3>Example output</h3>
+        <pre><code>$ infraudit diff before.json after.json
+
+  <span style="font-weight:bold">infraudit diff</span> — Audit Comparison
+  <span style="color:#8b949e">────────────────────────────────────────────────────</span>
+
+  <span style="font-weight:bold">Hardening Index:</span> 42 (F) → 78 (C)  <span style="color:#3fb950;font-weight:bold">+36</span>
+
+  <span style="color:#f85149;font-weight:bold">Regressions (1)</span>
+  <span style="color:#8b949e">──────────────────────────────────────────────────────</span>
+  <span style="color:#f85149">↓</span> NET-001      HIGH     <span style="color:#3fb950;font-weight:bold">PASS</span> → <span style="color:#f85149;font-weight:bold">FAIL</span>
+
+  <span style="color:#3fb950;font-weight:bold">Improvements (3)</span>
+  <span style="color:#8b949e">──────────────────────────────────────────────────────</span>
+  <span style="color:#3fb950">↑</span> FS-001       HIGH     <span style="color:#d29922;font-weight:bold">WARN</span> → <span style="color:#3fb950;font-weight:bold">PASS</span>
+  <span style="color:#3fb950">↑</span> AUTH-001     CRITICAL <span style="color:#f85149;font-weight:bold">FAIL</span> → <span style="color:#3fb950;font-weight:bold">PASS</span>
+  <span style="color:#3fb950">↑</span> AUTH-002     HIGH     <span style="color:#f85149;font-weight:bold">FAIL</span> → <span style="color:#3fb950;font-weight:bold">PASS</span>
+
+  <span style="color:#58a6ff;font-weight:bold">New checks (1)</span>
+  <span style="color:#8b949e">──────────────────────────────────────────────────────</span>
+  <span style="color:#58a6ff">+</span> LOG-001      MEDIUM   - → <span style="color:#3fb950;font-weight:bold">PASS</span>
+
+  <span style="color:#8b949e">══════════════════════════════════════════════════════</span>
+  <span style="font-weight:bold">SUMMARY</span>  <span style="color:#3fb950">↑ 3 improved</span>  <span style="color:#f85149">↓ 1 regressed</span>  <span style="color:#58a6ff">+ 1 new</span>  <span style="color:#8b949e">· 0 unchanged</span>
+  <span style="color:#8b949e">══════════════════════════════════════════════════════</span></code></pre>
+
+        <h3>Exit codes for diff</h3>
+        <table>
+            <thead><tr><th>Code</th><th>Meaning</th><th>CI/CD Action</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><code>0</code></td>
+                    <td>No regressions — all changes are improvements or unchanged</td>
+                    <td>Proceed — security posture is stable or improved</td>
+                </tr>
+                <tr>
+                    <td><code>1</code></td>
+                    <td>Regressions detected — one or more checks got worse</td>
+                    <td>Block — investigate why checks regressed before deploying</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>CI/CD workflow with diff</h3>
+        <pre><code><span class="comment"># Store baseline report in your repo or artifact storage</span>
+infraudit audit --format json --output baseline.json
+
+<span class="comment"># In CI/CD pipeline: compare current state against baseline</span>
+infraudit audit --format json --output current.json
+infraudit diff baseline.json current.json
+if [ $? -ne 0 ]; then
+    echo "Security regression detected — blocking deployment"
+    exit 1
+fi
+
+<span class="comment"># If passed, update baseline for next run</span>
+cp current.json baseline.json</code></pre>
+
         <h2>Filtering &amp; Profiles</h2>
         <p>Control which checks run to focus on what matters:</p>
         <pre><code><span class="comment"># Run only one category</span>
