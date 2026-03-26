@@ -387,6 +387,17 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Unit tests for host parsing, SSH args, arch mapping, exit codes
 - [x] Tested against real SSH container: 132 checks, score 68/100
 
+### Phase 36: SARIF Output ✅
+
+- [x] `--format sarif` generates SARIF 2.1.0 compliant JSON output
+- [x] Integrates with GitHub Code Scanning, GitLab SAST, VS Code SARIF Viewer
+- [x] Maps severity to CVSS-like security-severity scores (CRITICAL=9.5, HIGH=7.5, MEDIUM=5.0, LOW=2.5)
+- [x] Maps status to SARIF levels (FAIL→error, WARN→warning)
+- [x] Includes rules (all checks), results (non-PASS only), fixes (remediation text)
+- [x] Category-specific file paths as locations (e.g. auth→etc/ssh/sshd_config)
+- [x] Tags include security, category, and severity
+- [x] Unit tests for WriteSARIF, severityToScore, statusToLevel, empty results
+
 ## Check Categories
 
 | Category | Prefix | Description |

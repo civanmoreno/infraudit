@@ -279,6 +279,73 @@ sudo infraudit audit --format html --output /var/log/infraudit/audit-$(date +%F)
 <span class="comment"># Console report is still written to stdout when --output is used with console format</span>
 sudo infraudit audit --output /tmp/audit.txt</code></pre>
 
+        <h2>SARIF Output (GitHub / GitLab Integration)</h2>
+        <p><a href="https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html">SARIF</a> (Static Analysis Results Interchange Format) is the standard format for security tools used by GitHub Code Scanning, GitLab SAST, and VS Code. Use <code>--format sarif</code> to generate it.</p>
+        <pre><code>$ sudo infraudit audit --format sarif --output results.sarif</code></pre>
+
+        <h3>GitHub Actions integration</h3>
+        <p>Add this to your workflow to see infraudit findings in GitHub's Security tab automatically:</p>
+        <pre><code><span class="comment"># .github/workflows/security-audit.yml</span>
+name: Security Audit
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  push:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install infraudit
+        run: curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh
+
+      <span class="comment"># Option A: audit this runner directly</span>
+      - name: Run audit
+        run: sudo infraudit audit --format sarif --output results.sarif
+
+      <span class="comment"># Option B: audit a remote server via SSH</span>
+      <span class="comment"># - name: Run remote audit</span>
+      <span class="comment">#   run: |</span>
+      <span class="comment">#     ssh user@server "curl -sL .../install.sh | sh && sudo infraudit audit --format sarif" > results.sarif</span>
+
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif</code></pre>
+
+        <h3>What happens in GitHub</h3>
+        <ul class="check-list">
+            <li>Findings appear in <strong>Security &rarr; Code scanning alerts</strong></li>
+            <li>Each finding can be assigned, triaged, or dismissed with a reason</li>
+            <li>Findings auto-close when the next scan no longer detects them</li>
+            <li>GitHub sends notifications when new findings appear</li>
+            <li>PRs can be blocked if there are open security alerts</li>
+        </ul>
+
+        <h3>Severity mapping</h3>
+        <table>
+            <thead><tr><th>infraudit</th><th>SARIF security-severity</th><th>GitHub display</th></tr></thead>
+            <tbody>
+                <tr><td><span class="badge critical">CRITICAL</span></td><td>9.5</td><td>Critical</td></tr>
+                <tr><td><span class="badge high">HIGH</span></td><td>7.5</td><td>High</td></tr>
+                <tr><td><span class="badge medium">MEDIUM</span></td><td>5.0</td><td>Medium</td></tr>
+                <tr><td><span class="badge low">LOW</span></td><td>2.5</td><td>Low</td></tr>
+                <tr><td><span class="badge info">INFO</span></td><td>0.0</td><td>Note</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Other uses</h3>
+        <ul class="check-list">
+            <li><strong>GitLab:</strong> Upload as a <a href="https://docs.gitlab.com/ee/ci/yaml/artifacts_reports.html#artifactsreportssast">SAST artifact</a> in your <code>.gitlab-ci.yml</code></li>
+            <li><strong>VS Code:</strong> Open <code>.sarif</code> files directly with the <a href="https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer">SARIF Viewer</a> extension</li>
+            <li><strong>Azure DevOps:</strong> Supports SARIF natively in its security dashboard</li>
+        </ul>
+
         <h2>Comparing Reports (diff)</h2>
         <p>Use <code>infraudit diff</code> to compare two JSON audit reports and see what changed. This is essential for tracking remediation progress and detecting regressions.</p>
         <pre><code><span class="comment"># Run audit before remediation</span>

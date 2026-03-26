@@ -255,6 +255,8 @@ func runAudit(cmd *cobra.Command, args []string) {
 		writeErr = report.WriteHTML(w, rpt)
 	case "markdown", "md":
 		writeErr = report.WriteMarkdown(w, rpt)
+	case "sarif":
+		writeErr = report.WriteSARIF(w, rpt)
 	default:
 		report.WriteConsole(w, rpt)
 	}
