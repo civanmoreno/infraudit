@@ -532,6 +532,86 @@ infraudit scan --hosts servers.txt --format json --output fleet-report.json</cod
             </tbody>
         </table>
 
+        <h2>CIS Compliance Report</h2>
+        <p>Generate a formal CIS Benchmark compliance report from your audit results. Shows compliance percentage per CIS section and lists all gaps that need remediation.</p>
+
+        <h3>Usage</h3>
+        <pre><code><span class="comment"># Run audit and save JSON report</span>
+sudo infraudit audit --format json --output report.json
+
+<span class="comment"># Generate CIS Level 1 compliance report (default)</span>
+infraudit compliance report.json
+
+<span class="comment"># Generate CIS Level 2 compliance report</span>
+infraudit compliance report.json --level 2
+
+<span class="comment"># JSON output for automation</span>
+infraudit compliance report.json --format json</code></pre>
+
+        <h3>Example output</h3>
+        <pre><code>  <span style="color:#58a6ff;font-weight:bold">CIS Benchmark Level 1 — Compliance Report</span>
+  <span style="color:#8b949e">───────────────────────────────────────────────────────</span>
+
+  <span style="font-weight:bold">Overall:</span> <span style="color:#3fb950;font-weight:bold">78% compliant</span> (117/150 controls passed)
+
+  <span style="font-weight:bold">Section</span>                                Pass  Total     %
+  <span style="color:#8b949e">───────────────────────────────────────────────────────</span>
+  1. Initial Setup                          28     35   <span style="color:#3fb950;font-weight:bold">80%</span>
+  2. Services                               22     26   <span style="color:#3fb950;font-weight:bold">84%</span>
+  3. Network Configuration                  24     30   <span style="color:#3fb950;font-weight:bold">80%</span>
+  4. Logging and Auditing                    4      6   <span style="color:#d29922">66%</span>
+  5. Access, Authentication and Auth.       25     32   <span style="color:#d29922">78%</span>
+  6. System Maintenance                     14     21   <span style="color:#d29922">66%</span>
+
+  <span style="color:#f85149;font-weight:bold">Gaps (33)</span>
+  <span style="color:#8b949e">───────────────────────────────────────────────────────</span>
+  <span style="color:#f85149">FAIL</span>    AUTH-001   5.2.1 — Ensure SSH root login is disabled
+  <span style="color:#f85149">FAIL</span>    NET-001    3.5.1 — Ensure a firewall is active
+  <span style="color:#d29922">WARN</span>    PAM-001    5.4.1 — Ensure password creation requirements
+  ...</code></pre>
+
+        <h3>CIS Levels</h3>
+        <table>
+            <thead><tr><th>Level</th><th>Description</th><th>Controls</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Level 1</strong></td>
+                    <td>Essential security settings that can be applied on most systems with minimal impact on functionality. Recommended as the minimum baseline.</td>
+                    <td>~150 controls</td>
+                </tr>
+                <tr>
+                    <td><strong>Level 2</strong></td>
+                    <td>Advanced security settings for high-security environments. May reduce functionality or require additional planning. Includes all Level 1 controls.</td>
+                    <td>~170 controls</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>CIS Sections</h3>
+        <table>
+            <thead><tr><th>#</th><th>Section</th><th>What it covers</th></tr></thead>
+            <tbody>
+                <tr><td>1</td><td>Initial Setup</td><td>Filesystem, boot, MAC, banners, crypto policy, patches</td></tr>
+                <tr><td>2</td><td>Services</td><td>Unwanted services, NTP, MTA, NFS, Samba</td></tr>
+                <tr><td>3</td><td>Network Configuration</td><td>Sysctl params, firewall, SNMP, DNS, IPv6</td></tr>
+                <tr><td>4</td><td>Logging and Auditing</td><td>auditd rules, journald, rsyslog, logrotate</td></tr>
+                <tr><td>5</td><td>Access, Auth and Authorization</td><td>SSH, PAM, sudo, cron, user accounts, passwords</td></tr>
+                <tr><td>6</td><td>System Maintenance</td><td>File permissions, user/group integrity, duplicates</td></tr>
+            </tbody>
+        </table>
+
+        <h3>CI/CD integration</h3>
+        <pre><code><span class="comment"># Generate audit + check compliance in CI</span>
+sudo infraudit audit --format json --output report.json
+infraudit compliance report.json --format json > compliance.json
+
+<span class="comment"># Fail pipeline if compliance is below threshold</span>
+COMPLIANCE=$(cat compliance.json | jq '.overall_percentage')
+if [ "$COMPLIANCE" -lt 80 ]; then
+    echo "CIS compliance $COMPLIANCE% is below 80% threshold"
+    exit 1
+fi</code></pre>
+
         <h2>Policy-as-Code</h2>
         <p>Define compliance requirements in a JSON policy file and enforce them automatically. Use <code>--enforce-policy</code> to validate audit results against your policy.</p>
 
