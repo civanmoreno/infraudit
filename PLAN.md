@@ -382,7 +382,10 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Fleet summary table with per-host scores, grades, and failure counts
 - [x] JSON output with multi-host aggregation
 - [x] Exit codes: 0 (pass), 1 (warn), 2 (fail), 3 (operational error)
+- [x] Password authentication support via `--password` flag (uses `sshpass`)
+- [x] BatchMode=yes only when using key auth, disabled for password auth
 - [x] Unit tests for host parsing, SSH args, arch mapping, exit codes
+- [x] Tested against real SSH container: 132 checks, score 68/100
 
 ## Check Categories
 

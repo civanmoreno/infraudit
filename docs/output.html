@@ -391,6 +391,9 @@ infraudit scan --host deploy@server.com:2222 --sudo
 <span class="comment"># With specific SSH key</span>
 infraudit scan --host ubuntu@server.com --identity ~/.ssh/prod_key
 
+<span class="comment"># With password authentication (requires sshpass)</span>
+infraudit scan --host root@server.com --password mypassword
+
 <span class="comment"># Filter checks on the remote</span>
 infraudit scan --host root@server.com --category auth,network --profile web-server</code></pre>
 
@@ -415,10 +418,28 @@ infraudit scan --hosts servers.txt --format json --output fleet-report.json</cod
             <li>Removes the binary from the remote (unless <code>--keep-binary</code>)</li>
         </ol>
 
+        <h3>Authentication</h3>
+        <p>Two authentication methods are supported:</p>
+        <table>
+            <thead><tr><th>Method</th><th>Usage</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>SSH Key</strong> (recommended)</td>
+                    <td><code>infraudit scan --host root@server</code></td>
+                    <td>Uses your SSH agent and <code>~/.ssh/config</code> automatically. BatchMode=yes prevents password prompts.</td>
+                </tr>
+                <tr>
+                    <td><strong>Password</strong></td>
+                    <td><code>infraudit scan --host root@server --password pass</code></td>
+                    <td>Requires <code>sshpass</code> installed locally. Install: <code>apt install sshpass</code></td>
+                </tr>
+            </tbody>
+        </table>
+
         <h3>Requirements</h3>
         <ul class="check-list">
-            <li><strong>SSH key authentication</strong> — password prompts are disabled (BatchMode=yes) for automation safety</li>
             <li><strong>ssh and scp on PATH</strong> — uses your system SSH, inheriting agent, config, and ProxyJump settings</li>
+            <li><strong>sshpass on PATH</strong> (only if using <code>--password</code>) — install with your package manager</li>
             <li><strong>Remote: Linux with /tmp writable</strong> — the binary is placed in /tmp temporarily</li>
         </ul>
 
