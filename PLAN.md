@@ -362,6 +362,15 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Shell completion for `--category`, `--profile`, `--format`, `--severity-min`, `--status` flags
 - [x] Completions show check names as descriptions (e.g., `AUTH-001\tSSH root login disabled`)
 
+### Phase 34: Diff Command ✅
+
+- [x] `infraudit diff <before.json> <after.json>` — compare two audit reports
+- [x] Detects improvements (FAIL→PASS, WARN→PASS), regressions (PASS→FAIL), new and removed checks
+- [x] Hardening Index delta with color-coded score change (+/-) and grade comparison
+- [x] Sections: Regressions, Improvements, New checks, Removed checks, Summary
+- [x] Exit code 1 if any regressions detected (useful for CI/CD gates)
+- [x] Sorted output: regressions first (highest priority), then improvements
+
 ## Check Categories
 
 | Category | Prefix | Description |
