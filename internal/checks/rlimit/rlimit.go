@@ -182,8 +182,9 @@ func (c *varDisk) Run() check.Result {
 	}
 	if len(high) > 0 {
 		return check.Result{
-			Status:  check.Warn,
-			Message: "High disk usage: " + strings.Join(high, ", "),
+			Status:      check.Warn,
+			Message:     "High disk usage: " + strings.Join(high, ", "),
+			Remediation: "Free disk space or expand the partition",
 		}
 	}
 	return check.Result{Status: check.Pass, Message: "Key directories have sufficient disk space"}
@@ -201,7 +202,7 @@ func (c *inodeUsage) Description() string      { return "Verify inode usage is b
 func (c *inodeUsage) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "df", "-i", "--output=ipcent,target")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot check inode usage"}
+		return check.Result{Status: check.Error, Message: "Cannot check inode usage", Remediation: "Run infraudit with sudo or verify df command is available"}
 	}
 
 	var high []string

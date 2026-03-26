@@ -103,7 +103,7 @@ func (c *auditImmutable) Description() string {
 func (c *auditImmutable) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "auditctl", "-l")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot read audit rules"}
+		return check.Result{Status: check.Error, Message: "Cannot read audit rules", Remediation: "Install auditd and run with sudo"}
 	}
 	if strings.Contains(string(out), "-e 2") {
 		return check.Result{Status: check.Pass, Message: "Audit configuration is immutable (-e 2)"}
@@ -125,7 +125,7 @@ func (c *auditBacklog) Description() string {
 func (c *auditBacklog) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "auditctl", "-s")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query audit status"}
+		return check.Result{Status: check.Error, Message: "Cannot query audit status", Remediation: "Install auditd and run with sudo"}
 	}
 	if strings.Contains(string(out), "backlog_limit") {
 		return check.Result{Status: check.Pass, Message: "Audit backlog limit is configured"}
@@ -154,7 +154,7 @@ func (c *auditLoginUID) Run() check.Result {
 	if strings.Contains(string(out), "--loginuid-immutable") {
 		return check.Result{Status: check.Pass, Message: "loginuid immutability set via audit rules"}
 	}
-	return check.Result{Status: check.Warn, Message: "audit loginuid is not set to immutable"}
+	return check.Result{Status: check.Warn, Message: "audit loginuid is not set to immutable", Remediation: "Add '--loginuid-immutable' to audit rules"}
 }
 
 // LOG-034: /var/log permissions

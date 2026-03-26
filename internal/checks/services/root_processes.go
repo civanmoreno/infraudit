@@ -100,8 +100,9 @@ func (c *rootProcesses) Run() check.Result {
 			}
 		}
 		return check.Result{
-			Status:  check.Warn,
-			Message: fmt.Sprintf("Processes running as root (review recommended): %s", strings.Join(unique, ", ")),
+			Status:      check.Warn,
+			Message:     fmt.Sprintf("Processes running as root (review recommended): %s", strings.Join(unique, ", ")),
+			Remediation: "Review root processes and run non-essential services as dedicated users",
 		}
 	}
 

@@ -100,7 +100,7 @@ func (c *pamDenyRoot) Run() check.Result {
 	if strings.Contains(string(data), "pam_securetty") {
 		return check.Result{Status: check.Pass, Message: "pam_securetty is configured in /etc/pam.d/login"}
 	}
-	return check.Result{Status: check.Warn, Message: "pam_securetty not found in /etc/pam.d/login"}
+	return check.Result{Status: check.Warn, Message: "pam_securetty not found in /etc/pam.d/login", Remediation: "Add 'auth required pam_securetty.so' to /etc/pam.d/login"}
 }
 
 // PAM-009 to PAM-012: login.defs settings

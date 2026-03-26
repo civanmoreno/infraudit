@@ -152,8 +152,9 @@ func (c *varTmpMount) Run() check.Result {
 	m := findMount(mounts, "/var/tmp")
 	if m == nil {
 		return check.Result{
-			Status:  check.Warn,
-			Message: "/var/tmp is not a separate partition",
+			Status:      check.Warn,
+			Message:     "/var/tmp is not a separate partition",
+			Remediation: "Create a separate partition for /var/tmp with nodev,nosuid,noexec options",
 		}
 	}
 

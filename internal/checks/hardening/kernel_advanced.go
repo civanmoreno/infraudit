@@ -25,7 +25,7 @@ func (c *kernelParam) Description() string      { return c.desc }
 func (c *kernelParam) Run() check.Result {
 	val := check.ReadSysctl(c.path)
 	if val == "" {
-		return check.Result{Status: check.Error, Message: fmt.Sprintf("Cannot read %s", c.path)}
+		return check.Result{Status: check.Error, Message: fmt.Sprintf("Cannot read %s", c.path), Remediation: "This sysctl may not be available on your kernel version, or run with sudo"}
 	}
 	if val != c.expected {
 		return check.Result{

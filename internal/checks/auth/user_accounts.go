@@ -109,7 +109,7 @@ func (c *legacyEntry) Description() string      { return "Ensure no legacy + ent
 func (c *legacyEntry) Run() check.Result {
 	data, err := os.ReadFile(c.file)
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot read " + c.file}
+		return check.Result{Status: check.Error, Message: "Cannot read " + c.file, Remediation: "Run infraudit with sudo for full results"}
 	}
 	for _, line := range strings.Split(string(data), "\n") {
 		if strings.HasPrefix(line, "+") {

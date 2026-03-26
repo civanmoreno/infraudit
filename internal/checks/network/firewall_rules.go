@@ -31,7 +31,7 @@ func (c *fwDefaultDeny) Description() string {
 func (c *fwDefaultDeny) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "iptables", "-L", "-n")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query iptables rules"}
+		return check.Result{Status: check.Error, Message: "Cannot query iptables rules", Remediation: "Run with sudo or install iptables: apt install iptables"}
 	}
 	rules := string(out)
 	if strings.Contains(rules, "policy DROP") || strings.Contains(rules, "policy REJECT") {
@@ -59,7 +59,7 @@ func (c *fwLoopback) Description() string {
 func (c *fwLoopback) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "iptables", "-L", "INPUT", "-n", "-v")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query iptables"}
+		return check.Result{Status: check.Error, Message: "Cannot query iptables", Remediation: "Run with sudo or install iptables"}
 	}
 	if strings.Contains(string(out), "lo") && strings.Contains(string(out), "ACCEPT") {
 		return check.Result{Status: check.Pass, Message: "Loopback traffic is allowed in firewall"}
@@ -79,12 +79,12 @@ func (c *fwOutbound) Description() string      { return "Ensure outbound firewal
 func (c *fwOutbound) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "iptables", "-L", "OUTPUT", "-n", "-v")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query iptables"}
+		return check.Result{Status: check.Error, Message: "Cannot query iptables", Remediation: "Run with sudo or install iptables"}
 	}
 	if len(string(out)) > 100 {
 		return check.Result{Status: check.Pass, Message: "Outbound firewall rules are configured"}
 	}
-	return check.Result{Status: check.Warn, Message: "No outbound firewall rules configured"}
+	return check.Result{Status: check.Warn, Message: "No outbound firewall rules configured", Remediation: "Configure outbound firewall rules with iptables or nftables"}
 }
 
 // NET-035: Firewall established connections
@@ -101,7 +101,7 @@ func (c *fwEstablished) Description() string {
 func (c *fwEstablished) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "iptables", "-L", "-n")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query iptables"}
+		return check.Result{Status: check.Error, Message: "Cannot query iptables", Remediation: "Run with sudo or install iptables"}
 	}
 	if strings.Contains(string(out), "ESTABLISHED") || strings.Contains(string(out), "RELATED") {
 		return check.Result{Status: check.Pass, Message: "Established/related connections are allowed"}
@@ -123,13 +123,13 @@ func (c *fwOpenPorts) Description() string {
 func (c *fwOpenPorts) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "iptables", "-L", "INPUT", "-n")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query iptables"}
+		return check.Result{Status: check.Error, Message: "Cannot query iptables", Remediation: "Run with sudo or install iptables"}
 	}
 	rules := string(out)
 	if strings.Contains(rules, "dpt:") || strings.Contains(rules, "ACCEPT") {
 		return check.Result{Status: check.Pass, Message: "Firewall has port-specific rules"}
 	}
-	return check.Result{Status: check.Warn, Message: "No port-specific firewall rules found"}
+	return check.Result{Status: check.Warn, Message: "No port-specific firewall rules found", Remediation: "Add port-specific firewall rules: iptables -A INPUT -p tcp --dport 22 -j ACCEPT"}
 }
 
 // NET-037: IPv6 default deny
@@ -150,7 +150,7 @@ func (c *ip6DefaultDeny) Run() check.Result {
 	}
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "ip6tables", "-L", "-n")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query ip6tables"}
+		return check.Result{Status: check.Error, Message: "Cannot query ip6tables", Remediation: "Run with sudo or install iptables"}
 	}
 	if strings.Contains(string(out), "policy DROP") || strings.Contains(string(out), "policy REJECT") {
 		return check.Result{Status: check.Pass, Message: "ip6tables default policy is DROP/REJECT"}
@@ -173,12 +173,12 @@ func (c *ip6Loopback) Run() check.Result {
 	}
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "ip6tables", "-L", "INPUT", "-n", "-v")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query ip6tables"}
+		return check.Result{Status: check.Error, Message: "Cannot query ip6tables", Remediation: "Run with sudo or install iptables"}
 	}
 	if strings.Contains(string(out), "lo") {
 		return check.Result{Status: check.Pass, Message: "IPv6 loopback traffic is configured"}
 	}
-	return check.Result{Status: check.Warn, Message: "IPv6 loopback traffic rule not found"}
+	return check.Result{Status: check.Warn, Message: "IPv6 loopback traffic rule not found", Remediation: "ip6tables -A INPUT -i lo -j ACCEPT && ip6tables -A OUTPUT -o lo -j ACCEPT"}
 }
 
 // NET-039: IPv6 established
@@ -198,10 +198,10 @@ func (c *ip6Established) Run() check.Result {
 	}
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "ip6tables", "-L", "-n")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot query ip6tables"}
+		return check.Result{Status: check.Error, Message: "Cannot query ip6tables", Remediation: "Run with sudo or install iptables"}
 	}
 	if strings.Contains(string(out), "ESTABLISHED") {
 		return check.Result{Status: check.Pass, Message: "IPv6 established connections allowed"}
 	}
-	return check.Result{Status: check.Warn, Message: "No IPv6 ESTABLISHED rule found"}
+	return check.Result{Status: check.Warn, Message: "No IPv6 ESTABLISHED rule found", Remediation: "ip6tables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT"}
 }

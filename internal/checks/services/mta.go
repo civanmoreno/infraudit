@@ -99,8 +99,9 @@ func (c *mtaRootAlias) Run() check.Result {
 	f, err := os.Open("/etc/aliases")
 	if err != nil {
 		return check.Result{
-			Status:  check.Warn,
-			Message: "Could not read /etc/aliases",
+			Status:      check.Warn,
+			Message:     "Could not read /etc/aliases",
+			Remediation: "Create /etc/aliases with 'root: admin@example.com' and run newaliases",
 		}
 	}
 	defer f.Close()

@@ -55,8 +55,9 @@ func (c *dnssec) Run() check.Result {
 	}
 
 	return check.Result{
-		Status:  check.Warn,
-		Message: "Could not determine DNSSEC validation status",
+		Status:      check.Warn,
+		Message:     "Could not determine DNSSEC validation status",
+		Remediation: "Enable DNSSEC: set DNSSEC=yes in /etc/systemd/resolved.conf",
 	}
 }
 

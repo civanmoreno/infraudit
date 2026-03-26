@@ -25,8 +25,9 @@ func (c *emptyPassword) Run() check.Result {
 	entries, err := check.ParseShadow()
 	if err != nil {
 		return check.Result{
-			Status:  check.Error,
-			Message: "Could not read /etc/shadow: " + err.Error(),
+			Status:      check.Error,
+			Message:     "Could not read /etc/shadow: " + err.Error(),
+			Remediation: "Run infraudit with sudo for full results",
 		}
 	}
 

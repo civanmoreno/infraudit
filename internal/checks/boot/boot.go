@@ -129,7 +129,7 @@ func (c *singleUserAuth) Description() string {
 func (c *singleUserAuth) Run() check.Result {
 	entries, err := check.ParseShadow()
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot read /etc/shadow: " + err.Error()}
+		return check.Result{Status: check.Error, Message: "Cannot read /etc/shadow: " + err.Error(), Remediation: "Run infraudit with sudo for full results"}
 	}
 	for _, e := range entries {
 		if e.User == "root" {
@@ -218,7 +218,7 @@ func (c *macEnforcing) Run() check.Result {
 		}
 	}
 
-	return check.Result{Status: check.Warn, Message: "Could not determine MAC enforcement status"}
+	return check.Result{Status: check.Warn, Message: "Could not determine MAC enforcement status", Remediation: "Install and configure SELinux or AppArmor: apt install apparmor apparmor-utils"}
 }
 
 // BOOT-007

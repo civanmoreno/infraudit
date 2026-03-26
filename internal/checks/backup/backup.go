@@ -94,8 +94,9 @@ func (c *backupEncrypted) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "Restic encrypts backups by default"}
 	}
 	return check.Result{
-		Status:  check.Warn,
-		Message: "Cannot verify backup encryption — ensure your backup solution encrypts data",
+		Status:      check.Warn,
+		Message:     "Cannot verify backup encryption — ensure your backup solution encrypts data",
+		Remediation: "Configure encrypted backups: restic encrypts by default; for borg use 'borg init --encryption=repokey'",
 	}
 }
 

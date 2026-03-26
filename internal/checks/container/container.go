@@ -296,7 +296,7 @@ func (c *iccDisabled) Run() check.Result {
 
 	data, err := os.ReadFile("/etc/docker/daemon.json")
 	if err != nil {
-		return check.Result{Status: check.Warn, Message: "No daemon.json to check ICC setting"}
+		return check.Result{Status: check.Warn, Message: "No daemon.json to check ICC setting", Remediation: "Create /etc/docker/daemon.json with {\"icc\": false}"}
 	}
 
 	var conf map[string]interface{}
