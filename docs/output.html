@@ -378,6 +378,93 @@ fi
 <span class="comment"># If passed, update baseline for next run</span>
 cp current.json baseline.json</code></pre>
 
+        <h2>Remote Scanning (SSH)</h2>
+        <p>Use <code>infraudit scan</code> to audit remote servers without installing anything on them. The binary is copied via SCP, executed via SSH, and cleaned up automatically.</p>
+
+        <h3>Single host</h3>
+        <pre><code><span class="comment"># Audit a remote server</span>
+infraudit scan --host root@192.168.1.10
+
+<span class="comment"># With custom SSH port and sudo</span>
+infraudit scan --host deploy@server.com:2222 --sudo
+
+<span class="comment"># With specific SSH key</span>
+infraudit scan --host ubuntu@server.com --identity ~/.ssh/prod_key
+
+<span class="comment"># With password authentication (requires sshpass)</span>
+infraudit scan --host root@server.com --password mypassword
+
+<span class="comment"># Filter checks on the remote</span>
+infraudit scan --host root@server.com --category auth,network --profile web-server</code></pre>
+
+        <h3>Multiple hosts</h3>
+        <p>Create a hosts file (one per line, <code>#</code> for comments):</p>
+        <pre><code># servers.txt
+root@web1.example.com
+root@web2.example.com:2222
+deploy@db1.example.com</code></pre>
+        <pre><code><span class="comment"># Scan all hosts, 5 concurrent</span>
+infraudit scan --hosts servers.txt --concurrency 5
+
+<span class="comment"># JSON output for all hosts</span>
+infraudit scan --hosts servers.txt --format json --output fleet-report.json</code></pre>
+
+        <h3>How it works</h3>
+        <ol>
+            <li>Detects remote architecture via <code>ssh host uname -m</code></li>
+            <li>Copies the matching infraudit binary to <code>/tmp</code> via SCP</li>
+            <li>Executes <code>infraudit audit --format json</code> on the remote</li>
+            <li>Collects JSON output and renders locally</li>
+            <li>Removes the binary from the remote (unless <code>--keep-binary</code>)</li>
+        </ol>
+
+        <h3>Authentication</h3>
+        <p>Two authentication methods are supported:</p>
+        <table>
+            <thead><tr><th>Method</th><th>Usage</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>SSH Key</strong> (recommended)</td>
+                    <td><code>infraudit scan --host root@server</code></td>
+                    <td>Uses your SSH agent and <code>~/.ssh/config</code> automatically. BatchMode=yes prevents password prompts.</td>
+                </tr>
+                <tr>
+                    <td><strong>Password</strong></td>
+                    <td><code>infraudit scan --host root@server --password pass</code></td>
+                    <td>Requires <code>sshpass</code> installed locally. Install: <code>apt install sshpass</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Requirements</h3>
+        <ul class="check-list">
+            <li><strong>ssh and scp on PATH</strong> — uses your system SSH, inheriting agent, config, and ProxyJump settings</li>
+            <li><strong>sshpass on PATH</strong> (only if using <code>--password</code>) — install with your package manager</li>
+            <li><strong>Remote: Linux with /tmp writable</strong> — the binary is placed in /tmp temporarily</li>
+        </ul>
+
+        <h3>Fleet summary</h3>
+        <p>Multi-host scans show a fleet summary table after individual reports:</p>
+        <pre><code>  FLEET SUMMARY
+  ────────────────────────────────────────────────────────────
+  Host                          Score  Grade  Failures  Warnings
+  ────────────────────────────────────────────────────────────
+  root@web1.example.com            72      C         8         12
+  root@web2.example.com            85      B         3          7
+  deploy@db1.example.com          ERR      -    connection refused
+  ════════════════════════════════════════════════════════════</code></pre>
+
+        <h3>Exit codes for scan</h3>
+        <table>
+            <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+            <tbody>
+                <tr><td><code>0</code></td><td>All hosts passed (no failures or warnings)</td></tr>
+                <tr><td><code>1</code></td><td>Warnings found on at least one host</td></tr>
+                <tr><td><code>2</code></td><td>Failures found on at least one host</td></tr>
+                <tr><td><code>3</code></td><td>Operational error (SSH connection failed, timeout)</td></tr>
+            </tbody>
+        </table>
+
         <h2>Filtering &amp; Profiles</h2>
         <p>Control which checks run to focus on what matters:</p>
         <pre><code><span class="comment"># Run only one category</span>
