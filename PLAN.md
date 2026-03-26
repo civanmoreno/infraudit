@@ -345,6 +345,15 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] "Why it matters" explanations for high-impact checks (AUTH, NET, FS, LOG, BOOT, CRYPTO, CTR, HARD)
 - [x] Severity breakdown in console summary — shows count of findings by severity (critical, high, medium, low)
 
+### Phase 33: Enhanced Explain — Remediation Guidance ✅
+
+- [x] Copy-paste ready remediation commands for 50+ checks (syntax-highlighted in cyan)
+- [x] Verification commands to confirm each fix was applied correctly (highlighted in green)
+- [x] Remediation risk level (LOW/MEDIUM/HIGH) with color coding and context
+- [x] Expanded "Why it matters" coverage from 14 to 60+ checks across all categories
+- [x] Remediation info shown by default (no longer requires `--run` flag)
+- [x] Comments in remediation steps shown in dim for readability
+
 ### Phase 32: Top Command, Markdown Output & Shell Completion ✅
 
 - [x] `infraudit top` — shows the N most critical findings sorted by severity (`-n` flag, default 10)
