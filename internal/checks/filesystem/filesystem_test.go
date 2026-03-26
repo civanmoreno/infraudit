@@ -30,6 +30,10 @@ func writeFile(t *testing.T, root, path, content string, mode os.FileMode) {
 	if err := os.WriteFile(full, []byte(content), mode); err != nil {
 		t.Fatal(err)
 	}
+	// WriteFile is subject to umask; chmod explicitly to ensure exact permissions.
+	if err := os.Chmod(full, mode); err != nil {
+		t.Fatal(err)
+	}
 }
 
 // mkDir creates a directory under the FSRoot-prefixed path with the given mode.
