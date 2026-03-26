@@ -62,11 +62,10 @@ func TestWriteSARIF(t *testing.T) {
 	if run.Results[0].Level != "error" {
 		t.Errorf("result[0].level = %q, want error", run.Results[0].Level)
 	}
-	if len(run.Results[0].Fixes) != 1 {
-		t.Fatalf("result[0].fixes = %d, want 1", len(run.Results[0].Fixes))
-	}
-	if run.Results[0].Fixes[0].Description.Text != "Set PermitRootLogin no" {
-		t.Errorf("fix text = %q", run.Results[0].Fixes[0].Description.Text)
+	// Message should include remediation
+	wantMsg := "Root login enabled. Remediation: Set PermitRootLogin no"
+	if run.Results[0].Message.Text != wantMsg {
+		t.Errorf("result[0].message = %q, want %q", run.Results[0].Message.Text, wantMsg)
 	}
 
 	// NET-001 should be "warning" level
