@@ -422,6 +422,18 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] 13 unit tests covering all policy rules, edge cases, load/parse errors
 - [x] Tested with real audit output
 
+### Phase 39: CIS Compliance Report ✅
+
+- [x] `infraudit compliance report.json` — generates CIS Benchmark compliance report
+- [x] 90 CIS controls mapped (80 Level 1 + 10 Level 2) across all 6 CIS sections
+- [x] Compliance percentage per section (Initial Setup, Services, Network, Logging, Access, Maintenance)
+- [x] Overall compliance percentage with pass/total counts
+- [x] Gaps list with check ID, CIS section, name, and status (FAIL/WARN/ERROR/NOT RUN)
+- [x] `--level 1|2` flag for CIS Level 1 or Level 2
+- [x] `--format json` for machine-readable output
+- [x] 7 unit tests for CIS controls: levels, lookup, duplicates, field validation, category coverage
+- [x] `internal/compliance/` package with typed CIS control mappings
+
 ## Check Categories
 
 | Category | Prefix | Description |
