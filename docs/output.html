@@ -532,6 +532,57 @@ infraudit scan --hosts servers.txt --format json --output fleet-report.json</cod
             </tbody>
         </table>
 
+        <h2>Policy-as-Code</h2>
+        <p>Define compliance requirements in a JSON policy file and enforce them automatically. Use <code>--enforce-policy</code> to validate audit results against your policy.</p>
+
+        <h3>Policy file format</h3>
+        <pre><code><span class="comment"># .infraudit-policy.json</span>
+{
+  "min_score": 80,
+  "max_critical": 0,
+  "max_high": 3,
+  "required_pass": ["AUTH-001", "AUTH-002", "NET-001", "BOOT-005"],
+  "ignore": ["HARD-009", "MAL-003"]
+}</code></pre>
+
+        <table>
+            <thead><tr><th>Field</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>min_score</code></td><td>Minimum Hardening Index score (0-100). Fails if score is below this.</td></tr>
+                <tr><td><code>max_critical</code></td><td>Maximum allowed critical FAIL findings. Set to 0 for zero tolerance.</td></tr>
+                <tr><td><code>max_high</code></td><td>Maximum allowed high FAIL findings.</td></tr>
+                <tr><td><code>required_pass</code></td><td>Check IDs that must PASS. Fails if any of these are not PASS.</td></tr>
+                <tr><td><code>ignore</code></td><td>Check IDs to exclude from policy evaluation (accepted risks).</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Usage</h3>
+        <pre><code><span class="comment"># Enforce with explicit policy file</span>
+sudo infraudit audit --enforce-policy .infraudit-policy.json
+
+<span class="comment"># Auto-detect policy file (searches ./, ~/, /etc/infraudit/)</span>
+sudo infraudit audit --enforce-policy ""
+
+<span class="comment"># Combine with other flags</span>
+sudo infraudit audit --profile web-server --enforce-policy policy.json --format json</code></pre>
+
+        <h3>Policy violation output</h3>
+        <pre><code>  <span style="color:#f85149;font-weight:bold">POLICY VIOLATION</span> (.infraudit-policy.json)
+  <span style="color:#8b949e">──────────────────────────────────────────────────</span>
+  min_score        Score 65 is below minimum 80
+  max_critical     2 critical findings (maximum: 0)
+  required_pass    AUTH-001: FAIL (required: PASS)
+  required_pass    NET-001: WARN (required: PASS)
+  <span style="color:#8b949e">──────────────────────────────────────────────────</span></code></pre>
+
+        <h3>CI/CD integration</h3>
+        <pre><code><span class="comment"># In your CI/CD pipeline</span>
+sudo infraudit audit --enforce-policy .infraudit-policy.json --format json --output report.json
+if [ $? -ne 0 ]; then
+    echo "Policy violation — deployment blocked"
+    exit 1
+fi</code></pre>
+
         <h2>Filtering &amp; Profiles</h2>
         <p>Control which checks run to focus on what matters:</p>
         <pre><code><span class="comment"># Run only one category</span>

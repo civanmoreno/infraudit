@@ -11,6 +11,7 @@ import (
 
 	"github.com/civanmoreno/infraudit/internal/check"
 	"github.com/civanmoreno/infraudit/internal/config"
+	"github.com/civanmoreno/infraudit/internal/policy"
 	"github.com/civanmoreno/infraudit/internal/report"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
@@ -28,6 +29,7 @@ var (
 	checkFlag       string
 	statusFlag      string
 	ignoreErrors    bool
+	policyFlag      string
 )
 
 var auditCmd = &cobra.Command{
@@ -52,6 +54,7 @@ func init() {
 	auditCmd.Flags().StringVar(&checkFlag, "check", "", "Run a single check by ID (e.g. AUTH-001)")
 	auditCmd.Flags().StringVar(&statusFlag, "status", "", "Show only results with these statuses (comma-separated: pass,warn,fail,error)")
 	auditCmd.Flags().BoolVar(&ignoreErrors, "ignore-errors", false, "Don't count errors toward exit code 2")
+	auditCmd.Flags().StringVar(&policyFlag, "enforce-policy", "", "Enforce a policy file (auto-detects .infraudit-policy.json if empty)")
 	_ = auditCmd.RegisterFlagCompletionFunc("check", completeCheckIDFlag)
 	_ = auditCmd.RegisterFlagCompletionFunc("category", completeCategoryFlag)
 	_ = auditCmd.RegisterFlagCompletionFunc("profile", completeProfileFlag)
@@ -273,6 +276,30 @@ func runAudit(cmd *cobra.Command, args []string) {
 	if writeErr != nil {
 		fmt.Fprintf(os.Stderr, "Error writing report: %s\n", writeErr)
 		os.Exit(1)
+	}
+
+	// Policy enforcement
+	if cmd.Flags().Changed("enforce-policy") {
+		policyPath := policyFlag
+		if policyPath == "" {
+			policyPath = policy.FindPolicyFile()
+		}
+		if policyPath != "" {
+			pol, err := policy.Load(policyPath)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error loading policy: %v\n", err)
+				os.Exit(1)
+			}
+			result := policy.Enforce(pol, rpt)
+			if !result.Passed {
+				fmt.Fprintf(os.Stderr, "\n  %s%sPOLICY VIOLATION%s (%s)\n", red, bold, rst, policyPath)
+				fmt.Fprintf(os.Stderr, "  %s%s%s\n", dim, strings.Repeat("─", 50), rst)
+				fmt.Fprint(os.Stderr, policy.FormatViolations(result))
+				fmt.Fprintf(os.Stderr, "  %s%s%s\n\n", dim, strings.Repeat("─", 50), rst)
+				os.Exit(1)
+			}
+			fmt.Fprintf(os.Stderr, "\n  %s✓ Policy passed%s (%s)\n\n", green, rst, policyPath)
+		}
 	}
 
 	// Exit code
