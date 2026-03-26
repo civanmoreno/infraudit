@@ -16,7 +16,7 @@ func writeTestReport(t *testing.T, dir, name string, r *report.Report) string {
 	if err != nil {
 		t.Fatalf("marshal report: %v", err)
 	}
-	if err := os.WriteFile(path, data, 0644); err != nil {
+	if err := os.WriteFile(path, data, 0600); err != nil {
 		t.Fatalf("write report: %v", err)
 	}
 	return path
@@ -58,7 +58,7 @@ func TestLoadReportFileNotFound(t *testing.T) {
 func TestLoadReportInvalidJSON(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "bad.json")
-	os.WriteFile(path, []byte("not json"), 0644)
+	os.WriteFile(path, []byte("not json"), 0600)
 
 	_, err := loadReport(path)
 	if err == nil {
