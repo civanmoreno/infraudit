@@ -66,22 +66,19 @@ func runDiff(cmd *cobra.Command, args []string) {
 			})
 			continue
 		}
-		if be.Status == ae.Status {
-			changes = append(changes, diffChange{
-				ID: id, Name: ae.Name, Severity: ae.Severity,
-				Before: be.Status, After: ae.Status, ChangeType: "unchanged",
-			})
-		} else if statusRank(ae.Status) < statusRank(be.Status) {
-			changes = append(changes, diffChange{
-				ID: id, Name: ae.Name, Severity: ae.Severity,
-				Before: be.Status, After: ae.Status, ChangeType: "improved",
-			})
-		} else {
-			changes = append(changes, diffChange{
-				ID: id, Name: ae.Name, Severity: ae.Severity,
-				Before: be.Status, After: ae.Status, ChangeType: "regressed",
-			})
+		var ct string
+		switch {
+		case be.Status == ae.Status:
+			ct = "unchanged"
+		case statusRank(ae.Status) < statusRank(be.Status):
+			ct = "improved"
+		default:
+			ct = "regressed"
 		}
+		changes = append(changes, diffChange{
+			ID: id, Name: ae.Name, Severity: ae.Severity,
+			Before: be.Status, After: ae.Status, ChangeType: ct,
+		})
 	}
 
 	// Checks removed in after
