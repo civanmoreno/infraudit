@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"time"
 
 	"github.com/civanmoreno/infraudit/internal/remote"
@@ -100,15 +99,6 @@ func runScan(cmd *cobra.Command, _ []string) {
 		auditArgs = append(auditArgs, "--skip", scanSkip)
 	}
 
-	// Validate sshpass if password is used
-	if scanPassword != "" {
-		if _, err := exec.LookPath("sshpass"); err != nil {
-			fmt.Fprintf(os.Stderr, "Error: --password requires sshpass installed.\n")
-			fmt.Fprintf(os.Stderr, "Install it: apt install sshpass (Debian/Ubuntu) or yum install sshpass (RHEL/CentOS)\n")
-			os.Exit(1)
-		}
-	}
-
 	// Create scanner
 	scanner := &remote.Scanner{
 		BinaryPath: scanBinary,
@@ -143,6 +133,7 @@ func runScan(cmd *cobra.Command, _ []string) {
 		f, err := os.Create(scanOutput)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error creating output file: %v\n", err)
+			scanner.Cleanup()
 			os.Exit(1)
 		}
 		outFile = f
@@ -168,10 +159,12 @@ func runScan(cmd *cobra.Command, _ []string) {
 
 	if writeErr != nil {
 		fmt.Fprintf(os.Stderr, "Error writing output: %v\n", writeErr)
+		scanner.Cleanup()
 		os.Exit(1)
 	}
 
-	// Exit code: worst result across all hosts
+	// Cleanup temp files and exit
+	scanner.Cleanup()
 	os.Exit(scanExitCode(results))
 }
 

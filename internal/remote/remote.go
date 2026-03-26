@@ -34,6 +34,7 @@ type Scanner struct {
 	UseSudo    bool
 	KeepBinary bool
 	Password   string
+	tmpFiles   []string // temporary files to clean up
 }
 
 // ScanHost audits a single remote host.
@@ -263,17 +264,28 @@ func scpArgs(host Host, batchMode bool, localPath, remotePath string) []string {
 	return args
 }
 
-// buildCmd creates an exec.Cmd, wrapping with sshpass if password is set.
+// buildCmd creates an exec.Cmd, using sshpass or SSH_ASKPASS for password auth.
 func (s *Scanner) buildCmd(ctx context.Context, name string, args []string) *exec.Cmd {
 	if s.Password != "" {
-		sshpassArgs := append([]string{"-p", s.Password, name}, args...)
-		cmd := exec.CommandContext(ctx, "sshpass", sshpassArgs...)
+		// Prefer sshpass if available
+		if sshpassPath, err := exec.LookPath("sshpass"); err == nil {
+			sshpassArgs := append([]string{"-p", s.Password, name}, args...)
+			return exec.CommandContext(ctx, sshpassPath, sshpassArgs...)
+		}
+		// Fallback: SSH_ASKPASS with a helper script
+		cmd := exec.CommandContext(ctx, name, args...)
+		askpass := s.createAskpassHelper()
+		cmd.Env = append(os.Environ(),
+			"SSH_ASKPASS="+askpass,
+			"SSH_ASKPASS_REQUIRE=force",
+			"DISPLAY=:0",
+		)
 		return cmd
 	}
 	return exec.CommandContext(ctx, name, args...)
 }
 
-// runCmd executes a command, wrapping with sshpass if password is set.
+// runCmd executes a command with password support.
 func (s *Scanner) runCmd(ctx context.Context, name string, args []string) ([]byte, error) {
 	cmd := s.buildCmd(ctx, name, args)
 	var stdout, stderr bytes.Buffer
@@ -283,6 +295,29 @@ func (s *Scanner) runCmd(ctx context.Context, name string, args []string) ([]byt
 		return nil, fmt.Errorf("%w: %s", err, strings.TrimSpace(stderr.String()))
 	}
 	return stdout.Bytes(), nil
+}
+
+// createAskpassHelper creates a temporary script that echoes the password.
+// This is used as SSH_ASKPASS when sshpass is not available.
+func (s *Scanner) createAskpassHelper() string {
+	f, err := os.CreateTemp("", "infraudit-askpass-*.sh")
+	if err != nil {
+		return ""
+	}
+	script := fmt.Sprintf("#!/bin/sh\necho '%s'\n", strings.ReplaceAll(s.Password, "'", "'\"'\"'"))
+	_, _ = f.WriteString(script)
+	f.Close()
+	_ = os.Chmod(f.Name(), 0500) //#nosec G302 -- askpass script must be executable
+	s.tmpFiles = append(s.tmpFiles, f.Name())
+	return f.Name()
+}
+
+// Cleanup removes temporary files created during scanning.
+func (s *Scanner) Cleanup() {
+	for _, f := range s.tmpFiles {
+		_ = os.Remove(f)
+	}
+	s.tmpFiles = nil
 }
 
 // mapArch maps uname -m output to Go architecture names.
