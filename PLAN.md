@@ -422,6 +422,19 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] 13 unit tests covering all policy rules, edge cases, load/parse errors
 - [x] Tested with real audit output
 
+### Phase 41: CIS Complete v2.0.0 (287 checks) ✅
+
+- [x] Version bumped to v2.0.0
+- [x] 66 additional checks (221 → 287 total)
+- [x] SSH advanced: 7 checks (ClientAlive, LogLevel, UsePAM, DisableForwarding, GSSAPI, Kerberos)
+- [x] Firewall detailed: 8 checks (default deny, loopback, outbound, established, IPv6 rules)
+- [x] Kernel hardening: 10 checks (BPF, kexec, kptr_restrict, perf_event, SysRq, namespaces, symlink/hardlink protection)
+- [x] Filesystem permissions: 17 checks (cron dirs, at/cron allow, sshd_config, gshadow, backup files, user dotfiles)
+- [x] Logging advanced: 8 checks (journald forward, rsyslog remote, audit immutable, backlog, loginuid, /var/log perms)
+- [x] PAM advanced: 8 checks (nullok, securetty, login.defs UID/GID/UMASK/ENCRYPT, pam_wheel)
+- [x] Services advanced: 8 checks (rpcbind, XDMCP, prelink, apport, tftp, ldap, talk, rsh)
+- [x] Docs version updated to v2.0.0
+
 ### Phase 40: Complete CIS Benchmark Coverage ✅
 
 - [x] 89 new checks added (132 → 221 total checks)

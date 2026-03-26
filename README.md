@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/checks-221-34d399?style=flat-square&logo=checkmarx&logoColor=white" alt="221 checks">
+  <img src="https://img.shields.io/badge/checks-287-34d399?style=flat-square&logo=checkmarx&logoColor=white" alt="287 checks">
   <img src="https://img.shields.io/badge/categories-17-60a5fa?style=flat-square" alt="17 categories">
   <img src="https://img.shields.io/badge/go-1.24+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go 1.24+">
   <img src="https://img.shields.io/badge/license-BSL--1.1-yellow?style=flat-square" alt="BSL 1.1 License">
@@ -10,7 +10,7 @@
 
 > Linux server security auditing from the command line.
 
-A single binary you drop on any Linux server to audit its security posture. No dependencies, no agents, no runtime — just copy and run. Validates **221 checks** across **17 categories** based on **CIS Benchmarks**, **DISA STIG**, and industry best practices.
+A single binary you drop on any Linux server to audit its security posture. No dependencies, no agents, no runtime — just copy and run. Validates **287 checks** across **17 categories** based on **CIS Benchmarks**, **DISA STIG**, and industry best practices.
 
 <br>
 
