@@ -411,6 +411,17 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Category readiness summary with root access awareness
 - [x] Unit tests for helper functions
 
+### Phase 38: Policy-as-Code ✅
+
+- [x] `--enforce-policy` flag on audit command to enforce compliance policies
+- [x] Policy file format (JSON): min_score, max_critical, max_high, required_pass, ignore
+- [x] Auto-detection of `.infraudit-policy.json` in current dir, home, or `/etc/infraudit/`
+- [x] Policy violation output with per-rule details
+- [x] Exit code 1 on policy violation (for CI/CD gates)
+- [x] Ignore list to exclude accepted risks from policy checks
+- [x] 13 unit tests covering all policy rules, edge cases, load/parse errors
+- [x] Tested with real audit output
+
 ## Check Categories
 
 | Category | Prefix | Description |

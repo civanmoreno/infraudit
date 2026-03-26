@@ -58,6 +58,7 @@ docker run --rm --privileged -v /:/host:ro infraudit audit</code></pre>
                 <tr><td><code>infraudit diff &lt;a&gt; &lt;b&gt;</code></td><td>Compare two JSON audit reports — shows improvements, regressions, and score delta</td></tr>
                 <tr><td><code>infraudit scan --host user@server</code></td><td>Audit a remote server via SSH — no installation needed on the remote</td></tr>
                 <tr><td><code>infraudit doctor</code></td><td>Check system readiness — shows available tools, permissions, and category readiness</td></tr>
+                <tr><td><code>infraudit audit --enforce-policy</code></td><td>Enforce a compliance policy — fails if score, findings, or required checks don't meet the policy</td></tr>
                 <tr><td><code>infraudit list</code></td><td>Show all available checks in a table</td></tr>
                 <tr><td><code>infraudit categories</code></td><td>Show available categories with check counts</td></tr>
                 <tr><td><code>infraudit completion</code></td><td>Generate shell autocompletion (bash, zsh, fish, powershell)</td></tr>
