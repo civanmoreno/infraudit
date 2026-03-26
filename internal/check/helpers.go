@@ -180,6 +180,9 @@ func ResetCache() {
 	shadowErr = nil
 	mountsOnce = sync.Once{}
 	mountsCache = nil
+	groupOnce = sync.Once{}
+	groupCache = nil
+	groupErr = nil
 }
 
 // HasMountOption checks if a comma-separated option string contains the given option.
@@ -190,4 +193,65 @@ func HasMountOption(opts, opt string) bool {
 		}
 	}
 	return false
+}
+
+// PkgInstalled checks if any of the given package names is installed.
+// Supports dpkg (Debian/Ubuntu) and rpm (RHEL/CentOS).
+func PkgInstalled(names ...string) bool {
+	for _, name := range names {
+		if RunCmdOk(DefaultCmdTimeout, "dpkg", "-s", name) {
+			return true
+		}
+		if RunCmdOk(DefaultCmdTimeout, "rpm", "-q", name) {
+			return true
+		}
+	}
+	return false
+}
+
+// GroupEntry represents a parsed line from /etc/group.
+type GroupEntry struct {
+	Name    string
+	GID     int
+	Members []string
+}
+
+var (
+	groupOnce  sync.Once
+	groupCache []GroupEntry
+	groupErr   error
+)
+
+// ParseGroup reads /etc/group and returns parsed entries.
+// Results are cached for the lifetime of the process.
+func ParseGroup() ([]GroupEntry, error) {
+	groupOnce.Do(func() {
+		f, err := os.Open("/etc/group")
+		if err != nil {
+			groupErr = err
+			return
+		}
+		defer f.Close()
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if strings.HasPrefix(line, "#") || line == "" {
+				continue
+			}
+			fields := strings.SplitN(line, ":", 4)
+			if len(fields) < 4 {
+				continue
+			}
+			gid := 0
+			_, _ = fmt.Sscanf(fields[2], "%d", &gid)
+			var members []string
+			if fields[3] != "" {
+				members = strings.Split(fields[3], ",")
+			}
+			groupCache = append(groupCache, GroupEntry{
+				Name: fields[0], GID: gid, Members: members,
+			})
+		}
+	})
+	return groupCache, groupErr
 }
