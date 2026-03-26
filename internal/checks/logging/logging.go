@@ -75,7 +75,7 @@ func (c *auditRules) Description() string {
 func (c *auditRules) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "auditctl", "-l")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot read audit rules (auditctl not available or not root)"}
+		return check.Result{Status: check.Error, Message: "Cannot read audit rules (auditctl not available or not root)", Remediation: "Install auditd and run with sudo: apt install auditd && sudo infraudit audit"}
 	}
 
 	rules := string(out)

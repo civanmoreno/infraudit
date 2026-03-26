@@ -329,7 +329,7 @@ func (c *weakHash) Description() string {
 func (c *weakHash) Run() check.Result {
 	entries, err := check.ParseShadow()
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Cannot read /etc/shadow: " + err.Error()}
+		return check.Result{Status: check.Error, Message: "Cannot read /etc/shadow: " + err.Error(), Remediation: "Run infraudit with sudo for full results"}
 	}
 
 	var md5Users []string

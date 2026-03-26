@@ -41,7 +41,7 @@ func (c *suidSgid) Run() check.Result {
 	out, err := check.RunCmd(check.LongCmdTimeout, "find", "/usr", "/bin", "/sbin", "/opt", "/usr/local",
 		"-xdev", "-perm", "/6000", "-type", "f", "-print")
 	if err != nil {
-		return check.Result{Status: check.Error, Message: "Could not search for SUID/SGID files"}
+		return check.Result{Status: check.Error, Message: "Could not search for SUID/SGID files", Remediation: "Run infraudit with sudo for full filesystem scanning"}
 	}
 
 	// Build allowed set from defaults + config

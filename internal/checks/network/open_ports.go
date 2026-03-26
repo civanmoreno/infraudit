@@ -52,9 +52,10 @@ func (c *openPorts) Run() check.Result {
 	}
 
 	return check.Result{
-		Status:  check.Warn,
-		Message: fmt.Sprintf("Found %d unexpected listening ports: %s", len(listening), strings.Join(listening, ", ")),
-		Details: map[string]string{"ports": strings.Join(listening, "\n")},
+		Status:      check.Warn,
+		Message:     fmt.Sprintf("Found %d unexpected listening ports: %s", len(listening), strings.Join(listening, ", ")),
+		Remediation: "Close unnecessary ports or add them to allowed_ports in config",
+		Details:     map[string]string{"ports": strings.Join(listening, "\n")},
 	}
 }
 

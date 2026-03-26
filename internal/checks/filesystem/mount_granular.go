@@ -78,7 +78,7 @@ func (c *homeNodev) Run() check.Result {
 			return check.Result{Status: check.Fail, Message: "/home is missing nodev option", Remediation: "Add nodev to /home mount options in /etc/fstab"}
 		}
 	}
-	return check.Result{Status: check.Warn, Message: "/home is not a separate partition (nodev check skipped)"}
+	return check.Result{Status: check.Warn, Message: "/home is not a separate partition (nodev check skipped)", Remediation: "Create a separate /home partition with nodev option in /etc/fstab"}
 }
 
 func checkFilePerms(path string, maxPerm os.FileMode) check.Result {
