@@ -398,6 +398,19 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Tags include security, category, and severity
 - [x] Unit tests for WriteSARIF, severityToScore, statusToLevel, empty results
 
+### Phase 37: Doctor Command ✅
+
+- [x] `infraudit doctor` — system readiness diagnostic before auditing
+- [x] System info: hostname, architecture, user, root access
+- [x] Core tools detection: systemctl, find, awk, grep, ss
+- [x] Security tools: auditd, fail2ban, aide, rkhunter, ClamAV
+- [x] Firewall detection: ufw, nft, iptables (warns if none found)
+- [x] Container runtime: Docker, Podman (info if none found)
+- [x] Time sync, Boot/MAC, Backup tools detection
+- [x] Remote scanning readiness: ssh, scp, sshpass
+- [x] Category readiness summary with root access awareness
+- [x] Unit tests for helper functions
+
 ## Check Categories
 
 | Category | Prefix | Description |
