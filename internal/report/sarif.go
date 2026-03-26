@@ -50,7 +50,6 @@ type sarifResult struct {
 	Level     string          `json:"level"`
 	Message   sarifMessage    `json:"message"`
 	Locations []sarifLocation `json:"locations,omitempty"`
-	Fixes     []sarifFix      `json:"fixes,omitempty"`
 }
 
 type sarifMessage struct {
@@ -72,10 +71,6 @@ type sarifArtifactLocation struct {
 
 type sarifRegion struct {
 	StartLine int `json:"startLine"`
-}
-
-type sarifFix struct {
-	Description sarifMessage `json:"description"`
 }
 
 // WriteSARIF writes the report in SARIF 2.1.0 format.
@@ -106,10 +101,14 @@ func WriteSARIF(w io.Writer, r *Report) error {
 		if e.Status == "PASS" {
 			continue
 		}
-		result := sarifResult{
+		msg := e.Message
+		if e.Remediation != "" {
+			msg += ". Remediation: " + e.Remediation
+		}
+		results = append(results, sarifResult{
 			RuleID:  e.ID,
 			Level:   statusToLevel(e.Status),
-			Message: sarifMessage{Text: e.Message},
+			Message: sarifMessage{Text: msg},
 			Locations: []sarifLocation{
 				{
 					PhysicalLocation: sarifPhysicalLocation{
@@ -120,13 +119,7 @@ func WriteSARIF(w io.Writer, r *Report) error {
 					},
 				},
 			},
-		}
-		if e.Remediation != "" {
-			result.Fixes = []sarifFix{
-				{Description: sarifMessage{Text: e.Remediation}},
-			}
-		}
-		results = append(results, result)
+		})
 	}
 
 	doc := sarifDocument{
