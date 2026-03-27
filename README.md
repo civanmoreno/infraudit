@@ -29,6 +29,16 @@ sudo infraudit audit
 ```
 
 <details>
+<summary><strong>Install with Homebrew</strong></summary>
+
+```bash
+brew tap civanmoreno/tap https://github.com/civanmoreno/infraudit.git
+brew install infraudit
+```
+
+</details>
+
+<details>
 <summary><strong>Build from source</strong></summary>
 
 Requires Go 1.24+:
