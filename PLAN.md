@@ -540,6 +540,21 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Score delta with color-coded output
 - [x] Reuses diff infrastructure for regression/improvement detection
 
+### Phase 48: Test Coverage Expansion (36% → 47%) ✅
+
+- [x] Eliminated all 0% coverage packages
+- [x] boot: 0% → 55.7% (8 tests — grub password/perms, single-user auth)
+- [x] backup: 0% → 52.7% (3 tests — backup file permissions)
+- [x] malware: 0% → 44.4% (1 test — metadata)
+- [x] nfs: 0% → 71.2% (7 tests — NFS exports, Samba guest access)
+- [x] container: 0% → 44.1% (14 tests — daemon config, socket perms, ICC)
+- [x] rlimit: 0% → 67.5% (15 tests — open files, max procs, stack, wildcard unlimited)
+- [x] packages: 0% → 65.9% (13 tests — repo HTTPS, kernel update)
+- [x] network: 9.6% → 53.4% (31 tests — SNMP, DNS, IPv6, DNSSEC, DoT, bind address)
+- [x] services: 23.2% → 32.3% (21 tests — XDMCP, MTA relay, sudo pty/log, SSH settings)
+- [x] 15+ source files updated to use `check.P()` for FSRoot test isolation
+- [x] Total: 36% → 47.5% coverage
+
 ## Check Categories
 
 | Category | Prefix | Description |
