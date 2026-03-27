@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/checks-287-34d399?style=flat-square&logo=checkmarx&logoColor=white" alt="287 checks">
   <img src="https://img.shields.io/badge/categories-17-60a5fa?style=flat-square" alt="17 categories">
-  <img src="https://img.shields.io/badge/go-1.24+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go 1.24+">
+  <img src="https://img.shields.io/badge/go-1.25+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go 1.25+">
   <img src="https://img.shields.io/badge/license-BSL--1.1-yellow?style=flat-square" alt="BSL 1.1 License">
   <img src="https://img.shields.io/github/v/release/civanmoreno/infraudit?style=flat-square&color=fbbf24" alt="Release">
 </p>
@@ -41,7 +41,7 @@ brew install infraudit
 <details>
 <summary><strong>Build from source</strong></summary>
 
-Requires Go 1.24+:
+Requires Go 1.25+:
 
 ```bash
 git clone https://github.com/civanmoreno/infraudit.git
@@ -367,7 +367,7 @@ See the [action documentation](action/README.md) for fleet audits, SARIF integra
 | Standard | Coverage |
 |:---------|:---------|
 | CIS Benchmark Level 1 | ~90% of applicable controls |
-| CIS Benchmark Level 2 | ~70% of applicable controls |
+| CIS Benchmark Level 2 | ~90% of applicable controls |
 | DISA STIG | Key findings covered |
 | Lynis categories | All major categories mapped |
 

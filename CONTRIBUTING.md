@@ -12,7 +12,7 @@ Gracias por tu interés en contribuir. Este documento explica cómo hacerlo.
 
 ## Requisitos Previos
 
-- Go 1.24+
+- Go 1.25+
 - golangci-lint v2
 - Familiaridad con CIS Benchmarks o estándares de seguridad Linux
 
