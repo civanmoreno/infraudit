@@ -23,7 +23,7 @@ func (c *dnsResolvers) Description() string {
 }
 
 func (c *dnsResolvers) Run() check.Result {
-	f, err := os.Open("/etc/resolv.conf")
+	f, err := os.Open(check.P("/etc/resolv.conf"))
 	if err != nil {
 		return check.Result{
 			Status:  check.Error,

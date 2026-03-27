@@ -80,11 +80,11 @@ func (c *repoHTTPS) Description() string      { return "Verify package repos use
 
 func (c *repoHTTPS) Run() check.Result {
 	// Check apt sources
-	paths := []string{"/etc/apt/sources.list"}
-	entries, _ := os.ReadDir("/etc/apt/sources.list.d")
+	paths := []string{check.P("/etc/apt/sources.list")}
+	entries, _ := os.ReadDir(check.P("/etc/apt/sources.list.d"))
 	for _, e := range entries {
 		if strings.HasSuffix(e.Name(), ".list") || strings.HasSuffix(e.Name(), ".sources") {
-			paths = append(paths, "/etc/apt/sources.list.d/"+e.Name())
+			paths = append(paths, check.P("/etc/apt/sources.list.d/"+e.Name()))
 		}
 	}
 
@@ -107,12 +107,12 @@ func (c *repoHTTPS) Run() check.Result {
 	}
 
 	// Check yum/dnf repos
-	yumEntries, _ := os.ReadDir("/etc/yum.repos.d")
+	yumEntries, _ := os.ReadDir(check.P("/etc/yum.repos.d"))
 	for _, e := range yumEntries {
 		if !strings.HasSuffix(e.Name(), ".repo") {
 			continue
 		}
-		data, err := os.ReadFile("/etc/yum.repos.d/" + e.Name())
+		data, err := os.ReadFile(check.P("/etc/yum.repos.d/" + e.Name()))
 		if err != nil {
 			continue
 		}
@@ -142,7 +142,7 @@ func (c *kernelUpdate) Description() string      { return "Check if a newer kern
 
 func (c *kernelUpdate) Run() check.Result {
 	// Check if reboot required (kernel was updated but not rebooted)
-	if _, err := os.Stat("/var/run/reboot-required"); err == nil {
+	if _, err := os.Stat(check.P("/var/run/reboot-required")); err == nil {
 		return check.Result{
 			Status:      check.Warn,
 			Message:     "System reboot required (likely kernel update pending)",

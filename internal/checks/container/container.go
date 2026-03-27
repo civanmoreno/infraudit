@@ -77,7 +77,7 @@ func (c *dockerDaemonConfig) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "Docker not installed (skipped)"}
 	}
 
-	data, err := os.ReadFile("/etc/docker/daemon.json")
+	data, err := os.ReadFile(check.P("/etc/docker/daemon.json"))
 	if err != nil {
 		return check.Result{
 			Status: check.Warn, Message: "Docker daemon.json not found",
@@ -109,7 +109,7 @@ func (c *dockerSocketPerms) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "Docker not installed (skipped)"}
 	}
 
-	info, err := os.Stat("/var/run/docker.sock")
+	info, err := os.Stat(check.P("/var/run/docker.sock"))
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "Docker socket not found"}
 	}
@@ -294,7 +294,7 @@ func (c *iccDisabled) Run() check.Result {
 		return check.Result{Status: check.Pass, Message: "Docker not installed (skipped)"}
 	}
 
-	data, err := os.ReadFile("/etc/docker/daemon.json")
+	data, err := os.ReadFile(check.P("/etc/docker/daemon.json"))
 	if err != nil {
 		return check.Result{Status: check.Warn, Message: "No daemon.json to check ICC setting", Remediation: "Create /etc/docker/daemon.json with {\"icc\": false}"}
 	}

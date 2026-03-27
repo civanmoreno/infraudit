@@ -34,7 +34,7 @@ func (c *grubPassword) Run() check.Result {
 		"/boot/efi/EFI/ubuntu/grub.cfg",
 	}
 	for _, p := range paths {
-		data, err := os.ReadFile(p)
+		data, err := os.ReadFile(check.P(p))
 		if err != nil {
 			continue
 		}
@@ -45,7 +45,7 @@ func (c *grubPassword) Run() check.Result {
 
 	// Check user.cfg
 	for _, p := range []string{"/boot/grub/user.cfg", "/boot/grub2/user.cfg"} {
-		if _, err := os.Stat(p); err == nil {
+		if _, err := os.Stat(check.P(p)); err == nil {
 			return check.Result{Status: check.Pass, Message: "GRUB user.cfg found (password likely set)"}
 		}
 	}
@@ -68,7 +68,7 @@ func (c *grubPerms) Description() string      { return "Verify grub.cfg is 0600 
 func (c *grubPerms) Run() check.Result {
 	paths := []string{"/boot/grub/grub.cfg", "/boot/grub2/grub.cfg"}
 	for _, p := range paths {
-		info, err := os.Stat(p)
+		info, err := os.Stat(check.P(p))
 		if err != nil {
 			continue
 		}

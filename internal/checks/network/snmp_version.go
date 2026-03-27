@@ -24,7 +24,7 @@ func (c *snmpVersion) Description() string {
 
 func (c *snmpVersion) Run() check.Result {
 	// Check if snmpd is installed
-	confPath := "/etc/snmp/snmpd.conf"
+	confPath := check.P("/etc/snmp/snmpd.conf")
 	f, err := os.Open(confPath)
 	if err != nil {
 		return check.Result{

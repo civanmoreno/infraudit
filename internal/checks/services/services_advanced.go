@@ -45,7 +45,7 @@ func (c *xdmcpDisabled) Severity() check.Severity { return check.Medium }
 func (c *xdmcpDisabled) Description() string      { return "Ensure XDMCP is not enabled" }
 
 func (c *xdmcpDisabled) Run() check.Result {
-	data, err := os.ReadFile("/etc/gdm3/custom.conf")
+	data, err := os.ReadFile(check.P("/etc/gdm3/custom.conf"))
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "GDM not installed or no custom.conf (OK)"}
 	}

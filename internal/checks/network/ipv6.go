@@ -33,14 +33,14 @@ func (c *ipv6Config) Run() check.Result {
 
 	// IPv6 is enabled — check if it's properly configured
 	// Look for IPv6 addresses in /proc/net/if_inet6
-	if _, err := os.Stat("/proc/net/if_inet6"); err != nil {
+	if _, err := os.Stat(check.P("/proc/net/if_inet6")); err != nil {
 		return check.Result{
 			Status:  check.Pass,
 			Message: "IPv6 is not available on this system",
 		}
 	}
 
-	data, err := os.ReadFile("/proc/net/if_inet6")
+	data, err := os.ReadFile(check.P("/proc/net/if_inet6"))
 	if err != nil {
 		return check.Result{
 			Status:  check.Warn,

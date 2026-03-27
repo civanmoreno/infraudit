@@ -117,7 +117,7 @@ func (c *backupPerms) Run() check.Result {
 	var bad []string
 
 	for _, dir := range backupDirs {
-		info, err := os.Stat(dir)
+		info, err := os.Stat(check.P(dir))
 		if err != nil {
 			continue
 		}
@@ -136,7 +136,7 @@ func (c *backupPerms) Run() check.Result {
 	}
 
 	// Check /var/backups freshness
-	info, err := os.Stat("/var/backups")
+	info, err := os.Stat(check.P("/var/backups"))
 	if err == nil {
 		if time.Since(info.ModTime()) > 7*24*time.Hour {
 			return check.Result{

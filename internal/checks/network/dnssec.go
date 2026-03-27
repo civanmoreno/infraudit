@@ -47,7 +47,7 @@ func (c *dnssec) Run() check.Result {
 	}
 
 	// Check if unbound is configured
-	if _, err := os.Stat("/etc/unbound/unbound.conf"); err == nil {
+	if _, err := os.Stat(check.P("/etc/unbound/unbound.conf")); err == nil {
 		return check.Result{
 			Status:  check.Pass,
 			Message: "Unbound resolver detected (DNSSEC enabled by default)",
@@ -63,14 +63,14 @@ func (c *dnssec) Run() check.Result {
 
 func resolvedConfValue(key string) string {
 	paths := []string{
-		"/etc/systemd/resolved.conf",
+		check.P("/etc/systemd/resolved.conf"),
 	}
 	// Also check drop-ins
-	entries, err := os.ReadDir("/etc/systemd/resolved.conf.d")
+	entries, err := os.ReadDir(check.P("/etc/systemd/resolved.conf.d"))
 	if err == nil {
 		for _, e := range entries {
 			if strings.HasSuffix(e.Name(), ".conf") {
-				paths = append(paths, "/etc/systemd/resolved.conf.d/"+e.Name())
+				paths = append(paths, check.P("/etc/systemd/resolved.conf.d/"+e.Name()))
 			}
 		}
 	}

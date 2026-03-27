@@ -42,7 +42,7 @@ func (c *bindAddress) Run() check.Result {
 }
 
 func findWildcardListeners(path string) []string {
-	f, err := os.Open(path)
+	f, err := os.Open(check.P(path))
 	if err != nil {
 		return nil
 	}
