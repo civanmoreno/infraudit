@@ -314,40 +314,69 @@ sudo infraudit audit --output /tmp/audit.txt</code></pre>
         <p><a href="https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html">SARIF</a> (Static Analysis Results Interchange Format) is the standard format for security tools used by GitHub Code Scanning, GitLab SAST, and VS Code. Use <code>--format sarif</code> to generate it.</p>
         <pre><code>$ sudo infraudit audit --format sarif --output results.sarif</code></pre>
 
-        <h3>GitHub Actions integration</h3>
-        <p>Add this to your workflow to see infraudit findings in GitHub's Security tab automatically:</p>
+        <h3>GitHub Action</h3>
+        <p>Use the official <code>civanmoreno/infraudit/action</code> to integrate infraudit into your workflows. It supports two modes: <strong>local</strong> (audit the GHA runner) and <strong>SSH</strong> (audit a remote server).</p>
+
+        <h4>Modo local (en el runner)</h4>
         <pre><code><span class="comment"># .github/workflows/security-audit.yml</span>
 name: Security Audit
-on:
-  schedule:
-    - cron: '0 3 * * *'
-  push:
-    branches: [main]
+on: [push]
 
 jobs:
   audit:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install infraudit
-        run: curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh
-
-      <span class="comment"># Option A: audit this runner directly</span>
-      - name: Run audit
-        run: sudo infraudit audit --format sarif --output results.sarif
-
-      <span class="comment"># Option B: audit a remote server via SSH</span>
-      <span class="comment"># - name: Run remote audit</span>
-      <span class="comment">#   run: |</span>
-      <span class="comment">#     ssh user@server "curl -sL .../install.sh | sh && sudo infraudit audit --format sarif" > results.sarif</span>
-
-      - name: Upload SARIF to GitHub
-        uses: github/codeql-action/upload-sarif@v4
+      - name: Run infraudit
+        uses: civanmoreno/infraudit/action@v2
+        id: audit
         with:
-          sarif_file: results.sarif</code></pre>
+          min-score: 70
+          format: sarif</code></pre>
+
+        <h4>Modo SSH (servidor remoto)</h4>
+        <pre><code>- name: Audit production
+  uses: civanmoreno/infraudit/action@v2
+  with:
+    mode: ssh
+    host: deploy@prod.example.com
+    ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    profile: web-server
+    min-score: 80
+    format: sarif</code></pre>
+
+        <h4>Auditoría de flota (múltiples servidores)</h4>
+        <pre><code>jobs:
+  audit:
+    strategy:
+      matrix:
+        server:
+          - { name: web-1, host: "deploy@web1.example.com", profile: web-server }
+          - { name: db-1, host: "deploy@db1.example.com", profile: db-server }
+    steps:
+      - name: Audit ${{ matrix.server.name }}
+        uses: civanmoreno/infraudit/action@v2
+        with:
+          mode: ssh
+          host: ${{ matrix.server.host }}
+          ssh-key: ${{ secrets.FLEET_SSH_KEY }}
+          profile: ${{ matrix.server.profile }}
+          min-score: 70</code></pre>
+
+        <h4>Outputs disponibles</h4>
+        <table>
+            <thead><tr><th>Output</th><th>Descripción</th></tr></thead>
+            <tbody>
+                <tr><td><code>score</code></td><td>Hardening Index (0-100)</td></tr>
+                <tr><td><code>grade</code></td><td>Letra (A-F)</td></tr>
+                <tr><td><code>total</code></td><td>Total de checks</td></tr>
+                <tr><td><code>passed</code></td><td>Checks que pasaron</td></tr>
+                <tr><td><code>failures</code></td><td>Checks que fallaron</td></tr>
+                <tr><td><code>report-path</code></td><td>Ruta al reporte JSON</td></tr>
+            </tbody>
+        </table>
+
+        <p>Los resultados SARIF se suben automáticamente a <strong>Security &rarr; Code scanning alerts</strong> en GitHub.</p>
 
         <h3>What happens in GitHub</h3>
         <ul class="check-list">

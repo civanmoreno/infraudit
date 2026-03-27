@@ -321,21 +321,32 @@ make clean       # Remove build artifacts
 
 ## 🔄 CI/CD Integration
 
-Use exit codes to gate deployments:
+### GitHub Action
+
+```yaml
+# Audit the GHA runner
+- uses: civanmoreno/infraudit/action@v2
+  with:
+    min-score: 70
+
+# Or audit a remote server via SSH
+- uses: civanmoreno/infraudit/action@v2
+  with:
+    mode: ssh
+    host: deploy@prod.example.com
+    ssh-key: ${{ secrets.SSH_KEY }}
+    min-score: 80
+```
+
+See the [action documentation](action/README.md) for fleet audits, SARIF integration, and more.
+
+### Exit Codes
 
 | Code | Meaning | Action |
 |:-----|:--------|:-------|
 | `0` | All checks passed | Proceed |
 | `1` | Warnings found | Review recommended |
 | `2` | Failures or errors | Block deployment |
-
-```bash
-sudo infraudit audit --format json --output report.json
-if [ $? -eq 2 ]; then
-    echo "Security failures — blocking deployment"
-    exit 1
-fi
-```
 
 > 📊 See **[Output & Reports](https://civanmoreno.github.io/infraudit/output.html)** for JSON/YAML format details.
 

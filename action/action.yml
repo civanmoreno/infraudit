@@ -1,0 +1,331 @@
+name: 'infraudit - Linux Security Audit'
+description: 'Run infraudit security audit on the current runner or a remote server via SSH'
+author: 'Ivan Moreno'
+branding:
+  icon: 'shield'
+  color: 'green'
+
+inputs:
+  # ── Modo de ejecución ──
+  mode:
+    description: 'Execution mode: "local" (run on GHA runner) or "ssh" (run on remote server)'
+    required: false
+    default: 'local'
+
+  # ── SSH inputs (solo cuando mode=ssh) ──
+  host:
+    description: 'SSH host (user@hostname or user@hostname:port)'
+    required: false
+  ssh-key:
+    description: 'SSH private key for authentication'
+    required: false
+  ssh-password:
+    description: 'SSH password (if not using key auth)'
+    required: false
+  ssh-known-hosts:
+    description: 'Known hosts content (if empty, StrictHostKeyChecking=no)'
+    required: false
+
+  # ── Audit options ──
+  category:
+    description: 'Filter by category (comma-separated: auth,network,crypto)'
+    required: false
+  profile:
+    description: 'Server profile: web-server, db-server, container-host, minimal'
+    required: false
+  skip:
+    description: 'Comma-separated check IDs to skip'
+    required: false
+  severity-min:
+    description: 'Minimum severity to report: low, medium, high, critical'
+    required: false
+  format:
+    description: 'Output format: console, json, sarif'
+    required: false
+    default: 'sarif'
+  args:
+    description: 'Additional arguments to pass to infraudit audit'
+    required: false
+
+  # ── Policy ──
+  policy:
+    description: 'Path to policy file for enforcement'
+    required: false
+  min-score:
+    description: 'Minimum hardening score (0-100). Fails if below this threshold'
+    required: false
+
+  # ── Versión ──
+  version:
+    description: 'infraudit version to use (default: latest)'
+    required: false
+    default: 'latest'
+
+outputs:
+  score:
+    description: 'Hardening Index score (0-100)'
+  grade:
+    description: 'Letter grade (A-F)'
+  total:
+    description: 'Total checks executed'
+  passed:
+    description: 'Number of passed checks'
+  failures:
+    description: 'Number of failed checks'
+  warnings:
+    description: 'Number of warnings'
+  report-path:
+    description: 'Path to the generated report file'
+
+runs:
+  using: 'composite'
+  steps:
+    # ── Descargar infraudit ──
+    - name: Download infraudit
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        VERSION="${{ inputs.version }}"
+        if [ "$VERSION" = "latest" ]; then
+          VERSION=$(curl -sL https://api.github.com/repos/civanmoreno/infraudit/releases/latest | grep '"tag_name"' | cut -d'"' -f4 | sed 's/^v//')
+        fi
+
+        ARCH=$(uname -m)
+        case "$ARCH" in
+          x86_64) BINARY="infraudit-linux-amd64" ;;
+          aarch64) BINARY="infraudit-linux-arm64" ;;
+          *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+        esac
+
+        echo "Downloading infraudit v${VERSION} (${BINARY})..."
+        curl -sL "https://github.com/civanmoreno/infraudit/releases/download/v${VERSION}/${BINARY}" -o /tmp/infraudit
+        chmod +x /tmp/infraudit
+        echo "Downloaded: $(/tmp/infraudit --version)"
+
+    # ── Configurar SSH (modo ssh) ──
+    - name: Setup SSH
+      if: inputs.mode == 'ssh'
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+
+        # SSH key
+        if [ -n "${{ inputs.ssh-key }}" ]; then
+          echo "${{ inputs.ssh-key }}" > ~/.ssh/infraudit_key
+          chmod 600 ~/.ssh/infraudit_key
+        fi
+
+        # Known hosts
+        if [ -n "${{ inputs.ssh-known-hosts }}" ]; then
+          echo "${{ inputs.ssh-known-hosts }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+        fi
+
+    # ── Ejecutar audit (modo local) ──
+    - name: Run audit (local)
+      if: inputs.mode == 'local'
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        ARGS="--format json --output ${{ github.workspace }}/infraudit-report.json"
+
+        if [ -n "${{ inputs.category }}" ]; then
+          ARGS="$ARGS --category ${{ inputs.category }}"
+        fi
+        if [ -n "${{ inputs.profile }}" ]; then
+          ARGS="$ARGS --profile ${{ inputs.profile }}"
+        fi
+        if [ -n "${{ inputs.skip }}" ]; then
+          ARGS="$ARGS --skip ${{ inputs.skip }}"
+        fi
+        if [ -n "${{ inputs.severity-min }}" ]; then
+          ARGS="$ARGS --severity-min ${{ inputs.severity-min }}"
+        fi
+        if [ -n "${{ inputs.policy }}" ]; then
+          ARGS="$ARGS --enforce-policy ${{ inputs.policy }}"
+        fi
+        if [ -n "${{ inputs.args }}" ]; then
+          ARGS="$ARGS ${{ inputs.args }}"
+        fi
+
+        echo "Running: infraudit audit $ARGS"
+        sudo /tmp/infraudit audit $ARGS --quiet || true
+
+        # También generar SARIF si el formato es sarif
+        if [ "${{ inputs.format }}" = "sarif" ]; then
+          sudo /tmp/infraudit audit --format sarif --output ${{ github.workspace }}/infraudit.sarif --quiet ${{ inputs.args }} || true
+        fi
+
+    # ── Ejecutar audit (modo ssh) ──
+    - name: Run audit (SSH)
+      if: inputs.mode == 'ssh'
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        HOST="${{ inputs.host }}"
+        SSH_OPTS="-o ConnectTimeout=10 -o BatchMode=yes"
+
+        if [ -n "${{ inputs.ssh-known-hosts }}" ]; then
+          SSH_OPTS="$SSH_OPTS -o UserKnownHostsFile=~/.ssh/known_hosts"
+        else
+          SSH_OPTS="$SSH_OPTS -o StrictHostKeyChecking=no"
+        fi
+
+        if [ -f ~/.ssh/infraudit_key ]; then
+          SSH_OPTS="$SSH_OPTS -i ~/.ssh/infraudit_key"
+        fi
+
+        # Parsear host:port
+        if echo "$HOST" | grep -q ':'; then
+          PORT=$(echo "$HOST" | cut -d: -f2)
+          HOST=$(echo "$HOST" | cut -d: -f1)
+          SSH_OPTS="$SSH_OPTS -p $PORT"
+        fi
+
+        # Detectar arquitectura remota
+        REMOTE_ARCH=$(ssh $SSH_OPTS "$HOST" "uname -m")
+        case "$REMOTE_ARCH" in
+          x86_64) BINARY="infraudit-linux-amd64" ;;
+          aarch64) BINARY="infraudit-linux-arm64" ;;
+          *) echo "Unsupported remote arch: $REMOTE_ARCH"; exit 1 ;;
+        esac
+
+        # Descargar binario correcto si la arquitectura es diferente
+        VERSION="${{ inputs.version }}"
+        if [ "$VERSION" = "latest" ]; then
+          VERSION=$(curl -sL https://api.github.com/repos/civanmoreno/infraudit/releases/latest | grep '"tag_name"' | cut -d'"' -f4 | sed 's/^v//')
+        fi
+        curl -sL "https://github.com/civanmoreno/infraudit/releases/download/v${VERSION}/${BINARY}" -o /tmp/infraudit-remote
+        chmod +x /tmp/infraudit-remote
+
+        # Copiar binario al servidor
+        echo "Copying infraudit to $HOST..."
+        scp $SSH_OPTS /tmp/infraudit-remote "${HOST}:/tmp/infraudit"
+        ssh $SSH_OPTS "$HOST" "chmod +x /tmp/infraudit"
+
+        # Construir argumentos del audit
+        AUDIT_ARGS="--format json --output /tmp/infraudit-report.json --quiet"
+
+        if [ -n "${{ inputs.category }}" ]; then
+          AUDIT_ARGS="$AUDIT_ARGS --category ${{ inputs.category }}"
+        fi
+        if [ -n "${{ inputs.profile }}" ]; then
+          AUDIT_ARGS="$AUDIT_ARGS --profile ${{ inputs.profile }}"
+        fi
+        if [ -n "${{ inputs.skip }}" ]; then
+          AUDIT_ARGS="$AUDIT_ARGS --skip ${{ inputs.skip }}"
+        fi
+        if [ -n "${{ inputs.severity-min }}" ]; then
+          AUDIT_ARGS="$AUDIT_ARGS --severity-min ${{ inputs.severity-min }}"
+        fi
+        if [ -n "${{ inputs.args }}" ]; then
+          AUDIT_ARGS="$AUDIT_ARGS ${{ inputs.args }}"
+        fi
+
+        # Ejecutar audit remoto
+        echo "Running audit on $HOST..."
+        ssh $SSH_OPTS "$HOST" "sudo /tmp/infraudit audit $AUDIT_ARGS" || true
+
+        # Recoger reporte
+        scp $SSH_OPTS "${HOST}:/tmp/infraudit-report.json" "${{ github.workspace }}/infraudit-report.json"
+
+        # Generar SARIF si es necesario
+        if [ "${{ inputs.format }}" = "sarif" ]; then
+          ssh $SSH_OPTS "$HOST" "sudo /tmp/infraudit audit --format sarif --output /tmp/infraudit.sarif --quiet ${{ inputs.args }}" || true
+          scp $SSH_OPTS "${HOST}:/tmp/infraudit.sarif" "${{ github.workspace }}/infraudit.sarif"
+        fi
+
+        # Limpiar binario remoto
+        ssh $SSH_OPTS "$HOST" "rm -f /tmp/infraudit /tmp/infraudit-report.json /tmp/infraudit.sarif" || true
+
+    # ── Parsear resultados ──
+    - name: Parse results
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        REPORT="${{ github.workspace }}/infraudit-report.json"
+        if [ ! -f "$REPORT" ]; then
+          echo "No report found at $REPORT"
+          exit 1
+        fi
+
+        # Extraer métricas
+        SCORE=$(python3 -c "import json; r=json.load(open('$REPORT')); print(r['summary']['score'])")
+        GRADE=$(python3 -c "import json; r=json.load(open('$REPORT')); print(r['summary']['grade'])")
+        TOTAL=$(python3 -c "import json; r=json.load(open('$REPORT')); print(r['summary']['total'])")
+        PASSED=$(python3 -c "import json; r=json.load(open('$REPORT')); print(r['summary']['passed'])")
+        FAILURES=$(python3 -c "import json; r=json.load(open('$REPORT')); print(r['summary']['failures'])")
+        WARNINGS=$(python3 -c "import json; r=json.load(open('$REPORT')); print(r['summary']['warnings'])")
+
+        echo "score=$SCORE" >> $GITHUB_OUTPUT
+        echo "grade=$GRADE" >> $GITHUB_OUTPUT
+        echo "total=$TOTAL" >> $GITHUB_OUTPUT
+        echo "passed=$PASSED" >> $GITHUB_OUTPUT
+        echo "failures=$FAILURES" >> $GITHUB_OUTPUT
+        echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
+        echo "report-path=$REPORT" >> $GITHUB_OUTPUT
+
+        # Resumen en el job
+        echo "## infraudit Security Audit" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+        echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+        echo "| **Score** | **${SCORE}/100 (${GRADE})** |" >> $GITHUB_STEP_SUMMARY
+        echo "| Total | ${TOTAL} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Passed | ${PASSED} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Warnings | ${WARNINGS} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Failures | ${FAILURES} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Listar failures críticos
+        CRITICAL=$(python3 -c "
+        import json
+        r=json.load(open('$REPORT'))
+        for c in r['checks']:
+            if c['status'] == 'FAIL' and c['severity'] in ('CRITICAL', 'HIGH'):
+                print(f\"| {c['id']} | {c['severity']} | {c['message'][:80]} |\")
+        " 2>/dev/null || true)
+
+        if [ -n "$CRITICAL" ]; then
+          echo "### Critical & High Findings" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Severity | Finding |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|----------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "$CRITICAL" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    # ── Upload SARIF ──
+    - name: Upload SARIF
+      if: inputs.format == 'sarif' && hashFiles('infraudit.sarif') != ''
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: infraudit.sarif
+        category: infraudit
+      continue-on-error: true
+
+    # ── Verificar min-score ──
+    - name: Check minimum score
+      if: inputs.min-score != ''
+      shell: bash
+      run: |
+        REPORT="${{ github.workspace }}/infraudit-report.json"
+        SCORE=$(python3 -c "import json; print(json.load(open('$REPORT'))['summary']['score'])")
+        MIN=${{ inputs.min-score }}
+
+        if [ "$SCORE" -lt "$MIN" ]; then
+          echo "::error::Hardening score ${SCORE} is below minimum ${MIN}"
+          exit 1
+        fi
+        echo "Score ${SCORE} meets minimum threshold ${MIN}"
+
+    # ── Limpiar SSH ──
+    - name: Cleanup SSH
+      if: always() && inputs.mode == 'ssh'
+      shell: bash
+      run: rm -f ~/.ssh/infraudit_key
