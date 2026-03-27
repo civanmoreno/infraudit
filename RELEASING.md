@@ -103,6 +103,27 @@ cosign verify-blob \
   /tmp/infraudit
 ```
 
+### 9. Actualizar Homebrew formula
+
+```bash
+# Actualizar SHA256 y versión en la formula
+./scripts/update-formula.sh X.Y.Z
+
+# Verificar la formula
+cat Formula/infraudit.rb
+
+# Commit y push
+git add Formula/infraudit.rb
+git commit -m "chore: update Homebrew formula to vX.Y.Z"
+git push
+```
+
+Los usuarios pueden instalar via:
+```bash
+brew tap civanmoreno/tap https://github.com/civanmoreno/infraudit.git
+brew install infraudit
+```
+
 ## Qué incluye cada release
 
 | Archivo | Descripción |

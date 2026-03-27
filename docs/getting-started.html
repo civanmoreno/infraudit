@@ -37,7 +37,11 @@
         <p>One command. Detects your server's architecture automatically and installs the correct binary:</p>
         <pre><code>curl -sL https://raw.githubusercontent.com/civanmoreno/infraudit/main/install.sh | sh</code></pre>
 
-        <h3>Option 2: Build from source</h3>
+        <h3>Option 2: Homebrew</h3>
+        <pre><code>brew tap civanmoreno/tap https://github.com/civanmoreno/infraudit.git
+brew install infraudit</code></pre>
+
+        <h3>Option 3: Build from source</h3>
         <p>Requires Go 1.24+:</p>
         <pre><code>git clone https://github.com/civanmoreno/infraudit.git
 cd infraudit
@@ -45,7 +49,7 @@ make build
 sudo mv infraudit /usr/local/bin/
 sudo make install-man  <span class="comment"># Install man page (optional)</span></code></pre>
 
-        <h3>Option 3: Docker</h3>
+        <h3>Option 4: Docker</h3>
         <pre><code>docker build -t infraudit .
 docker run --rm --privileged -v /:/host:ro infraudit audit</code></pre>
 

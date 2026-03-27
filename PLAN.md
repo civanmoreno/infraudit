@@ -570,6 +570,16 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Limpieza automática de SSH keys (even on failure)
 - [x] `action/README.md` con ejemplos: local, SSH, fleet, SARIF, policy, multi-server matrix
 
+### Phase 50: Homebrew Formula ✅
+
+- [x] `Formula/infraudit.rb` — Homebrew formula con soporte amd64/arm64
+- [x] Descarga directa de binarios desde GitHub Releases (sin compilar)
+- [x] Tests integrados (`--version`, `list` muestra 287)
+- [x] Caveats con quick start y documentación
+- [x] `scripts/update-formula.sh` — actualiza SHA256 y versión automáticamente
+- [x] Instalación: `brew tap civanmoreno/tap https://github.com/civanmoreno/infraudit.git && brew install infraudit`
+- [x] Documentado en RELEASING.md (paso 9)
+
 ## Check Categories
 
 | Category | Prefix | Description |
