@@ -124,8 +124,9 @@ func runBaselineCheck(cmd *cobra.Command, args []string) {
 	// Run current audit
 	current := runSilentAudit()
 
-	// Compare
-	beforeMap := indexEntries(bl.Report.AllEntries)
+	// Compare — use Entries (serialized as "checks" in JSON) for baseline,
+	// and AllEntries for current audit (includes all checks before display filters).
+	beforeMap := indexEntries(bl.Report.Entries)
 	afterMap := indexEntries(current.AllEntries)
 
 	var regressions, improvements, newChecks, unchanged int
@@ -283,15 +284,15 @@ func runSilentAudit() *report.Report {
 		rpt.Entries = append(rpt.Entries, entry)
 		rpt.Summary.Total++
 		switch r.Status {
-		case 0: // Pass
+		case check.Pass:
 			rpt.Summary.Passed++
-		case 1: // Warn
+		case check.Warn:
 			rpt.Summary.Warnings++
-		case 2: // Fail
+		case check.Fail:
 			rpt.Summary.Failures++
-		case 3: // Error
+		case check.Error:
 			rpt.Summary.Errors++
-		case 4: // Skipped
+		case check.Skipped:
 			rpt.Summary.Skipped++
 		}
 	}
