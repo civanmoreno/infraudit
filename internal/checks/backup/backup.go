@@ -25,6 +25,7 @@ func (c *backupSchedule) Name() string             { return "Backup schedule exi
 func (c *backupSchedule) Category() string         { return "backup" }
 func (c *backupSchedule) Severity() check.Severity { return check.High }
 func (c *backupSchedule) Description() string      { return "Verify backup jobs are scheduled and running" }
+func (c *backupSchedule) RequiredInit() string     { return "systemd" }
 
 func (c *backupSchedule) Run() check.Result {
 	// Check common backup tools

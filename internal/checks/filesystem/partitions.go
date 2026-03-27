@@ -58,6 +58,7 @@ func (c *tmpCleanup) Severity() check.Severity { return check.Low }
 func (c *tmpCleanup) Description() string {
 	return "Verify systemd-tmpfiles or tmpreaper cleans temporary files"
 }
+func (c *tmpCleanup) RequiredInit() string { return "systemd" }
 
 func (c *tmpCleanup) Run() check.Result {
 	if check.ServiceActive("systemd-tmpfiles-clean.timer") {

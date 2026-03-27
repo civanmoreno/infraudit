@@ -29,6 +29,7 @@ func (c *syslogActive) Name() string             { return "Syslog/journald activ
 func (c *syslogActive) Category() string         { return "logging" }
 func (c *syslogActive) Severity() check.Severity { return check.Critical }
 func (c *syslogActive) Description() string      { return "Verify logging service is running" }
+func (c *syslogActive) RequiredInit() string     { return "systemd" }
 
 func (c *syslogActive) Run() check.Result {
 	for _, svc := range []string{"rsyslog", "syslog-ng", "systemd-journald"} {
@@ -50,6 +51,7 @@ func (c *auditdRunning) Name() string             { return "auditd installed and
 func (c *auditdRunning) Category() string         { return "logging" }
 func (c *auditdRunning) Severity() check.Severity { return check.High }
 func (c *auditdRunning) Description() string      { return "Verify auditd is installed and active" }
+func (c *auditdRunning) RequiredInit() string     { return "systemd" }
 
 func (c *auditdRunning) Run() check.Result {
 	if check.ServiceActive("auditd") {

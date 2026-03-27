@@ -505,6 +505,41 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] Checks updated to use `check.P()` for FSRoot-based test isolation across 20+ files
 - [x] Total: 10.3% → 35.9% coverage
 
+### Phase 45: OS Annotations for All Checks ✅
+
+- [x] 24 checks annotated with `RequiredInit() = "systemd"` across 14 files
+- [x] BAK-001, CRON-001, FS-011, FS-012, LOG-001, LOG-002 annotated
+- [x] NFS-002, NFS-004, PKG-004 annotated
+- [x] SVC-001, SVC-003, SVC-007, SVC-009, SVC-010, SVC-012, SVC-013, SVC-049 annotated
+- [x] SVC-014 through SVC-027 (14 unwanted service checks) annotated
+- [x] File-only checks (journald.conf, auditd.conf, rsyslog.conf readers) correctly left universal
+- [x] CRYPTO-001 (redhat) and SVC-052 (debian) SupportedOS already in place
+- [x] All other checks verified as truly universal or multi-approach (no annotation needed)
+
+### Phase 46: YAML Plugin System ✅
+
+- [x] `internal/plugin` package — load custom checks from `/etc/infraudit/checks.d/*.yaml`
+- [x] 6 rule types: `file_exists`, `file_missing`, `file_contains`, `file_not_contains`, `file_perms`, `command`
+- [x] Plugin checks support OS/init/pkg_manager annotations via YAML fields
+- [x] Single check and multi-check (`checks:` list) YAML formats
+- [x] Validation: required fields, valid severity, valid regex patterns, valid rule types
+- [x] Wired into audit command — plugins loaded before check execution
+- [x] 22 unit tests covering all rule types, validation, loading, OS/init awareness
+- [x] Regex-based file content matching for `file_contains`/`file_not_contains`
+- [x] Octal permission checks for `file_perms`
+- [x] Command execution with `expect` (pass if match) and `expect_fail` (fail if match)
+
+### Phase 47: Baseline Command ✅
+
+- [x] `infraudit baseline save` — run audit and save snapshot to `/etc/infraudit/baseline.json`
+- [x] `infraudit baseline check` — run audit, compare against baseline, report regressions
+- [x] `infraudit baseline show` — display baseline info (score, date, host, OS)
+- [x] `infraudit baseline clear` — remove saved baseline
+- [x] `--file` flag for custom baseline path
+- [x] Exit code 1 if regressions found (CI-friendly)
+- [x] Score delta with color-coded output
+- [x] Reuses diff infrastructure for regression/improvement detection
+
 ## Check Categories
 
 | Category | Prefix | Description |

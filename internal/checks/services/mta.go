@@ -24,6 +24,7 @@ func (c *mtaLocalOnly) Severity() check.Severity { return check.High }
 func (c *mtaLocalOnly) Description() string {
 	return "Verify Postfix inet_interfaces is set to loopback-only"
 }
+func (c *mtaLocalOnly) RequiredInit() string { return "systemd" }
 
 func (c *mtaLocalOnly) Run() check.Result {
 	val := postfixMainCfValue("inet_interfaces")
@@ -60,6 +61,7 @@ func (c *mtaOpenRelay) Severity() check.Severity { return check.Critical }
 func (c *mtaOpenRelay) Description() string {
 	return "Verify Postfix does not relay mail for untrusted networks"
 }
+func (c *mtaOpenRelay) RequiredInit() string { return "systemd" }
 
 func (c *mtaOpenRelay) Run() check.Result {
 	if !check.ServiceActive("postfix") {

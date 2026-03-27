@@ -21,6 +21,7 @@ func (c *unwantedSvc) Name() string             { return c.name }
 func (c *unwantedSvc) Category() string         { return "services" }
 func (c *unwantedSvc) Severity() check.Severity { return c.severity }
 func (c *unwantedSvc) Description() string      { return c.desc }
+func (c *unwantedSvc) RequiredInit() string     { return "systemd" }
 
 func (c *unwantedSvc) Run() check.Result {
 	var installed []string

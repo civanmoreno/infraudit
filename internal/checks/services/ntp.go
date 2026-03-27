@@ -21,6 +21,7 @@ func (c *ntpSync) Name() string             { return "NTP/chrony running and syn
 func (c *ntpSync) Category() string         { return "services" }
 func (c *ntpSync) Severity() check.Severity { return check.Medium }
 func (c *ntpSync) Description() string      { return "Verify time synchronization is active and working" }
+func (c *ntpSync) RequiredInit() string     { return "systemd" }
 
 func (c *ntpSync) Run() check.Result {
 	// Check timedatectl

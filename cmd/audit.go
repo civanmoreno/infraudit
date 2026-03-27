@@ -12,6 +12,7 @@ import (
 	"github.com/civanmoreno/infraudit/internal/check"
 	"github.com/civanmoreno/infraudit/internal/config"
 	"github.com/civanmoreno/infraudit/internal/osinfo"
+	"github.com/civanmoreno/infraudit/internal/plugin"
 	"github.com/civanmoreno/infraudit/internal/policy"
 	"github.com/civanmoreno/infraudit/internal/report"
 	"github.com/spf13/cobra"
@@ -110,6 +111,15 @@ func runAudit(cmd *cobra.Command, args []string) {
 
 	// Detect OS
 	osi := osinfo.Detect()
+
+	// Load custom checks from plugin directory
+	if n, errs := plugin.LoadDir(plugin.DefaultDir); n > 0 && !quietFlag {
+		fmt.Fprintf(os.Stderr, "Loaded %d custom check(s) from %s\n", n, plugin.DefaultDir)
+	} else if len(errs) > 0 && !quietFlag {
+		for _, e := range errs {
+			fmt.Fprintf(os.Stderr, "Plugin warning: %s\n", e)
+		}
+	}
 
 	// Get checks
 	var checks []check.Check
