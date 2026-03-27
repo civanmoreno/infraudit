@@ -1,0 +1,50 @@
+name: Solicitud de Feature
+description: Proponer una nueva funcionalidad
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Proponer una nueva funcionalidad para infraudit.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema
+      description: Qué problema resuelve esta funcionalidad
+      placeholder: "Actualmente no hay forma de..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solución Propuesta
+      description: Cómo debería funcionar
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: Qué otras opciones consideraste y por qué esta es mejor
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - CLI / Comandos
+        - Checks / Reglas
+        - Output / Reportes
+        - Configuración
+        - Plugin System
+        - Remote Scanning
+        - Compliance
+        - Documentación
+        - CI/CD
+        - Otra
+    validations:
+      required: true

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Vulnerabilidad de Seguridad
+    url: https://github.com/civanmoreno/infraudit/security/policy
+    about: "NO abras un issue para vulnerabilidades. Usa el proceso de SECURITY.md"
+  - name: Pregunta General
+    url: https://github.com/civanmoreno/infraudit/discussions
+    about: "Para preguntas de uso, abre una discusión en vez de un issue"
