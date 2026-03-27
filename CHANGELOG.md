@@ -1,63 +1,63 @@
 # Changelog
 
-Todos los cambios notables en este proyecto se documentan en este archivo.
+All notable changes to this project are documented in this file.
 
-El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.1.0/),
-y el proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [2.2.0] - 2026-03-27
 
-### Agregado
-- **GitHub Action** (`action/action.yml`): action oficial para CI/CD con dos modos de ejecución — `local` (auditar el runner) y `ssh` (auditar servidor remoto via SSH). Descarga automática de binarios, detección de arquitectura remota, SARIF upload para GitHub Code Scanning, `min-score` gate, job summary con métricas
-- **Homebrew formula** (`Formula/infraudit.rb`): `brew tap civanmoreno/tap ... && brew install infraudit` con soporte amd64/arm64
-- **`scripts/update-formula.sh`**: actualiza SHA256 y versión de la formula automáticamente desde el release más reciente
-- **~110 tests nuevos**: cobertura de 36% a 47.5%, eliminando todos los paquetes con 0% coverage
-- Tests para boot (55%), backup (52%), malware (44%), nfs (71%), container (44%), rlimit (67%), packages (65%)
-- Network expandido de 9% a 53% (SNMP, DNS, IPv6, DNSSEC, DoT, bind address)
-- Services expandido de 23% a 32% (XDMCP, MTA, sudo, SSH settings)
+### Added
+- **GitHub Action** (`action/action.yml`): official action for CI/CD with two execution modes — `local` (audit the runner) and `ssh` (audit remote server via SSH). Auto binary download, remote architecture detection, SARIF upload for GitHub Code Scanning, `min-score` gate, job summary with metrics
+- **Homebrew formula** (`Formula/infraudit.rb`): `brew tap civanmoreno/tap ... && brew install infraudit` with amd64/arm64 support
+- **`scripts/update-formula.sh`**: auto-updates SHA256 and version from the latest release
+- **~110 new tests**: coverage from 36% to 47.5%, eliminating all packages with 0% coverage
+- Tests for boot (55%), backup (52%), malware (44%), nfs (71%), container (44%), rlimit (67%), packages (65%)
+- Network expanded from 9% to 53% (SNMP, DNS, IPv6, DNSSEC, DoT, bind address)
+- Services expanded from 23% to 32% (XDMCP, MTA, sudo, SSH settings)
 
-### Cambiado
-- 15+ source files actualizados a `check.P()` para test isolation via FSRoot
-- RELEASING.md: agregado paso 9 (actualizar Homebrew formula)
-- docs/output.html: sección GitHub Action reemplazada con la action oficial
-- docs/getting-started.html: Homebrew como opción de instalación
+### Changed
+- 15+ source files updated to `check.P()` for test isolation via FSRoot
+- RELEASING.md: added step 9 (update Homebrew formula)
+- docs/output.html: GitHub Action section replaced with official action
+- docs/getting-started.html: Homebrew as installation option
 
 ## [2.1.0] - 2026-03-27
 
-### Agregado
-- **OS Detection**: Nuevo paquete `internal/osinfo` que detecta distribución, familia (Debian/RedHat/SUSE/Alpine/Arch), package manager e init system via `/etc/os-release`
-- **Status SKIPPED**: Nuevo status para checks que no aplican al OS/init system detectado. Excluidos del scoring
-- **OS info en reportes**: Información del OS detectado en console, JSON, YAML, HTML, Markdown y SARIF
-- **24 checks con RequiredInit("systemd")**: BAK-001, CRON-001, FS-011, FS-012, LOG-001, LOG-002, NFS-002, NFS-004, PKG-004, SVC-001, SVC-003, SVC-007, SVC-009, SVC-010, SVC-012, SVC-013, SVC-014-027, SVC-049
-- **CRYPTO-001 como RedHat-only**: Anotado con `SupportedOS: ["redhat"]`
-- **SVC-052 como Debian-only**: Anotado con `SupportedOS: ["debian"]`
-- **Plugin system YAML**: Checks personalizados en `/etc/infraudit/checks.d/*.yaml` sin recompilar. 6 tipos de regla: `file_exists`, `file_missing`, `file_contains`, `file_not_contains`, `file_perms`, `command`
-- **Comando `baseline`**: `save`, `check`, `show`, `clear` para detección de regresiones. Exit code 1 si hay regresiones
-- **SVC-057**: Nuevo check de autenticación Redis (`requirepass`)
-- **Standards & Methodology**: Nueva página HTML documentando fuentes (CIS, STIG, NIST), metodología y mapeo a PCI-DSS, SOC 2, HIPAA, ISO 27001, FedRAMP
-- **SECURITY.md**: Política de reporte de vulnerabilidades
-- **CONTRIBUTING.md**: Guía de contribución con patrones de desarrollo, convenciones de commits e IDs de checks
-- **Issue templates**: Bug report, solicitud de nuevo check, solicitud de feature
-- **PR template**: Checklist de tests, lint, docs, CIS mapping
-- **FUNDING.yml**: GitHub Sponsors habilitado
-- **~270 tests nuevos**: Cobertura de 10.3% a 35.9% en 12 paquetes
+### Added
+- **OS Detection**: new `internal/osinfo` package that detects distro, family (Debian/RedHat/SUSE/Alpine/Arch), package manager and init system via `/etc/os-release`
+- **SKIPPED status**: new status for checks that don't apply to the detected OS/init system. Excluded from scoring
+- **OS info in reports**: detected OS information in console, JSON, YAML, HTML, Markdown and SARIF
+- **24 checks with RequiredInit("systemd")**: BAK-001, CRON-001, FS-011, FS-012, LOG-001, LOG-002, NFS-002, NFS-004, PKG-004, SVC-001, SVC-003, SVC-007, SVC-009, SVC-010, SVC-012, SVC-013, SVC-014-027, SVC-049
+- **CRYPTO-001 as RedHat-only**: annotated with `SupportedOS: ["redhat"]`
+- **SVC-052 as Debian-only**: annotated with `SupportedOS: ["debian"]`
+- **YAML plugin system**: custom checks in `/etc/infraudit/checks.d/*.yaml` without recompilation. 6 rule types: `file_exists`, `file_missing`, `file_contains`, `file_not_contains`, `file_perms`, `command`
+- **`baseline` command**: `save`, `check`, `show`, `clear` for regression detection. Exit code 1 on regressions
+- **SVC-057**: new Redis authentication check (`requirepass`)
+- **Standards & Methodology**: new HTML page documenting sources (CIS, STIG, NIST), methodology and mapping to PCI-DSS, SOC 2, HIPAA, ISO 27001, FedRAMP
+- **SECURITY.md**: vulnerability disclosure policy
+- **CONTRIBUTING.md**: contribution guide with development patterns, commit conventions and check IDs
+- **Issue templates**: bug report, new check request, feature request
+- **PR template**: checklist for tests, lint, docs, CIS mapping
+- **FUNDING.yml**: GitHub Sponsors enabled
+- **~270 new tests**: coverage from 10.3% to 35.9% across 12 packages
 
-### Corregido
-- **SVC-052**: Removido `RequiredInit("systemd")` — el check usa `PkgInstalled` que no requiere systemd (#25)
-- **baseline check**: Usaba `AllEntries` (con tag `json:"-"`) para comparar baseline, resultando en todos los checks como "new". Ahora usa `Entries` (#26)
-- **Checks actualizados a `check.P()`**: 20+ archivos de checks actualizados para usar `check.P()` en rutas de archivos, habilitando test isolation via FSRoot
-- **gofmt y gosec**: Resueltos todos los warnings de golangci-lint en archivos de test
+### Fixed
+- **SVC-052**: removed `RequiredInit("systemd")` — the check uses `PkgInstalled` which doesn't require systemd (#25)
+- **baseline check**: was using `AllEntries` (with `json:"-"` tag) to compare baseline, causing all checks to appear as "new". Now uses `Entries` (#26)
+- **Checks updated to `check.P()`**: 20+ check files updated to use `check.P()` for file paths, enabling test isolation via FSRoot
+- **gofmt and gosec**: resolved all golangci-lint warnings in test files
 
-### Cambiado
-- **doctor command**: Ahora muestra OS detectado, familia, package manager e init system
-- **Coverage CI**: Ahora corre coverage en todos los paquetes (`./...`) en vez de solo los core
-- **Release CI**: Solo crea release cuando el tag no existe (evita sobreescribir releases)
-- **Release notes**: Usa `RELEASE_NOTES.md` en vez de auto-generated notes
+### Changed
+- **doctor command**: now shows detected OS, family, package manager and init system
+- **Coverage CI**: now runs coverage on all packages (`./...`) instead of only core
+- **Release CI**: only creates release when tag doesn't exist (prevents overwriting releases)
+- **Release notes**: uses `RELEASE_NOTES.md` instead of auto-generated notes
 
 ## [2.0.0] - 2026-03-25
 
-### Agregado
-- 66 checks nuevos (221 → 287 total) para cobertura CIS completa
+### Added
+- 66 new checks (221 → 287 total) for complete CIS coverage
 - SSH advanced: 7 checks (ClientAlive, LogLevel, UsePAM, DisableForwarding, GSSAPI, Kerberos)
 - Firewall detailed: 8 checks (default deny, loopback, outbound, established, IPv6 rules)
 - Kernel hardening: 10 checks (BPF, kexec, kptr_restrict, perf_event, SysRq, namespaces)
@@ -65,32 +65,32 @@ y el proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Logging advanced: 8 checks (journald forward, rsyslog remote, audit immutable)
 - PAM advanced: 8 checks (nullok, securetty, login.defs UID/GID/UMASK/ENCRYPT)
 - Services advanced: 8 checks (rpcbind, XDMCP, prelink, apport, tftp, ldap, talk, rsh)
-- Remediación en 100% de los 287 checks
+- Remediation on 100% of all 287 checks
 
 ## [1.1.0] - 2026-03-22
 
-### Agregado
-- Comando `explain` con CIS/STIG mapping y remediación detallada
-- Comando `top` para findings más críticos
-- Comando `diff` para comparar dos reportes JSON
-- Comando `scan` para auditoría remota via SSH
-- Formato SARIF para integración con GitHub/GitLab
-- Comando `doctor` para diagnóstico de readiness
-- Policy-as-code con `--enforce-policy`
-- Comando `compliance` para reporte CIS Benchmark
-- Formato Markdown
-- Hardening Index (scoring 0-100 con grades A-F)
-- HTML report autocontenido
+### Added
+- `explain` command with CIS/STIG mapping and detailed remediation
+- `top` command for most critical findings
+- `diff` command to compare two JSON audit reports
+- `scan` command for remote auditing via SSH
+- SARIF format for GitHub/GitLab integration
+- `doctor` command for system readiness diagnostics
+- Policy-as-code with `--enforce-policy`
+- `compliance` command for CIS Benchmark reporting
+- Markdown format
+- Hardening Index (scoring 0-100 with A-F grades)
+- Self-contained HTML report
 - Shell completion
 - Man page
 
 ## [1.0.0] - 2026-03-19
 
-### Agregado
-- 132 checks iniciales en 17 categorías
-- Formatos de salida: console, JSON, YAML
-- Perfiles de servidor (web-server, db-server, container-host, minimal)
-- Configuración via JSON files (system, user, directory)
-- Ejecución paralela con `--parallel`
+### Added
+- 132 initial checks across 17 categories
+- Output formats: console, JSON, YAML
+- Server profiles (web-server, db-server, container-host, minimal)
+- Configuration via JSON files (system, user, directory)
+- Parallel execution with `--parallel`
 - Command timeouts
-- CI/CD con tests, lint, race detector, SBOM, cosign signing
+- CI/CD with tests, lint, race detector, SBOM, cosign signing
