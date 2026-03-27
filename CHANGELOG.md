@@ -5,6 +5,23 @@ Todos los cambios notables en este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.1.0/),
 y el proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [2.2.0] - 2026-03-27
+
+### Agregado
+- **GitHub Action** (`action/action.yml`): action oficial para CI/CD con dos modos de ejecución — `local` (auditar el runner) y `ssh` (auditar servidor remoto via SSH). Descarga automática de binarios, detección de arquitectura remota, SARIF upload para GitHub Code Scanning, `min-score` gate, job summary con métricas
+- **Homebrew formula** (`Formula/infraudit.rb`): `brew tap civanmoreno/tap ... && brew install infraudit` con soporte amd64/arm64
+- **`scripts/update-formula.sh`**: actualiza SHA256 y versión de la formula automáticamente desde el release más reciente
+- **~110 tests nuevos**: cobertura de 36% a 47.5%, eliminando todos los paquetes con 0% coverage
+- Tests para boot (55%), backup (52%), malware (44%), nfs (71%), container (44%), rlimit (67%), packages (65%)
+- Network expandido de 9% a 53% (SNMP, DNS, IPv6, DNSSEC, DoT, bind address)
+- Services expandido de 23% a 32% (XDMCP, MTA, sudo, SSH settings)
+
+### Cambiado
+- 15+ source files actualizados a `check.P()` para test isolation via FSRoot
+- RELEASING.md: agregado paso 9 (actualizar Homebrew formula)
+- docs/output.html: sección GitHub Action reemplazada con la action oficial
+- docs/getting-started.html: Homebrew como opción de instalación
+
 ## [2.1.0] - 2026-03-27
 
 ### Agregado

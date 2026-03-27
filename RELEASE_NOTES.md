@@ -1,58 +1,46 @@
 ## Highlights
 
-### OS Detection & Platform Awareness
-infraudit now detects your OS family (Debian, RedHat, SUSE, Alpine, Arch), package manager, and init system at startup. Checks that don't apply to your platform are automatically **SKIPPED** — no more false positives from running RHEL-specific checks on Ubuntu or systemd checks in containers.
-
-### YAML Plugin System
-Define custom checks in `/etc/infraudit/checks.d/*.yaml` without recompiling:
+### GitHub Action
+Official GitHub Action for CI/CD security audits with two execution modes:
 
 ```yaml
-id: CUSTOM-001
-name: App secure mode enabled
-category: custom
-severity: high
-remediation: Set secure_mode=true in /etc/myapp/config
-rule:
-  type: file_contains
-  path: /etc/myapp/config
-  pattern: "secure_mode=true"
+# Audit the GHA runner
+- uses: civanmoreno/infraudit/action@v2
+  with:
+    min-score: 70
+
+# Or audit a remote server via SSH
+- uses: civanmoreno/infraudit/action@v2
+  with:
+    mode: ssh
+    host: deploy@prod.example.com
+    ssh-key: ${{ secrets.SSH_KEY }}
+    min-score: 80
 ```
 
-6 rule types: `file_exists`, `file_missing`, `file_contains`, `file_not_contains`, `file_perms`, `command`.
+Features: auto-download binary, remote arch detection, SARIF upload for GitHub Code Scanning, min-score gate, job summary, fleet audits via matrix strategy.
 
-### Baseline & Regression Detection
-Track security posture over time:
+### Homebrew Formula
 
 ```bash
-sudo infraudit baseline save        # Save current state
-sudo infraudit baseline check       # Compare against baseline (exit 1 on regressions)
+brew tap civanmoreno/tap https://github.com/civanmoreno/infraudit.git
+brew install infraudit
 ```
 
-### Standards Documentation
-New [Standards & Methodology](https://civanmoreno.github.io/infraudit/standards.html) page documenting how checks map to CIS Benchmarks, DISA STIG, NIST SP 800-53, PCI-DSS, SOC 2, HIPAA, and ISO 27001.
-
-### Test Coverage: 10% → 36%
-~270 new unit tests across 12 packages with FSRoot-based test isolation.
+### Test Coverage: 36% to 47%
+~110 new tests across 9 packages. All 17 check categories now have test coverage — zero packages at 0%.
 
 ## What's Changed
 
-**New Features:**
-- OS detection (`internal/osinfo`) with 6 distro families
-- SKIPPED status for platform-incompatible checks
-- 26 checks annotated with OS/init requirements
-- YAML plugin system with 6 rule types
-- `infraudit baseline` command (save/check/show/clear)
-- SVC-057: Redis authentication check
-- Standards & Methodology docs page
+**New:**
+- GitHub Action with local and SSH modes (`action/action.yml`)
+- Homebrew formula (`Formula/infraudit.rb`)
+- Auto-update script for formula SHA256 (`scripts/update-formula.sh`)
+- ~110 new tests for boot, backup, malware, nfs, container, rlimit, packages, network, services
 
-**Bug Fixes:**
-- SVC-052 no longer skipped on Debian containers without systemd (#25)
-- `baseline check` now correctly compares checks by ID (#26)
+**Improved:**
+- 15+ source files updated to use `check.P()` for test isolation
+- Network tests: 9% to 53% (SNMP, DNS, IPv6, DNSSEC, DoT)
+- Services tests: 23% to 32% (XDMCP, MTA, sudo, SSH)
 
-**Governance:**
-- SECURITY.md — vulnerability reporting policy
-- CONTRIBUTING.md — contribution guide
-- Issue templates (bug, feature, new check)
-- PR template with checklist
-
-**Full Changelog**: https://github.com/civanmoreno/infraudit/compare/v2.0.0...v2.1.0
+**Full Changelog**: https://github.com/civanmoreno/infraudit/compare/v2.1.0...v2.2.0
