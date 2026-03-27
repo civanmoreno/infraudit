@@ -27,7 +27,7 @@ jobs:
         run: go test -race -count=1 ./...
 
       - name: Coverage
-        run: go test -coverprofile=coverage.out ./internal/check/ ./internal/config/ ./internal/report/ ./internal/checks/
+        run: go test -coverprofile=coverage.out ./...
         continue-on-error: true
 
       - name: Upload coverage
@@ -69,7 +69,17 @@ jobs:
           VERSION=$(grep 'Version =' internal/version/version.go | cut -d'"' -f2)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Check if release already exists
+        id: check_release
+        run: |
+          if git tag -l "v${{ steps.version.outputs.VERSION }}" | grep -q .; then
+            echo "EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build linux/amd64
+        if: steps.check_release.outputs.EXISTS == 'false'
         env:
           GOOS: linux
           GOARCH: amd64
@@ -77,6 +87,7 @@ jobs:
         run: go build -ldflags="-s -w" -o dist/infraudit-linux-amd64 .
 
       - name: Build linux/arm64
+        if: steps.check_release.outputs.EXISTS == 'false'
         env:
           GOOS: linux
           GOARCH: arm64
@@ -84,30 +95,35 @@ jobs:
         run: go build -ldflags="-s -w" -o dist/infraudit-linux-arm64 .
 
       - name: Generate checksums
+        if: steps.check_release.outputs.EXISTS == 'false'
         working-directory: dist
         run: sha256sum infraudit-* > checksums.txt
 
       - name: Generate SBOM
+        if: steps.check_release.outputs.EXISTS == 'false'
         uses: anchore/sbom-action@v0
         with:
           artifact-name: sbom.spdx.json
           output-file: dist/sbom.spdx.json
 
       - name: Install cosign
+        if: steps.check_release.outputs.EXISTS == 'false'
         uses: sigstore/cosign-installer@v3
 
       - name: Sign artifacts
+        if: steps.check_release.outputs.EXISTS == 'false'
         run: |
           for f in dist/infraudit-*; do
             cosign sign-blob --yes --output-signature "${f}.sig" "$f"
           done
 
-      - name: Create or update release
+      - name: Create release
+        if: steps.check_release.outputs.EXISTS == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
           name: infraudit v${{ steps.version.outputs.VERSION }}
-          generate_release_notes: true
+          body_path: RELEASE_NOTES.md
           make_latest: true
           files: |
             dist/infraudit-linux-amd64
