@@ -27,6 +27,7 @@ func (c *cronRunning) Name() string             { return "Cron daemon enabled an
 func (c *cronRunning) Category() string         { return "cron" }
 func (c *cronRunning) Severity() check.Severity { return check.Low }
 func (c *cronRunning) Description() string      { return "Verify cron service is active" }
+func (c *cronRunning) RequiredInit() string     { return "systemd" }
 
 func (c *cronRunning) Run() check.Result {
 	if check.ServiceActive("cron") || check.ServiceActive("crond") {

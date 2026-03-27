@@ -26,6 +26,7 @@ func (c *rpcbindDisabled) Name() string             { return "rpcbind service di
 func (c *rpcbindDisabled) Category() string         { return "services" }
 func (c *rpcbindDisabled) Severity() check.Severity { return check.Medium }
 func (c *rpcbindDisabled) Description() string      { return "Ensure rpcbind is not installed or running" }
+func (c *rpcbindDisabled) RequiredInit() string     { return "systemd" }
 
 func (c *rpcbindDisabled) Run() check.Result {
 	if check.ServiceActive("rpcbind") {
@@ -83,6 +84,7 @@ func (c *apportDisabled) Description() string {
 	return "Ensure apport crash reporter is disabled on servers"
 }
 func (c *apportDisabled) SupportedOS() []string { return []string{"debian"} }
+func (c *apportDisabled) RequiredInit() string  { return "systemd" }
 
 func (c *apportDisabled) Run() check.Result {
 	if !check.PkgInstalled("apport") {

@@ -21,6 +21,7 @@ func (c *desktopEnv) Severity() check.Severity { return check.Medium }
 func (c *desktopEnv) Description() string {
 	return "Verify no GUI desktop environment is installed on the server"
 }
+func (c *desktopEnv) RequiredInit() string { return "systemd" }
 
 func (c *desktopEnv) Run() check.Result {
 	// Check if gdm, lightdm, or sddm is active
@@ -58,6 +59,7 @@ func (c *automount) Name() string             { return "Automount (autofs) disab
 func (c *automount) Category() string         { return "services" }
 func (c *automount) Severity() check.Severity { return check.Medium }
 func (c *automount) Description() string      { return "Verify autofs is not running" }
+func (c *automount) RequiredInit() string     { return "systemd" }
 
 func (c *automount) Run() check.Result {
 	if check.ServiceActive("autofs") {

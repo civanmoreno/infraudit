@@ -162,6 +162,7 @@ func (c *autoUpdates) Severity() check.Severity { return check.Medium }
 func (c *autoUpdates) Description() string {
 	return "Verify unattended-upgrades or dnf-automatic is configured"
 }
+func (c *autoUpdates) RequiredInit() string { return "systemd" }
 
 func (c *autoUpdates) Run() check.Result {
 	// Check unattended-upgrades (Debian/Ubuntu)

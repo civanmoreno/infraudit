@@ -66,6 +66,7 @@ func (c *nfsv3Disabled) Name() string             { return "NFSv3 disabled if NF
 func (c *nfsv3Disabled) Category() string         { return "nfs" }
 func (c *nfsv3Disabled) Severity() check.Severity { return check.Medium }
 func (c *nfsv3Disabled) Description() string      { return "Verify NFSv3 is disabled in favor of NFSv4" }
+func (c *nfsv3Disabled) RequiredInit() string     { return "systemd" }
 
 func (c *nfsv3Disabled) Run() check.Result {
 	// Check if NFS server is running
@@ -141,6 +142,7 @@ func (c *rpcbindDisabled) Severity() check.Severity { return check.Medium }
 func (c *rpcbindDisabled) Description() string {
 	return "Verify rpcbind is not running if NFS is not needed"
 }
+func (c *rpcbindDisabled) RequiredInit() string { return "systemd" }
 
 func (c *rpcbindDisabled) Run() check.Result {
 	rpcActive := check.ServiceActive("rpcbind")

@@ -20,6 +20,7 @@ func (c *insecureServices) Severity() check.Severity { return check.Critical }
 func (c *insecureServices) Description() string {
 	return "Verify insecure services like telnet, rsh, rlogin, xinetd are not running"
 }
+func (c *insecureServices) RequiredInit() string { return "systemd" }
 
 var insecureSvcs = []string{
 	"telnet.socket", "telnetd", "rsh.socket", "rlogin.socket",

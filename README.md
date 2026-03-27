@@ -190,6 +190,8 @@ The score appears in console, JSON, YAML, and HTML output.
 | `infraudit diff` | Compare two JSON audit reports (improvements, regressions) |
 | `infraudit scan` | Audit remote servers via SSH (zero-install) |
 | `infraudit compliance` | Generate CIS Benchmark compliance report |
+| `infraudit baseline save` | Save current audit as baseline for regression detection |
+| `infraudit baseline check` | Run audit and compare against baseline (exit 1 on regressions) |
 | `infraudit doctor` | Check system readiness (OS, tools, permissions) |
 | `infraudit list` | Show all available checks (filterable) |
 | `infraudit categories` | Show available categories with check counts |
@@ -228,6 +230,48 @@ Pre-built configurations for common server roles:
 ```bash
 sudo infraudit audit --profile web-server
 ```
+
+---
+
+## 🔌 Custom Checks (Plugins)
+
+Define your own checks in `/etc/infraudit/checks.d/*.yaml`:
+
+```yaml
+id: CUSTOM-001
+name: Application config has secure mode
+category: custom
+severity: high
+description: Verify app runs in secure mode
+remediation: Set secure_mode=true in /etc/myapp/config
+rule:
+  type: file_contains
+  path: /etc/myapp/config
+  pattern: "secure_mode\\s*=\\s*true"
+```
+
+**Rule types:** `file_exists`, `file_missing`, `file_contains`, `file_not_contains`, `file_perms`, `command`
+
+Plugin checks support OS annotations (`os: [debian]`), init system requirements (`init: systemd`), and are loaded automatically during audits.
+
+---
+
+## 📊 Baseline & Regression Detection
+
+Track security posture over time:
+
+```bash
+# Save current state as baseline
+sudo infraudit baseline save
+
+# After changes, check for regressions
+sudo infraudit baseline check
+
+# View baseline info
+infraudit baseline show
+```
+
+`baseline check` exits with code 1 if any regressions are found — ideal for CI/CD pipelines.
 
 ---
 

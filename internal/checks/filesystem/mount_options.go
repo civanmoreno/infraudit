@@ -187,6 +187,7 @@ func (c *tmpMount) Severity() check.Severity { return check.Low }
 func (c *tmpMount) Description() string {
 	return "Verify tmp.mount is enabled if using systemd for /tmp"
 }
+func (c *tmpMount) RequiredInit() string { return "systemd" }
 
 func (c *tmpMount) Run() check.Result {
 	mounts := check.ParseMounts()

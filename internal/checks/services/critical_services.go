@@ -20,6 +20,7 @@ func (c *criticalServices) Severity() check.Severity { return check.High }
 func (c *criticalServices) Description() string {
 	return "Verify sshd and intrusion prevention (fail2ban/crowdsec) are running"
 }
+func (c *criticalServices) RequiredInit() string { return "systemd" }
 
 func (c *criticalServices) Run() check.Result {
 	var missing []string
