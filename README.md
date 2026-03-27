@@ -99,7 +99,7 @@ infraudit categories
 ## 📊 Sample Output
 
 ```
-  infraudit v1.1.0 — Security Audit Report
+  infraudit v2.0.0 — Security Audit Report
   ────────────────────────────────────────────────────
 
   AUTH — Users & Authentication   5 passed  2 warn  1 fail
@@ -113,8 +113,11 @@ infraudit categories
 
   ══════════════════════════════════════════════════════════
   SUMMARY
+  OS: Ubuntu 24.04 LTS (debian, apt, systemd)
+
   █████████████████████████████████████████  5/8 checks
-  ✓ 5 Passed    ! 2 Warnings    ✗ 1 Failures    0 Errors
+
+  ✓ 5 Passed    ! 2 Warnings    ✗ 1 Failures    ? 0 Errors
 
   Hardening Index: 72/100 (C)
 ```
@@ -169,7 +172,7 @@ Every audit produces a **Hardening Index** (0–100) that summarizes your system
 | LOW | 1 pt | +1 | +0 | 0 |
 | INFO | 0 pts | — | — | — |
 
-ERROR checks are excluded. The score maps to a letter grade: **A** (≥90), **B** (≥80), **C** (≥70), **D** (≥60), **F** (<60).
+ERROR and SKIPPED checks are excluded. The score maps to a letter grade: **A** (≥90), **B** (≥80), **C** (≥70), **D** (≥60), **F** (<60).
 
 The score appears in console, JSON, YAML, and HTML output.
 
@@ -184,6 +187,10 @@ The score appears in console, JSON, YAML, and HTML output.
 | `infraudit audit` | Run security checks and generate a report |
 | `infraudit top` | Show the most critical findings (`-n 10`) |
 | `infraudit explain <ID>` | Explain a check in detail (CIS mapping, why it matters) |
+| `infraudit diff` | Compare two JSON audit reports (improvements, regressions) |
+| `infraudit scan` | Audit remote servers via SSH (zero-install) |
+| `infraudit compliance` | Generate CIS Benchmark compliance report |
+| `infraudit doctor` | Check system readiness (OS, tools, permissions) |
 | `infraudit list` | Show all available checks (filterable) |
 | `infraudit categories` | Show available categories with check counts |
 | `infraudit completion` | Generate shell autocompletion (bash, zsh, fish) |
@@ -199,10 +206,11 @@ The score appears in console, JSON, YAML, and HTML output.
 | `--profile` | *(none)* | Server profile to apply |
 | `--skip` | *(none)* | Comma-separated check IDs to skip |
 | `--severity-min` | *(none)* | Show only results at or above this severity |
-| `--status` | *(all)* | Show only results with these statuses (`fail,warn,error`) |
+| `--status` | *(all)* | Show only results with these statuses (`fail,warn,error,skipped`) |
 | `--parallel` | `0` | Run checks in parallel with N workers |
 | `-q, --quiet` | `false` | Suppress progress output |
 | `--ignore-errors` | `false` | Don't count errors toward exit code 2 |
+| `--enforce-policy` | *(auto)* | Enforce a compliance policy file for CI/CD gates |
 
 ---
 
@@ -307,7 +315,7 @@ Full documentation: **[civanmoreno.github.io/infraudit](https://civanmoreno.gith
 | Page | Description |
 |:-----|:------------|
 | [Getting Started](https://civanmoreno.github.io/infraudit/getting-started.html) | Installation, basic usage, CLI reference |
-| [Checks Reference](https://civanmoreno.github.io/infraudit/checks.html) | All 221 checks with security impact and remediation |
+| [Checks Reference](https://civanmoreno.github.io/infraudit/checks.html) | All 287 checks with security impact and remediation |
 | [Configuration](https://civanmoreno.github.io/infraudit/configuration.html) | Flags, config files, profiles |
 | [Output & Reports](https://civanmoreno.github.io/infraudit/output.html) | Console, JSON, YAML formats and CI/CD integration |
 | [Architecture](https://civanmoreno.github.io/infraudit/architecture.html) | Internal design and check interface |

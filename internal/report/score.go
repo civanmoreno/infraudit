@@ -33,7 +33,7 @@ func ComputeScore(entries []Entry) int {
 		if w == 0 {
 			continue // INFO checks don't affect score
 		}
-		if e.Status == "ERROR" {
+		if e.Status == "ERROR" || e.Status == "SKIPPED" {
 			continue // can't evaluate, exclude
 		}
 

@@ -24,7 +24,7 @@ func (c *passwordExpiry) Description() string {
 }
 
 func (c *passwordExpiry) Run() check.Result {
-	f, err := os.Open("/etc/login.defs")
+	f, err := os.Open(check.P("/etc/login.defs"))
 	if err != nil {
 		return check.Result{
 			Status:  check.Error,

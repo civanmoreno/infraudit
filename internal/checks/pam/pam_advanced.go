@@ -32,7 +32,7 @@ func (c *pamNullok) Description() string {
 
 func (c *pamNullok) Run() check.Result {
 	for _, path := range []string{"/etc/pam.d/common-auth", "/etc/pam.d/system-auth", "/etc/pam.d/password-auth"} {
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(check.P(path))
 		if err != nil {
 			continue
 		}
@@ -61,10 +61,10 @@ func (c *pamSecuretty) Description() string {
 }
 
 func (c *pamSecuretty) Run() check.Result {
-	if _, err := os.Stat("/etc/securetty"); os.IsNotExist(err) {
+	if _, err := os.Stat(check.P("/etc/securetty")); os.IsNotExist(err) {
 		return check.Result{Status: check.Pass, Message: "/etc/securetty not present (default secure on modern systems)"}
 	}
-	data, err := os.ReadFile("/etc/securetty")
+	data, err := os.ReadFile(check.P("/etc/securetty"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/securetty"}
 	}
@@ -93,7 +93,7 @@ func (c *pamDenyRoot) Description() string {
 }
 
 func (c *pamDenyRoot) Run() check.Result {
-	data, err := os.ReadFile("/etc/pam.d/login")
+	data, err := os.ReadFile(check.P("/etc/pam.d/login"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/pam.d/login"}
 	}
@@ -197,7 +197,7 @@ func (c *pamSuWheel) Severity() check.Severity { return check.Medium }
 func (c *pamSuWheel) Description() string      { return "Ensure access to su is restricted via pam_wheel" }
 
 func (c *pamSuWheel) Run() check.Result {
-	data, err := os.ReadFile("/etc/pam.d/su")
+	data, err := os.ReadFile(check.P("/etc/pam.d/su"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/pam.d/su"}
 	}
@@ -214,7 +214,7 @@ func (c *pamSuWheel) Run() check.Result {
 }
 
 func loginDefsValue(key string) string {
-	data, err := os.ReadFile("/etc/login.defs")
+	data, err := os.ReadFile(check.P("/etc/login.defs"))
 	if err != nil {
 		return ""
 	}

@@ -74,7 +74,7 @@ func (c *sshHardening) Run() check.Result {
 }
 
 func parseSSHConfig(path string) map[string]string {
-	f, err := os.Open(path)
+	f, err := os.Open(check.P(path))
 	if err != nil {
 		return nil
 	}

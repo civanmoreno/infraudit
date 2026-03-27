@@ -64,7 +64,11 @@
 │   │   ├── nfs/            <span class="comment"># NFS exports, Samba, rpcbind</span>
 │   │   ├── malware/        <span class="comment"># Rootkit detection, antimalware</span>
 │   │   └── backup/         <span class="comment"># Backup schedule, encryption</span>
-│   └── report/             <span class="comment"># Output formatting (console, JSON, YAML)</span>
+│   ├── report/             <span class="comment"># Output formatting (console, JSON, YAML, HTML, SARIF)</span>
+│   ├── osinfo/             <span class="comment"># OS detection (family, distro, pkg manager, init system)</span>
+│   ├── compliance/         <span class="comment"># CIS Benchmark control mappings</span>
+│   ├── policy/             <span class="comment"># Policy-as-code enforcement</span>
+│   └── remote/             <span class="comment"># SSH remote scanning</span>
 └── main.go                 <span class="comment"># Entry point</span></code></pre>
 
         <h2>Check Interface</h2>
@@ -80,11 +84,26 @@
 
         <h2>Result Model</h2>
         <pre><code>type Result struct {
-    Status      Status            <span class="comment">// PASS, WARN, FAIL, ERROR</span>
+    Status      Status            <span class="comment">// PASS, WARN, FAIL, ERROR, SKIPPED</span>
     Message     string            <span class="comment">// What was found</span>
     Remediation string            <span class="comment">// How to fix it</span>
     Details     map[string]string <span class="comment">// Additional context</span>
 }</code></pre>
+
+        <h2>Platform-Aware Checks</h2>
+        <p>Checks can optionally implement platform interfaces to declare compatibility:</p>
+        <pre><code>type OSAware interface {
+    SupportedOS() []string  <span class="comment">// ["debian", "redhat", "suse", "alpine", "arch"]</span>
+}
+
+type InitAware interface {
+    RequiredInit() string   <span class="comment">// "systemd", "openrc", "sysvinit"</span>
+}
+
+type PkgAware interface {
+    RequiredPkgManager() string <span class="comment">// "apt", "dnf", "yum", "apk", "zypper", "pacman"</span>
+}</code></pre>
+        <p>If a check implements these interfaces and the detected OS doesn't match, the check returns <code>SKIPPED</code> instead of running. Skipped checks are excluded from scoring. The OS is detected at startup via <code>/etc/os-release</code> by the <code>osinfo</code> package.</p>
 
         <h2>Check Registry</h2>
         <p>Checks self-register via <code>init()</code> functions. The registry supports:</p>
@@ -99,10 +118,11 @@
         <h2>Execution Flow</h2>
         <pre><code>1. User runs: sudo infraudit audit --category auth,network
 2. Cobra parses flags, calls audit handler
-3. Registry filters checks by requested categories
-4. Engine runs each check, collects Results
-5. Reporter formats output (console/JSON/YAML)
-6. Exit code set based on highest severity found</code></pre>
+3. OS detected via /etc/os-release (family, pkg manager, init system)
+4. Registry filters checks by requested categories
+5. Engine runs each check (or skips if OS-incompatible)
+6. Reporter formats output (console/JSON/YAML/HTML/SARIF)
+7. Exit code set based on highest severity found</code></pre>
 
         <h2>Dependencies</h2>
         <table>

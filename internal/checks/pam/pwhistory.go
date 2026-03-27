@@ -55,7 +55,7 @@ func (c *pwhistory) Run() check.Result {
 }
 
 func findRememberValue(path string) int {
-	f, err := os.Open(path)
+	f, err := os.Open(check.P(path))
 	if err != nil {
 		return -1
 	}

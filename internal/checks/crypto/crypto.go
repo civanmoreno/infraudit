@@ -34,6 +34,7 @@ func (c *cryptoPolicy) Severity() check.Severity { return check.High }
 func (c *cryptoPolicy) Description() string {
 	return "Verify system-wide crypto policy is not set to LEGACY"
 }
+func (c *cryptoPolicy) SupportedOS() []string { return []string{"redhat"} }
 
 func (c *cryptoPolicy) Run() check.Result {
 	out, err := check.RunCmd(check.DefaultCmdTimeout, "update-crypto-policies", "--show")
@@ -69,7 +70,7 @@ func (c *certExpiry) Run() check.Result {
 
 	certDirs := []string{"/etc/ssl/certs", "/etc/pki/tls/certs"}
 	for _, dir := range certDirs {
-		_ = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		_ = filepath.Walk(check.P(dir), func(path string, info os.FileInfo, err error) error {
 			if err != nil || info.IsDir() || info.Size() > 100*1024 {
 				return nil
 			}
@@ -146,7 +147,7 @@ func (c *selfSigned) Run() check.Result {
 
 	var found []string
 	for _, p := range certPaths {
-		if _, err := os.Stat(p); err == nil {
+		if _, err := os.Stat(check.P(p)); err == nil {
 			found = append(found, filepath.Base(p))
 		}
 	}
@@ -172,7 +173,7 @@ func (c *tlsVersion) Description() string      { return "Verify TLS 1.0 and 1.1 
 
 func (c *tlsVersion) Run() check.Result {
 	// Check OpenSSL default config
-	data, err := os.ReadFile("/etc/ssl/openssl.cnf")
+	data, err := os.ReadFile(check.P("/etc/ssl/openssl.cnf"))
 	if err != nil {
 		return check.Result{Status: check.Warn, Message: "Cannot read OpenSSL config"}
 	}
@@ -244,10 +245,10 @@ func (c *certChain) Description() string {
 
 func (c *certChain) Run() check.Result {
 	// Basic check - verify ca-certificates is installed
-	if _, err := os.Stat("/etc/ssl/certs/ca-certificates.crt"); err == nil {
+	if _, err := os.Stat(check.P("/etc/ssl/certs/ca-certificates.crt")); err == nil {
 		return check.Result{Status: check.Pass, Message: "CA certificates bundle is installed"}
 	}
-	if _, err := os.Stat("/etc/pki/tls/certs/ca-bundle.crt"); err == nil {
+	if _, err := os.Stat(check.P("/etc/pki/tls/certs/ca-bundle.crt")); err == nil {
 		return check.Result{Status: check.Pass, Message: "CA certificates bundle is installed"}
 	}
 	return check.Result{
@@ -270,7 +271,7 @@ func (c *privateKeyPerms) Run() check.Result {
 	var bad []string
 
 	for _, dir := range keyDirs {
-		_ = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		_ = filepath.Walk(check.P(dir), func(path string, info os.FileInfo, err error) error {
 			if err != nil || info.IsDir() {
 				return nil
 			}
@@ -302,7 +303,7 @@ func (c *fipsMode) Severity() check.Severity { return check.Medium }
 func (c *fipsMode) Description() string      { return "Check if FIPS mode is enabled" }
 
 func (c *fipsMode) Run() check.Result {
-	data, err := os.ReadFile("/proc/sys/crypto/fips_enabled")
+	data, err := os.ReadFile(check.P("/proc/sys/crypto/fips_enabled"))
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "FIPS check not applicable"}
 	}

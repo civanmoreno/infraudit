@@ -99,8 +99,8 @@ var sshSettings = []*sshSetting{
 
 // readSSHDirective reads a directive value from sshd_config and drop-in files.
 func readSSHDirective(directive string) string {
-	paths := []string{"/etc/ssh/sshd_config"}
-	dropins, _ := filepath.Glob("/etc/ssh/sshd_config.d/*.conf")
+	paths := []string{check.P("/etc/ssh/sshd_config")}
+	dropins, _ := filepath.Glob(check.P("/etc/ssh/sshd_config.d") + "/*.conf")
 	paths = append(paths, dropins...)
 
 	for _, p := range paths {
@@ -170,8 +170,8 @@ func (c *sudoLog) Run() check.Result {
 }
 
 func sudoersContains(keyword string) bool {
-	paths := []string{"/etc/sudoers"}
-	dropins, _ := filepath.Glob("/etc/sudoers.d/*")
+	paths := []string{check.P("/etc/sudoers")}
+	dropins, _ := filepath.Glob(check.P("/etc/sudoers.d") + "/*")
 	paths = append(paths, dropins...)
 
 	for _, p := range paths {

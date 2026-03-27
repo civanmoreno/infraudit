@@ -11,6 +11,7 @@ import (
 
 	"github.com/civanmoreno/infraudit/internal/check"
 	"github.com/civanmoreno/infraudit/internal/config"
+	"github.com/civanmoreno/infraudit/internal/osinfo"
 	"github.com/civanmoreno/infraudit/internal/policy"
 	"github.com/civanmoreno/infraudit/internal/report"
 	"github.com/spf13/cobra"
@@ -107,6 +108,9 @@ func runAudit(cmd *cobra.Command, args []string) {
 	// Store config globally so checks can access it
 	config.Set(cfg)
 
+	// Detect OS
+	osi := osinfo.Detect()
+
 	// Get checks
 	var checks []check.Check
 	switch {
@@ -168,8 +172,8 @@ func runAudit(cmd *cobra.Command, args []string) {
 		statusFilter = make(map[string]bool)
 		for _, s := range strings.Split(statusFlag, ",") {
 			s = strings.ToUpper(strings.TrimSpace(s))
-			if s != "PASS" && s != "WARN" && s != "FAIL" && s != "ERROR" {
-				fmt.Fprintf(os.Stderr, "Invalid status: %s\nValid values: pass, warn, fail, error\n", s)
+			if s != "PASS" && s != "WARN" && s != "FAIL" && s != "ERROR" && s != "SKIPPED" {
+				fmt.Fprintf(os.Stderr, "Invalid status: %s\nValid values: pass, warn, fail, error, skipped\n", s)
 				os.Exit(1)
 			}
 			statusFilter[s] = true
@@ -178,6 +182,17 @@ func runAudit(cmd *cobra.Command, args []string) {
 
 	// Run checks and build report
 	rpt := &report.Report{}
+
+	// runOrSkip executes a check or returns a Skipped result if the OS doesn't match.
+	runOrSkip := func(c check.Check) check.Result {
+		if reason := checkOSCompat(c, osi); reason != "" {
+			return check.Result{
+				Status:  check.Skipped,
+				Message: reason,
+			}
+		}
+		return c.Run()
+	}
 
 	if parallelFlag > 0 && total > 1 {
 		type checkResult struct {
@@ -195,7 +210,7 @@ func runAudit(cmd *cobra.Command, args []string) {
 			go func() {
 				defer wg.Done()
 				for c := range jobs {
-					r := c.Run()
+					r := runOrSkip(c)
 					results <- checkResult{check: c, result: r}
 					done := int(completed.Add(1))
 					progress(done, total)
@@ -219,7 +234,7 @@ func runAudit(cmd *cobra.Command, args []string) {
 	} else {
 		for i, c := range active {
 			progress(i+1, total)
-			r := c.Run()
+			r := runOrSkip(c)
 			addResult(rpt, c, r, minSeverity, statusFilter)
 		}
 	}
@@ -230,6 +245,17 @@ func runAudit(cmd *cobra.Command, args []string) {
 	rpt.Summary.Duration = time.Since(start).Seconds()
 	rpt.Summary.Score = report.ComputeScore(rpt.AllEntries)
 	rpt.Summary.Grade = report.ScoreGrade(rpt.Summary.Score)
+
+	// Attach OS info to report
+	rpt.Summary.OSInfo = &report.OSInfo{
+		ID:         osi.ID,
+		Name:       osi.Name,
+		Version:    osi.VersionID,
+		Family:     string(osi.Family),
+		PkgManager: string(osi.PkgManager),
+		InitSystem: string(osi.InitSystem),
+		Arch:       osi.Arch,
+	}
 
 	// Determine output writer
 	var w *os.File
@@ -324,6 +350,8 @@ func addResult(rpt *report.Report, c check.Check, r check.Result, minSeverity ch
 		rpt.Summary.Failures++
 	case check.Error:
 		rpt.Summary.Errors++
+	case check.Skipped:
+		rpt.Summary.Skipped++
 	}
 
 	entry := report.NewEntry(c, r)
@@ -338,4 +366,38 @@ func addResult(rpt *report.Report, c check.Check, r check.Result, minSeverity ch
 		return
 	}
 	rpt.Entries = append(rpt.Entries, entry)
+}
+
+// checkOSCompat tests whether a check is compatible with the detected OS.
+// Returns an empty string if compatible, or a reason string if not.
+func checkOSCompat(c check.Check, osi osinfo.Info) string {
+	if oa, ok := c.(check.OSAware); ok {
+		families := oa.SupportedOS()
+		if len(families) > 0 {
+			found := false
+			for _, f := range families {
+				if osinfo.Family(f) == osi.Family {
+					found = true
+					break
+				}
+			}
+			if !found {
+				return fmt.Sprintf("Not applicable on %s (requires %s)",
+					osi.Family, strings.Join(families, ", "))
+			}
+		}
+	}
+	if ia, ok := c.(check.InitAware); ok {
+		req := ia.RequiredInit()
+		if req != "" && osinfo.InitSystem(req) != osi.InitSystem {
+			return fmt.Sprintf("Requires %s init system (detected %s)", req, osi.InitSystem)
+		}
+	}
+	if pa, ok := c.(check.PkgAware); ok {
+		req := pa.RequiredPkgManager()
+		if req != "" && osinfo.PkgManager(req) != osi.PkgManager {
+			return fmt.Sprintf("Requires %s package manager (detected %s)", req, osi.PkgManager)
+		}
+	}
+	return ""
 }

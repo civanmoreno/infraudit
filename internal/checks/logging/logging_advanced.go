@@ -49,7 +49,7 @@ func (c *rsyslogRemote) Description() string {
 }
 
 func (c *rsyslogRemote) Run() check.Result {
-	data, err := os.ReadFile("/etc/rsyslog.conf")
+	data, err := os.ReadFile(check.P("/etc/rsyslog.conf"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/rsyslog.conf"}
 	}
@@ -72,7 +72,7 @@ func (c *rsyslogNoReceive) Description() string {
 }
 
 func (c *rsyslogNoReceive) Run() check.Result {
-	data, err := os.ReadFile("/etc/rsyslog.conf")
+	data, err := os.ReadFile(check.P("/etc/rsyslog.conf"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/rsyslog.conf"}
 	}
@@ -167,7 +167,7 @@ func (c *logPermissions) Severity() check.Severity { return check.Medium }
 func (c *logPermissions) Description() string      { return "Ensure /var/log has restrictive permissions" }
 
 func (c *logPermissions) Run() check.Result {
-	info, err := os.Stat("/var/log")
+	info, err := os.Stat(check.P("/var/log"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot stat /var/log"}
 	}

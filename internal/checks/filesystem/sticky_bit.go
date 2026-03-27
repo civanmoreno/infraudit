@@ -27,7 +27,7 @@ func (c *stickyBit) Run() check.Result {
 	var missing []string
 
 	for _, dir := range dirs {
-		info, err := os.Stat(dir)
+		info, err := os.Stat(check.P(dir))
 		if err != nil {
 			continue
 		}

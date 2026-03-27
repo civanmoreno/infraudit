@@ -23,7 +23,7 @@ func (c *pamWheel) Description() string {
 }
 
 func (c *pamWheel) Run() check.Result {
-	f, err := os.Open("/etc/pam.d/su")
+	f, err := os.Open(check.P("/etc/pam.d/su"))
 	if err != nil {
 		return check.Result{
 			Status:  check.Error,

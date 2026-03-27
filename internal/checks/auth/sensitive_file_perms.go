@@ -37,7 +37,7 @@ func (c *sensitiveFilePerms) Run() check.Result {
 
 	var bad []string
 	for _, fc := range checks {
-		info, err := os.Stat(fc.path)
+		info, err := os.Stat(check.P(fc.path))
 		if err != nil {
 			bad = append(bad, fmt.Sprintf("%s: %s", fc.path, err.Error()))
 			continue

@@ -48,7 +48,7 @@ func (c *crontabPerms) Severity() check.Severity { return check.Medium }
 func (c *crontabPerms) Description() string      { return "Verify /etc/crontab is 0600 root:root" }
 
 func (c *crontabPerms) Run() check.Result {
-	info, err := os.Stat("/etc/crontab")
+	info, err := os.Stat(check.P("/etc/crontab"))
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "/etc/crontab not found"}
 	}
@@ -73,7 +73,7 @@ func (c *cronDirPerms) Severity() check.Severity { return check.Medium }
 func (c *cronDirPerms) Description() string      { return "Verify cron directories are 0700" }
 
 func (c *cronDirPerms) Run() check.Result {
-	dirs := []string{"/etc/cron.hourly", "/etc/cron.daily", "/etc/cron.weekly", "/etc/cron.monthly"}
+	dirs := []string{check.P("/etc/cron.hourly"), check.P("/etc/cron.daily"), check.P("/etc/cron.weekly"), check.P("/etc/cron.monthly")}
 	var bad []string
 	for _, d := range dirs {
 		info, err := os.Stat(d)
@@ -106,8 +106,8 @@ func (c *cronAllow) Severity() check.Severity { return check.Medium }
 func (c *cronAllow) Description() string      { return "Verify whitelist approach for cron access" }
 
 func (c *cronAllow) Run() check.Result {
-	_, allowErr := os.Stat("/etc/cron.allow")
-	_, denyErr := os.Stat("/etc/cron.deny")
+	_, allowErr := os.Stat(check.P("/etc/cron.allow"))
+	_, denyErr := os.Stat(check.P("/etc/cron.deny"))
 
 	if allowErr == nil && denyErr != nil {
 		return check.Result{Status: check.Pass, Message: "cron.allow exists and cron.deny is absent"}
@@ -138,8 +138,8 @@ func (c *atAllow) Severity() check.Severity { return check.Medium }
 func (c *atAllow) Description() string      { return "Verify whitelist approach for at access" }
 
 func (c *atAllow) Run() check.Result {
-	_, allowErr := os.Stat("/etc/at.allow")
-	_, denyErr := os.Stat("/etc/at.deny")
+	_, allowErr := os.Stat(check.P("/etc/at.allow"))
+	_, denyErr := os.Stat(check.P("/etc/at.deny"))
 
 	if allowErr == nil && denyErr != nil {
 		return check.Result{Status: check.Pass, Message: "at.allow exists and at.deny is absent"}
@@ -173,7 +173,7 @@ func (c *suspiciousJobs) Description() string {
 var suspiciousPatterns = []string{"curl ", "wget ", "nc ", "ncat ", "/dev/tcp", "bash -i"}
 
 func (c *suspiciousJobs) Run() check.Result {
-	cronDirs := []string{"/etc/cron.d", "/etc/cron.hourly", "/etc/cron.daily", "/etc/cron.weekly", "/etc/cron.monthly"}
+	cronDirs := []string{check.P("/etc/cron.d"), check.P("/etc/cron.hourly"), check.P("/etc/cron.daily"), check.P("/etc/cron.weekly"), check.P("/etc/cron.monthly")}
 	var findings []string
 
 	for _, dir := range cronDirs {
@@ -190,7 +190,7 @@ func (c *suspiciousJobs) Run() check.Result {
 	}
 
 	// Check system crontab
-	if scanFileForPatterns("/etc/crontab", suspiciousPatterns) {
+	if scanFileForPatterns(check.P("/etc/crontab"), suspiciousPatterns) {
 		findings = append(findings, "/etc/crontab")
 	}
 
@@ -236,9 +236,9 @@ func (c *userCrontabs) Severity() check.Severity { return check.Low }
 func (c *userCrontabs) Description() string      { return "List users with crontabs for review" }
 
 func (c *userCrontabs) Run() check.Result {
-	entries, err := os.ReadDir("/var/spool/cron/crontabs")
+	entries, err := os.ReadDir(check.P("/var/spool/cron/crontabs"))
 	if err != nil {
-		entries, err = os.ReadDir("/var/spool/cron")
+		entries, err = os.ReadDir(check.P("/var/spool/cron"))
 		if err != nil {
 			return check.Result{Status: check.Pass, Message: "No user crontabs directory found"}
 		}

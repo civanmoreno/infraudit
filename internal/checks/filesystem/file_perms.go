@@ -113,7 +113,7 @@ func (c *userDotFiles) Run() check.Result {
 		if e.UID < 1000 || e.Home == "" || e.Home == "/" {
 			continue
 		}
-		dotFiles, _ := filepath.Glob(filepath.Join(e.Home, ".*"))
+		dotFiles, _ := filepath.Glob(filepath.Join(check.P(e.Home), ".*"))
 		for _, f := range dotFiles {
 			info, err := os.Lstat(f)
 			if err != nil || info.IsDir() {
@@ -150,7 +150,7 @@ func checkUserDotFile(filename string) check.Result {
 		if e.UID < 1000 || e.Home == "" || e.Home == "/" {
 			continue
 		}
-		path := filepath.Join(e.Home, filename)
+		path := filepath.Join(check.P(e.Home), filename)
 		if _, err := os.Stat(path); err == nil {
 			found = append(found, e.User)
 		}

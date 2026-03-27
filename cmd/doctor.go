@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/civanmoreno/infraudit/internal/check"
+	"github.com/civanmoreno/infraudit/internal/osinfo"
 	"github.com/civanmoreno/infraudit/internal/version"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +42,19 @@ func runDoctor(_ *cobra.Command, _ []string) {
 	// System info
 	printSection("System")
 	hostname, _ := os.Hostname()
+	osi := osinfo.Detect()
+	osLabel := osi.PrettyName
+	if osLabel == "" {
+		osLabel = osi.Name
+		if osi.VersionID != "" {
+			osLabel += " " + osi.VersionID
+		}
+	}
 	fmt.Printf("  Hostname:      %s\n", hostname)
+	fmt.Printf("  OS:            %s\n", osLabel)
+	fmt.Printf("  Family:        %s\n", osi.Family)
+	fmt.Printf("  Pkg Manager:   %s\n", osi.PkgManager)
+	fmt.Printf("  Init System:   %s\n", osi.InitSystem)
 	fmt.Printf("  Architecture:  %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	fmt.Printf("  Running as:    %s\n", currentUser())
 	fmt.Printf("  Root access:   %s\n", boolStatus(os.Getuid() == 0))

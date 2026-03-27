@@ -405,6 +405,35 @@
             </ul>
         </div>
 
+        <div class="phase-card">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 43: OS Detection &amp; Platform Support</h2>
+                <span class="phase-status done">DONE</span>
+            </div>
+            <ul class="check-list">
+                <li>osinfo package: detect OS family, distro, package manager, init system via /etc/os-release <span class="phase-status done">DONE</span></li>
+                <li>6 families supported: Debian, RedHat, SUSE, Alpine, Arch, Unknown <span class="phase-status done">DONE</span></li>
+                <li>OSAware, InitAware, PkgAware interfaces for platform-aware checks <span class="phase-status done">DONE</span></li>
+                <li>SKIPPED status for checks with unmet platform requirements <span class="phase-status done">DONE</span></li>
+                <li>OS info in JSON, YAML, HTML, SARIF, Markdown, and console reports <span class="phase-status done">DONE</span></li>
+                <li>doctor command shows detected OS, family, pkg manager, init system <span class="phase-status done">DONE</span></li>
+            </ul>
+        </div>
+
+        <div class="phase-card">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 44: Test Coverage (10% &rarr; 36%)</h2>
+                <span class="phase-status done">DONE</span>
+            </div>
+            <ul class="check-list">
+                <li>~270 new unit tests across 12 packages <span class="phase-status done">DONE</span></li>
+                <li>auth (61%), pam (61%), secrets (78%), cron (59%), hardening (49%) <span class="phase-status done">DONE</span></li>
+                <li>crypto (51%), filesystem (47%), logging (35%), services (23%), network (9%) <span class="phase-status done">DONE</span></li>
+                <li>report (81%), osinfo (82%), cmd (15%) <span class="phase-status done">DONE</span></li>
+                <li>FSRoot-based test isolation for file-reading checks <span class="phase-status done">DONE</span></li>
+            </ul>
+        </div>
+
         <h2>Standards Coverage</h2>
         <table>
             <thead>

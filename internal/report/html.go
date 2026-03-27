@@ -35,6 +35,7 @@ type categoryGroup struct {
 	Warns   int
 	Fails   int
 	Errors  int
+	Skipped int
 }
 
 // WriteHTML writes a self-contained HTML report.
@@ -130,6 +131,8 @@ func buildGroup(cat string, entries []Entry) categoryGroup {
 			g.Fails++
 		case "ERROR":
 			g.Errors++
+		case "SKIPPED":
+			g.Skipped++
 		}
 	}
 	return g
@@ -209,6 +212,7 @@ code { font-family:'JetBrains Mono',monospace; font-size:.85em; }
 .badge-warn { color:var(--yellow); background:var(--yellow-bg); }
 .badge-fail { color:var(--red); background:var(--red-bg); }
 .badge-error { color:var(--purple); background:var(--purple-bg); }
+.badge-skipped { color:var(--text3); background:rgba(107,114,128,.15); }
 
 .sev { font-size:.7rem; font-weight:500; padding:.1rem .4rem; border-radius:3px; }
 .sev-critical { color:var(--red); background:var(--red-bg); }
@@ -267,6 +271,9 @@ code { font-family:'JetBrains Mono',monospace; font-size:.85em; }
     <div class="meta">
       <span>{{.Hostname}}</span>
       <span>{{.Timestamp}}</span>
+      {{- if .Summary.OSInfo}}
+      <span>{{.Summary.OSInfo.Name}}{{if .Summary.OSInfo.Version}} {{.Summary.OSInfo.Version}}{{end}} ({{.Summary.OSInfo.Family}})</span>
+      {{- end}}
       {{- if gtZero .Summary.Duration}}
       <span>{{fmtFloat .Summary.Duration}}s</span>
       {{- end}}
@@ -313,6 +320,7 @@ code { font-family:'JetBrains Mono',monospace; font-size:.85em; }
         {{if gt .Warns 0}}<span class="st st-warn">{{.Warns}} warn</span>{{end}}
         {{if gt .Fails 0}}<span class="st st-fail">{{.Fails}} fail</span>{{end}}
         {{if gt .Errors 0}}<span class="st st-err">{{.Errors}} err</span>{{end}}
+        {{if gt .Skipped 0}}<span class="st" style="color:var(--text3)">{{.Skipped}} skip</span>{{end}}
       </div>
     </div>
     {{range .Entries}}

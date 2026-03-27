@@ -53,7 +53,7 @@ func (c *loginBanner) Description() string {
 func (c *loginBanner) Run() check.Result {
 	var issues []string
 	for _, path := range []string{"/etc/issue", "/etc/issue.net"} {
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(check.P(path))
 		if err != nil || len(strings.TrimSpace(string(data))) < 10 {
 			issues = append(issues, path+" is empty or missing")
 		}
@@ -85,7 +85,7 @@ func (c *coreDumps) Run() check.Result {
 	}
 
 	// Check limits
-	data, err := os.ReadFile("/etc/security/limits.conf")
+	data, err := os.ReadFile(check.P("/etc/security/limits.conf"))
 	if err == nil && strings.Contains(string(data), "hard core 0") {
 		return check.Result{Status: check.Pass, Message: "Core dumps disabled via limits.conf"}
 	}
@@ -196,7 +196,7 @@ func (c *swapEncrypted) Severity() check.Severity { return check.Low }
 func (c *swapEncrypted) Description() string      { return "Verify swap is encrypted or not in use" }
 
 func (c *swapEncrypted) Run() check.Result {
-	data, err := os.ReadFile("/proc/swaps")
+	data, err := os.ReadFile(check.P("/proc/swaps"))
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "No swap information available"}
 	}
@@ -283,9 +283,9 @@ func (c *wirelessModules) Description() string {
 
 func (c *wirelessModules) Run() check.Result {
 	// Check if any wireless interfaces exist
-	entries, _ := os.ReadDir("/sys/class/net")
+	entries, _ := os.ReadDir(check.P("/sys/class/net"))
 	for _, e := range entries {
-		wirelessPath := "/sys/class/net/" + e.Name() + "/wireless"
+		wirelessPath := check.P("/sys/class/net/" + e.Name() + "/wireless")
 		if _, err := os.Stat(wirelessPath); err == nil {
 			return check.Result{
 				Status: check.Warn, Message: "Wireless interface found: " + e.Name(),

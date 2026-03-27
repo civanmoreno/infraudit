@@ -71,7 +71,7 @@ func (c *rsyslogPerms) Description() string {
 }
 
 func (c *rsyslogPerms) Run() check.Result {
-	data, err := os.ReadFile("/etc/rsyslog.conf")
+	data, err := os.ReadFile(check.P("/etc/rsyslog.conf"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read /etc/rsyslog.conf"}
 	}
@@ -94,7 +94,7 @@ func (c *rsyslogPerms) Run() check.Result {
 }
 
 func journaldConfValue(key string) string {
-	data, err := os.ReadFile("/etc/systemd/journald.conf")
+	data, err := os.ReadFile(check.P("/etc/systemd/journald.conf"))
 	if err != nil {
 		return ""
 	}
