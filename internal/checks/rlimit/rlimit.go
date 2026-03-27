@@ -30,7 +30,7 @@ func (c *openFiles) Severity() check.Severity { return check.Low }
 func (c *openFiles) Description() string      { return "Check system-wide open files limit" }
 
 func (c *openFiles) Run() check.Result {
-	data, err := os.ReadFile("/proc/sys/fs/file-max")
+	data, err := os.ReadFile(check.P("/proc/sys/fs/file-max"))
 	if err != nil {
 		return check.Result{Status: check.Error, Message: "Cannot read file-max"}
 	}
@@ -55,7 +55,7 @@ func (c *maxProcs) Severity() check.Severity { return check.Medium }
 func (c *maxProcs) Description() string      { return "Verify nproc limits protect against fork bombs" }
 
 func (c *maxProcs) Run() check.Result {
-	data, err := os.ReadFile("/etc/security/limits.conf")
+	data, err := os.ReadFile(check.P("/etc/security/limits.conf"))
 	if err != nil {
 		return check.Result{Status: check.Warn, Message: "Cannot read limits.conf"}
 	}
@@ -65,9 +65,9 @@ func (c *maxProcs) Run() check.Result {
 	}
 
 	// Check limits.d
-	entries, _ := os.ReadDir("/etc/security/limits.d")
+	entries, _ := os.ReadDir(check.P("/etc/security/limits.d"))
 	for _, e := range entries {
-		d, _ := os.ReadFile("/etc/security/limits.d/" + e.Name())
+		d, _ := os.ReadFile(check.P("/etc/security/limits.d/" + e.Name()))
 		if strings.Contains(string(d), "nproc") {
 			return check.Result{Status: check.Pass, Message: "nproc limits configured in limits.d/" + e.Name()}
 		}
@@ -89,7 +89,7 @@ func (c *stackSize) Severity() check.Severity { return check.Low }
 func (c *stackSize) Description() string      { return "Verify stack size limits are set" }
 
 func (c *stackSize) Run() check.Result {
-	data, _ := os.ReadFile("/etc/security/limits.conf")
+	data, _ := os.ReadFile(check.P("/etc/security/limits.conf"))
 	if strings.Contains(string(data), "stack") {
 		return check.Result{Status: check.Pass, Message: "Stack size limits configured"}
 	}
@@ -108,10 +108,10 @@ func (c *wildcardUnlimited) Description() string {
 }
 
 func (c *wildcardUnlimited) Run() check.Result {
-	files := []string{"/etc/security/limits.conf"}
-	entries, _ := os.ReadDir("/etc/security/limits.d")
+	files := []string{check.P("/etc/security/limits.conf")}
+	entries, _ := os.ReadDir(check.P("/etc/security/limits.d"))
 	for _, e := range entries {
-		files = append(files, "/etc/security/limits.d/"+e.Name())
+		files = append(files, check.P("/etc/security/limits.d/"+e.Name()))
 	}
 
 	for _, path := range files {

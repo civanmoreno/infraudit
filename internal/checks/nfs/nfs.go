@@ -27,7 +27,7 @@ func (c *nfsExports) Description() string {
 }
 
 func (c *nfsExports) Run() check.Result {
-	f, err := os.Open("/etc/exports")
+	f, err := os.Open(check.P("/etc/exports"))
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "NFS exports not configured"}
 	}
@@ -100,7 +100,7 @@ func (c *sambaConfig) Severity() check.Severity { return check.Medium }
 func (c *sambaConfig) Description() string      { return "Verify Samba does not allow guest access" }
 
 func (c *sambaConfig) Run() check.Result {
-	f, err := os.Open("/etc/samba/smb.conf")
+	f, err := os.Open(check.P("/etc/samba/smb.conf"))
 	if err != nil {
 		return check.Result{Status: check.Pass, Message: "Samba not configured"}
 	}

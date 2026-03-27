@@ -21,7 +21,7 @@ func (c *snmpUnused) Description() string      { return "Verify SNMP daemon is n
 
 func (c *snmpUnused) Run() check.Result {
 	// Check if snmpd config exists
-	if _, err := os.Stat("/etc/snmp/snmpd.conf"); err != nil {
+	if _, err := os.Stat(check.P("/etc/snmp/snmpd.conf")); err != nil {
 		return check.Result{
 			Status:  check.Pass,
 			Message: "SNMP is not installed",

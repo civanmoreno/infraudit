@@ -61,7 +61,7 @@ func (c *openPorts) Run() check.Result {
 
 // parseProcNet reads /proc/net/tcp or tcp6 and returns ports in LISTEN state (0A).
 func parseProcNet(path string) []string {
-	f, err := os.Open(path)
+	f, err := os.Open(check.P(path))
 	if err != nil {
 		return nil
 	}
