@@ -221,7 +221,7 @@ func TestSeverityBreakdown_AllStatuses(t *testing.T) {
 		{Severity: "MEDIUM", Status: "WARN"},
 		{Severity: "LOW", Status: "FAIL"},
 		{Severity: "CRITICAL", Status: "PASS"}, // should be excluded
-		{Severity: "HIGH", Status: "PASS"},      // should be excluded
+		{Severity: "HIGH", Status: "PASS"},     // should be excluded
 	}
 
 	c := severityBreakdown(entries)
@@ -358,9 +358,9 @@ func TestVisibleLen_OnlyEscapes(t *testing.T) {
 
 func TestComputeScore_SkippedExcluded(t *testing.T) {
 	entries := []Entry{
-		{Severity: "CRITICAL", Status: "PASS"},    // 10/10
-		{Severity: "HIGH", Status: "SKIPPED"},      // excluded
-		{Severity: "MEDIUM", Status: "SKIPPED"},    // excluded
+		{Severity: "CRITICAL", Status: "PASS"},  // 10/10
+		{Severity: "HIGH", Status: "SKIPPED"},   // excluded
+		{Severity: "MEDIUM", Status: "SKIPPED"}, // excluded
 	}
 	score := ComputeScore(entries)
 	// Only CRITICAL counts: 10/10 = 100
@@ -383,10 +383,10 @@ func TestComputeScore_AllSkipped(t *testing.T) {
 
 func TestComputeScore_MixedWithSkipped(t *testing.T) {
 	entries := []Entry{
-		{Severity: "CRITICAL", Status: "PASS"},    // 10/10
-		{Severity: "HIGH", Status: "FAIL"},         // 0/5
-		{Severity: "MEDIUM", Status: "SKIPPED"},    // excluded
-		{Severity: "LOW", Status: "WARN"},          // 0/1
+		{Severity: "CRITICAL", Status: "PASS"},  // 10/10
+		{Severity: "HIGH", Status: "FAIL"},      // 0/5
+		{Severity: "MEDIUM", Status: "SKIPPED"}, // excluded
+		{Severity: "LOW", Status: "WARN"},       // 0/1
 	}
 	// earned=10, possible=16 -> 62
 	score := ComputeScore(entries)

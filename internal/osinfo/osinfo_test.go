@@ -9,7 +9,7 @@ import (
 func writeOSRelease(t *testing.T, dir, content string) {
 	t.Helper()
 	path := filepath.Join(dir, "os-release")
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 }
@@ -258,7 +258,7 @@ EXTRA_KEY=unquoted_value
 SINGLE_QUOTED='single'
 `
 	path := filepath.Join(dir, "os-release")
-	os.WriteFile(path, []byte(content), 0644)
+	os.WriteFile(path, []byte(content), 0644) //nolint:gosec,errcheck
 
 	fields := parseOSRelease(path)
 

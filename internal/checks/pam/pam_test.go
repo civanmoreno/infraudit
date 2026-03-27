@@ -25,10 +25,10 @@ func setupFSRoot(t *testing.T) string {
 func writeFile(t *testing.T, root, relPath, content string) {
 	t.Helper()
 	abs := filepath.Join(root, relPath)
-	if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(abs, []byte(content), 0o644); err != nil {
+	if err := os.WriteFile(abs, []byte(content), 0o644); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 }

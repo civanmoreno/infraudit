@@ -21,7 +21,7 @@ func setupTmpRoot(t *testing.T) string {
 
 func mkdirAll(t *testing.T, path string) {
 	t.Helper()
-	if err := os.MkdirAll(path, 0755); err != nil {
+	if err := os.MkdirAll(path, 0755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 }
@@ -200,7 +200,7 @@ func TestCronDirPerms_Pass(t *testing.T) {
 	tmp := setupTmpRoot(t)
 	for _, dir := range []string{"cron.hourly", "cron.daily", "cron.weekly", "cron.monthly"} {
 		mkdirAll(t, filepath.Join(tmp, "etc", dir))
-		if err := os.Chmod(filepath.Join(tmp, "etc", dir), 0700); err != nil {
+		if err := os.Chmod(filepath.Join(tmp, "etc", dir), 0700); err != nil { //nolint:gosec
 			t.Fatal(err)
 		}
 	}
@@ -216,7 +216,7 @@ func TestCronDirPerms_Warn(t *testing.T) {
 	tmp := setupTmpRoot(t)
 	dir := filepath.Join(tmp, "etc", "cron.daily")
 	mkdirAll(t, dir)
-	if err := os.Chmod(dir, 0755); err != nil {
+	if err := os.Chmod(dir, 0755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 

@@ -24,7 +24,7 @@ func setupFSRoot(t *testing.T) string {
 func writeFile(t *testing.T, root, path, content string, mode os.FileMode) {
 	t.Helper()
 	full := filepath.Join(root, path)
-	if err := os.MkdirAll(filepath.Dir(full), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), 0755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(full, []byte(content), mode); err != nil {
@@ -36,7 +36,7 @@ func writeFile(t *testing.T, root, path, content string, mode os.FileMode) {
 func mkDir(t *testing.T, root, path string, mode os.FileMode) {
 	t.Helper()
 	full := filepath.Join(root, path)
-	if err := os.MkdirAll(full, 0755); err != nil {
+	if err := os.MkdirAll(full, 0755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 	if err := os.Chmod(full, mode); err != nil {

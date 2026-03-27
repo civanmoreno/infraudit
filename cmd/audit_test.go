@@ -18,12 +18,12 @@ type mockCheck struct {
 	severity check.Severity
 }
 
-func (m mockCheck) ID() string          { return m.id }
-func (m mockCheck) Name() string        { return m.name }
-func (m mockCheck) Category() string    { return m.category }
+func (m mockCheck) ID() string               { return m.id }
+func (m mockCheck) Name() string             { return m.name }
+func (m mockCheck) Category() string         { return m.category }
 func (m mockCheck) Severity() check.Severity { return m.severity }
-func (m mockCheck) Description() string { return "mock check" }
-func (m mockCheck) Run() check.Result   { return check.Result{Status: check.Pass, Message: "ok"} }
+func (m mockCheck) Description() string      { return "mock check" }
+func (m mockCheck) Run() check.Result        { return check.Result{Status: check.Pass, Message: "ok"} }
 
 // mockOSCheck implements check.Check + check.OSAware.
 type mockOSCheck struct {

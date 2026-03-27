@@ -34,10 +34,10 @@ func setupFSRoot(t *testing.T) string {
 func writeFile(t *testing.T, root, absPath, content string) {
 	t.Helper()
 	full := filepath.Join(root, absPath)
-	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil { //nolint:gosec //nolint:gosec
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(full, []byte(content), 0o644); err != nil {
+	if err := os.WriteFile(full, []byte(content), 0o644); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 }
@@ -46,7 +46,7 @@ func writeFile(t *testing.T, root, absPath, content string) {
 func writeFileMode(t *testing.T, root, absPath, content string, mode os.FileMode) {
 	t.Helper()
 	full := filepath.Join(root, absPath)
-	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil { //nolint:gosec //nolint:gosec
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(full, []byte(content), mode); err != nil {
@@ -99,10 +99,10 @@ func TestCertExpiry_ValidCert_Pass(t *testing.T) {
 		time.Now().Add(365*24*time.Hour),
 	)
 	full := filepath.Join(root, "/etc/ssl/certs/valid.pem")
-	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(full, certPEM, 0o644); err != nil {
+	if err := os.WriteFile(full, certPEM, 0o644); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 
@@ -120,10 +120,10 @@ func TestCertExpiry_ExpiredCert_Fail(t *testing.T) {
 		time.Now().Add(-1*time.Hour),
 	)
 	full := filepath.Join(root, "/etc/ssl/certs/expired.pem")
-	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(full, certPEM, 0o644); err != nil {
+	if err := os.WriteFile(full, certPEM, 0o644); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 
@@ -141,10 +141,10 @@ func TestCertExpiry_ExpiringSoon_Warn(t *testing.T) {
 		time.Now().Add(10*24*time.Hour), // expires in 10 days (< 30 day threshold)
 	)
 	full := filepath.Join(root, "/etc/ssl/certs/expiring.crt")
-	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(full, certPEM, 0o644); err != nil {
+	if err := os.WriteFile(full, certPEM, 0o644); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 
@@ -164,10 +164,10 @@ func TestSelfSigned_SnakeoilPresent_Warn(t *testing.T) {
 		time.Now().Add(365*24*time.Hour),
 	)
 	full := filepath.Join(root, "/etc/ssl/certs/ssl-cert-snakeoil.pem")
-	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(full, certPEM, 0o644); err != nil {
+	if err := os.WriteFile(full, certPEM, 0o644); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 

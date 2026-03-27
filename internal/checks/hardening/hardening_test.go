@@ -26,10 +26,10 @@ func setupFSRoot(t *testing.T) string {
 func writeFile(t *testing.T, root, absPath, content string) {
 	t.Helper()
 	full := filepath.Join(root, absPath)
-	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(full, []byte(content), 0o644); err != nil {
+	if err := os.WriteFile(full, []byte(content), 0o644); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 }
@@ -271,7 +271,7 @@ func TestWirelessModules_NoInterfaces(t *testing.T) {
 	root := setupFSRoot(t)
 	// Create /sys/class/net but with no wireless subdir
 	netDir := filepath.Join(root, "sys/class/net/eth0")
-	if err := os.MkdirAll(netDir, 0o755); err != nil {
+	if err := os.MkdirAll(netDir, 0o755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 
@@ -286,7 +286,7 @@ func TestWirelessModules_WirelessFound(t *testing.T) {
 	root := setupFSRoot(t)
 	// Create a wireless interface indicator
 	wirelessDir := filepath.Join(root, "sys/class/net/wlan0/wireless")
-	if err := os.MkdirAll(wirelessDir, 0o755); err != nil {
+	if err := os.MkdirAll(wirelessDir, 0o755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 

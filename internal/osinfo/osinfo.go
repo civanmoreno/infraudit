@@ -45,16 +45,16 @@ const (
 
 // Info holds the detected operating system information.
 type Info struct {
-	ID            string     // e.g. "ubuntu", "debian", "rhel", "centos", "alpine"
-	Name          string     // e.g. "Ubuntu", "Debian GNU/Linux", "Alpine Linux"
-	Version       string     // e.g. "24.04", "9", "3.21"
-	VersionID     string     // e.g. "24.04", "9.3"
-	Family        Family     // distribution family
-	PkgManager    PkgManager // detected package manager
-	InitSystem    InitSystem // detected init system
-	Arch          string     // runtime.GOARCH
-	PrettyName    string     // human-readable name from os-release
-	IDLike        []string   // parent distros (e.g. ["debian"] for ubuntu)
+	ID         string     // e.g. "ubuntu", "debian", "rhel", "centos", "alpine"
+	Name       string     // e.g. "Ubuntu", "Debian GNU/Linux", "Alpine Linux"
+	Version    string     // e.g. "24.04", "9", "3.21"
+	VersionID  string     // e.g. "24.04", "9.3"
+	Family     Family     // distribution family
+	PkgManager PkgManager // detected package manager
+	InitSystem InitSystem // detected init system
+	Arch       string     // runtime.GOARCH
+	PrettyName string     // human-readable name from os-release
+	IDLike     []string   // parent distros (e.g. ["debian"] for ubuntu)
 }
 
 // osReleasePath can be overridden in tests.

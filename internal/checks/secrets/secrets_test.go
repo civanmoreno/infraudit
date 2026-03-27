@@ -21,7 +21,7 @@ func setupTmpRoot(t *testing.T) string {
 
 func mkdirAll(t *testing.T, path string) {
 	t.Helper()
-	if err := os.MkdirAll(path, 0755); err != nil {
+	if err := os.MkdirAll(path, 0755); err != nil { //nolint:gosec
 		t.Fatal(err)
 	}
 }
