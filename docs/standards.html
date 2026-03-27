@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standards &amp; Methodology — infraudit</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>infraudit</h1>
+            <span class="version">v2.0.0</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="getting-started.html">Getting Started</a></li>
+            <li><a href="architecture.html">Architecture</a></li>
+            <li><a href="checks.html">Checks Reference</a></li>
+            <li><a href="configuration.html">Configuration</a></li>
+            <li><a href="output.html">Output &amp; Reports</a></li>
+            <li><a href="standards.html" class="active">Standards &amp; Methodology</a></li>
+            <li><a href="roadmap.html">Roadmap</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://github.com/civanmoreno/infraudit">GitHub</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1>Standards &amp; Methodology</h1>
+        <p>This document explains the security standards, authoritative sources, and methodology behind infraudit's 287 checks. Every check is traceable to at least one recognized security framework.</p>
+
+        <!-- ══ Why infraudit is valid ══ -->
+        <h2>Why infraudit Is Valid</h2>
+        <p>infraudit does not invent security rules. Every check is derived from one or more of the following authoritative sources, maintained by recognized security organizations:</p>
+
+        <table>
+            <thead><tr><th>Source</th><th>Publisher</th><th>Authority</th><th>Used For</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>CIS Benchmarks</strong></td>
+                    <td>Center for Internet Security</td>
+                    <td>Industry-recognized, used by auditors, required by PCI-DSS, HIPAA, SOC 2, FedRAMP</td>
+                    <td>Primary source for 90%+ of checks</td>
+                </tr>
+                <tr>
+                    <td><strong>DISA STIG</strong></td>
+                    <td>Defense Information Systems Agency (US DoD)</td>
+                    <td>Required for US government and defense contractor systems</td>
+                    <td>Container security, access controls, audit logging</td>
+                </tr>
+                <tr>
+                    <td><strong>NIST SP 800-53</strong></td>
+                    <td>National Institute of Standards and Technology</td>
+                    <td>Foundation for FedRAMP, FISMA, and many compliance frameworks</td>
+                    <td>Control families: AC, AU, CM, IA, SC, SI</td>
+                </tr>
+                <tr>
+                    <td><strong>OWASP</strong></td>
+                    <td>Open Worldwide Application Security Project</td>
+                    <td>Industry standard for application and infrastructure security</td>
+                    <td>Docker/container security checks</td>
+                </tr>
+                <tr>
+                    <td><strong>Linux man pages &amp; kernel docs</strong></td>
+                    <td>The Linux Kernel Organization / distribution maintainers</td>
+                    <td>Definitive reference for sysctl, PAM, systemd, auditd, and file system behavior</td>
+                    <td>Correct parameter values, default behaviors, configuration syntax</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ══ CIS Benchmarks ══ -->
+        <h2>CIS Benchmarks (Primary Source)</h2>
+        <p>The <a href="https://www.cisecurity.org/cis-benchmarks">CIS Benchmarks</a> are consensus-based security configuration guides developed by a global community of security professionals. They are the most widely adopted hardening standards for Linux systems.</p>
+
+        <h3>Benchmark Versions Used</h3>
+        <table>
+            <thead><tr><th>Benchmark</th><th>Version</th><th>Date</th></tr></thead>
+            <tbody>
+                <tr><td>CIS Ubuntu Linux 24.04 LTS</td><td>v1.0.0</td><td>2024</td></tr>
+                <tr><td>CIS Red Hat Enterprise Linux 9</td><td>v2.0.0</td><td>2024</td></tr>
+                <tr><td>CIS Debian Linux 12</td><td>v1.0.0</td><td>2024</td></tr>
+            </tbody>
+        </table>
+
+        <h3>CIS Coverage by Section</h3>
+        <table>
+            <thead><tr><th>CIS Section</th><th>Topic</th><th>infraudit Category</th><th>Level 1 Controls</th><th>Level 2 Controls</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>1. Initial Setup</strong></td>
+                    <td>Filesystem, bootloader, process hardening, MAC, integrity</td>
+                    <td>FS, HARD, BOOT, LOG</td>
+                    <td>~30 mapped</td>
+                    <td>~10 mapped</td>
+                </tr>
+                <tr>
+                    <td><strong>2. Services</strong></td>
+                    <td>Unnecessary services, NTP, MTA, NFS, DNS, DHCP, SNMP</td>
+                    <td>SVC, NFS, NET</td>
+                    <td>~25 mapped</td>
+                    <td>~15 mapped</td>
+                </tr>
+                <tr>
+                    <td><strong>3. Network Configuration</strong></td>
+                    <td>IP forwarding, source routing, redirects, TCP SYN cookies, firewall</td>
+                    <td>NET, HARD</td>
+                    <td>~30 mapped</td>
+                    <td>~20 mapped</td>
+                </tr>
+                <tr>
+                    <td><strong>4. Logging and Auditing</strong></td>
+                    <td>rsyslog, journald, auditd, log permissions, log retention</td>
+                    <td>LOG</td>
+                    <td>~25 mapped</td>
+                    <td>~15 mapped</td>
+                </tr>
+                <tr>
+                    <td><strong>5. Access, Authentication &amp; Authorization</strong></td>
+                    <td>SSH, PAM, sudo, password policy, user accounts</td>
+                    <td>AUTH, PAM, CRON</td>
+                    <td>~30 mapped</td>
+                    <td>~10 mapped</td>
+                </tr>
+                <tr>
+                    <td><strong>6. System Maintenance</strong></td>
+                    <td>File permissions, user/group integrity, SUID/SGID</td>
+                    <td>FS, AUTH</td>
+                    <td>~10 mapped</td>
+                    <td>~5 mapped</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Total CIS coverage:</strong> ~150 Level 1 controls (~95%) and ~75 Level 2 controls (~90%) are mapped to infraudit checks. Run <code>infraudit compliance &lt;report.json&gt;</code> for a detailed per-section compliance report.</p>
+
+        <h3>CIS Levels Explained</h3>
+        <table>
+            <thead><tr><th>Level</th><th>Intent</th><th>Who Needs It</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Level 1</strong></td>
+                    <td>Essential security settings that can be applied without significant performance impact or service disruption</td>
+                    <td>All servers in production</td>
+                </tr>
+                <tr>
+                    <td><strong>Level 2</strong></td>
+                    <td>Defense-in-depth settings that may reduce functionality or require additional planning</td>
+                    <td>High-security environments, regulated industries</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ══ DISA STIG ══ -->
+        <h2>DISA STIG</h2>
+        <p>The <a href="https://public.cyber.mil/stigs/">Security Technical Implementation Guides (STIGs)</a> are published by the US Defense Information Systems Agency. They provide configuration standards for DoD systems and are widely adopted in government and defense.</p>
+
+        <h3>STIG Coverage</h3>
+        <table>
+            <thead><tr><th>STIG Area</th><th>infraudit Coverage</th><th>Example Checks</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td>Access Control</td>
+                    <td>AUTH, PAM, CRON</td>
+                    <td>SSH root login, empty passwords, account lockout, sudoers</td>
+                </tr>
+                <tr>
+                    <td>Audit and Accountability</td>
+                    <td>LOG</td>
+                    <td>auditd rules, log integrity, log retention, AIDE</td>
+                </tr>
+                <tr>
+                    <td>Configuration Management</td>
+                    <td>HARD, BOOT, SVC</td>
+                    <td>ASLR, kernel hardening, unnecessary services, bootloader</td>
+                </tr>
+                <tr>
+                    <td>Identification and Authentication</td>
+                    <td>AUTH, PAM, CRYPTO</td>
+                    <td>Password policy, certificate validation, MFA readiness</td>
+                </tr>
+                <tr>
+                    <td>System and Communications Protection</td>
+                    <td>NET, CRYPTO, CTR</td>
+                    <td>Firewall, TLS, cipher suites, container isolation</td>
+                </tr>
+                <tr>
+                    <td>System and Information Integrity</td>
+                    <td>PKG, MAL, LOG</td>
+                    <td>Security updates, rootkit detection, file integrity</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ══ NIST ══ -->
+        <h2>NIST SP 800-53 Mapping</h2>
+        <p><a href="https://csf.tools/reference/nist-sp-800-53/r5/">NIST SP 800-53 Rev. 5</a> defines security and privacy controls for federal information systems. Many compliance frameworks (FedRAMP, FISMA, CMMC) reference these controls. infraudit checks map to the following control families:</p>
+
+        <table>
+            <thead><tr><th>Control Family</th><th>Name</th><th>infraudit Categories</th><th>Example Controls</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>AC</strong></td>
+                    <td>Access Control</td>
+                    <td>AUTH, PAM, CRON, FS</td>
+                    <td>AC-2 (account management), AC-3 (access enforcement), AC-6 (least privilege)</td>
+                </tr>
+                <tr>
+                    <td><strong>AU</strong></td>
+                    <td>Audit and Accountability</td>
+                    <td>LOG</td>
+                    <td>AU-2 (audit events), AU-3 (content of audit records), AU-8 (time stamps), AU-12 (audit generation)</td>
+                </tr>
+                <tr>
+                    <td><strong>CM</strong></td>
+                    <td>Configuration Management</td>
+                    <td>HARD, SVC, PKG, BOOT</td>
+                    <td>CM-6 (configuration settings), CM-7 (least functionality), CM-11 (user-installed software)</td>
+                </tr>
+                <tr>
+                    <td><strong>IA</strong></td>
+                    <td>Identification and Authentication</td>
+                    <td>AUTH, PAM, CRYPTO</td>
+                    <td>IA-2 (multi-factor), IA-5 (authenticator management), IA-7 (cryptographic module auth)</td>
+                </tr>
+                <tr>
+                    <td><strong>SC</strong></td>
+                    <td>System and Communications Protection</td>
+                    <td>NET, CRYPTO, CTR</td>
+                    <td>SC-8 (transmission confidentiality), SC-12 (crypto key management), SC-28 (data at rest)</td>
+                </tr>
+                <tr>
+                    <td><strong>SI</strong></td>
+                    <td>System and Information Integrity</td>
+                    <td>PKG, MAL, LOG, SEC</td>
+                    <td>SI-2 (flaw remediation), SI-3 (malicious code protection), SI-7 (software integrity)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ══ How checks are derived ══ -->
+        <h2>How Checks Are Derived</h2>
+        <p>Each infraudit check follows a traceable process from standard to implementation:</p>
+
+        <ol>
+            <li><strong>Control identification</strong> — A security requirement is identified from CIS Benchmarks, DISA STIG, or NIST SP 800-53.</li>
+            <li><strong>Technical mapping</strong> — The control is mapped to a specific Linux configuration: a file, a sysctl parameter, a service state, a permission, or a command output.</li>
+            <li><strong>Pass/Fail criteria</strong> — Objective, binary criteria are defined. For example: <code>PermitRootLogin</code> must be <code>no</code>, not just "reviewed."</li>
+            <li><strong>Severity assignment</strong> — Based on exploitability and impact:
+                <ul>
+                    <li><strong>CRITICAL</strong> — Directly exploitable without authentication (e.g., empty passwords, root SSH login)</li>
+                    <li><strong>HIGH</strong> — Enables privilege escalation or significant data exposure (e.g., missing firewall, weak ciphers)</li>
+                    <li><strong>MEDIUM</strong> — Security best practice not applied (e.g., log rotation, ASLR)</li>
+                    <li><strong>LOW</strong> — Defense-in-depth improvement (e.g., login banners, NTP security)</li>
+                </ul>
+            </li>
+            <li><strong>Remediation</strong> — Every check includes the exact command or configuration change to fix the finding.</li>
+            <li><strong>CIS mapping</strong> — The check is mapped to the specific CIS section (e.g., "5.2.1 Ensure SSH root login is disabled") and level (L1/L2).</li>
+        </ol>
+
+        <!-- ══ What infraudit inspects ══ -->
+        <h2>What infraudit Inspects</h2>
+        <p>infraudit reads system state through these mechanisms — it never modifies your system:</p>
+
+        <table>
+            <thead><tr><th>Source</th><th>What It Reveals</th><th>Example Checks</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>Configuration files</strong></td>
+                    <td>Service settings, security policies, PAM configuration</td>
+                    <td><code>/etc/ssh/sshd_config</code>, <code>/etc/security/pwquality.conf</code>, <code>/etc/audit/auditd.conf</code></td>
+                </tr>
+                <tr>
+                    <td><strong>File permissions</strong></td>
+                    <td>Access control on sensitive files</td>
+                    <td><code>/etc/shadow</code> (0640), <code>/etc/crontab</code> (0600), private keys (0600)</td>
+                </tr>
+                <tr>
+                    <td><strong>Kernel parameters</strong></td>
+                    <td>Hardening settings via <code>/proc/sys/</code></td>
+                    <td>ASLR, IP forwarding, SYN cookies, ptrace scope, dmesg restriction</td>
+                </tr>
+                <tr>
+                    <td><strong>Mount options</strong></td>
+                    <td>Filesystem security flags</td>
+                    <td><code>noexec</code> on <code>/tmp</code>, <code>nosuid</code> on <code>/dev/shm</code>, separate partitions</td>
+                </tr>
+                <tr>
+                    <td><strong>Service state</strong></td>
+                    <td>Running/enabled systemd units</td>
+                    <td>auditd, fail2ban, chrony, unnecessary services</td>
+                </tr>
+                <tr>
+                    <td><strong>User/group databases</strong></td>
+                    <td>Account security, password hashes</td>
+                    <td><code>/etc/passwd</code>, <code>/etc/shadow</code>, <code>/etc/group</code></td>
+                </tr>
+                <tr>
+                    <td><strong>Process table</strong></td>
+                    <td>Running processes and their privileges</td>
+                    <td>Root processes, container runtime</td>
+                </tr>
+                <tr>
+                    <td><strong>Package manager</strong></td>
+                    <td>Installed packages and pending updates</td>
+                    <td>Security updates, repository HTTPS, unwanted packages</td>
+                </tr>
+                <tr>
+                    <td><strong>Certificate stores</strong></td>
+                    <td>TLS/SSL certificate health</td>
+                    <td>Expired certs, weak algorithms, private key permissions</td>
+                </tr>
+                <tr>
+                    <td><strong>Container runtime</strong></td>
+                    <td>Docker/Podman security configuration</td>
+                    <td>Privileged containers, resource limits, content trust</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ══ Compliance frameworks ══ -->
+        <h2>Compliance Framework Applicability</h2>
+        <p>Because infraudit's checks are derived from CIS and NIST, they are directly applicable to audits under the following frameworks:</p>
+
+        <table>
+            <thead><tr><th>Framework</th><th>Requirement</th><th>How infraudit Helps</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><strong>PCI-DSS v4.0</strong></td>
+                    <td>Req. 2: Secure configurations for all system components</td>
+                    <td>287 checks validate configuration hardening across all layers</td>
+                </tr>
+                <tr>
+                    <td><strong>PCI-DSS v4.0</strong></td>
+                    <td>Req. 5: Protect against malicious software</td>
+                    <td>MAL checks verify antimalware, rootkit detection, definition updates</td>
+                </tr>
+                <tr>
+                    <td><strong>PCI-DSS v4.0</strong></td>
+                    <td>Req. 6: Develop and maintain secure systems</td>
+                    <td>PKG checks verify security patches and automatic updates</td>
+                </tr>
+                <tr>
+                    <td><strong>PCI-DSS v4.0</strong></td>
+                    <td>Req. 8: Identify users and authenticate access</td>
+                    <td>AUTH + PAM checks validate password policies, lockout, MFA readiness</td>
+                </tr>
+                <tr>
+                    <td><strong>PCI-DSS v4.0</strong></td>
+                    <td>Req. 10: Log and monitor all access</td>
+                    <td>LOG checks verify auditd, syslog, log integrity, retention</td>
+                </tr>
+                <tr>
+                    <td><strong>SOC 2 Type II</strong></td>
+                    <td>CC6.1: Logical and physical access controls</td>
+                    <td>AUTH, PAM, FS, CRON checks cover access control requirements</td>
+                </tr>
+                <tr>
+                    <td><strong>SOC 2 Type II</strong></td>
+                    <td>CC7.2: Monitor system components for anomalies</td>
+                    <td>LOG checks verify audit trail, file integrity monitoring (AIDE)</td>
+                </tr>
+                <tr>
+                    <td><strong>SOC 2 Type II</strong></td>
+                    <td>CC8.1: Change management</td>
+                    <td>Baseline command detects security regressions after changes</td>
+                </tr>
+                <tr>
+                    <td><strong>HIPAA</strong></td>
+                    <td>164.312(a): Access control</td>
+                    <td>AUTH + PAM checks enforce authentication and authorization</td>
+                </tr>
+                <tr>
+                    <td><strong>HIPAA</strong></td>
+                    <td>164.312(b): Audit controls</td>
+                    <td>LOG checks verify audit logging is active and protected</td>
+                </tr>
+                <tr>
+                    <td><strong>HIPAA</strong></td>
+                    <td>164.312(e): Transmission security</td>
+                    <td>CRYPTO + NET checks verify TLS, cipher suites, network hardening</td>
+                </tr>
+                <tr>
+                    <td><strong>ISO 27001</strong></td>
+                    <td>A.8: Asset management, A.9: Access control, A.12: Operations security</td>
+                    <td>Broad coverage across all 17 categories</td>
+                </tr>
+                <tr>
+                    <td><strong>FedRAMP</strong></td>
+                    <td>Based on NIST SP 800-53</td>
+                    <td>Direct mapping to AC, AU, CM, IA, SC, SI control families</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- ══ Methodology ══ -->
+        <h2>Audit Methodology</h2>
+
+        <h3>Principles</h3>
+        <ul>
+            <li><strong>Read-only</strong> — infraudit never modifies system state. It only reads files, queries services, and inspects configurations.</li>
+            <li><strong>Deterministic</strong> — The same system state always produces the same results. No sampling, no heuristics.</li>
+            <li><strong>Objective</strong> — Pass/fail criteria are binary and documented. There is no subjective "risk assessment."</li>
+            <li><strong>Traceable</strong> — Every check maps to a specific CIS section, STIG rule, or NIST control.</li>
+            <li><strong>Actionable</strong> — Every finding includes a remediation command or configuration change.</li>
+        </ul>
+
+        <h3>Scoring Algorithm</h3>
+        <p>The Hardening Index (0-100) weights each check by severity:</p>
+        <table>
+            <thead><tr><th>Severity</th><th>Weight</th><th>PASS</th><th>WARN</th><th>FAIL</th></tr></thead>
+            <tbody>
+                <tr><td>CRITICAL</td><td>10 points</td><td>+10</td><td>+5</td><td>0</td></tr>
+                <tr><td>HIGH</td><td>5 points</td><td>+5</td><td>+2</td><td>0</td></tr>
+                <tr><td>MEDIUM</td><td>3 points</td><td>+3</td><td>+1</td><td>0</td></tr>
+                <tr><td>LOW</td><td>1 point</td><td>+1</td><td>+0</td><td>0</td></tr>
+                <tr><td>INFO</td><td>0 points</td><td>-</td><td>-</td><td>-</td></tr>
+            </tbody>
+        </table>
+        <p>ERROR and SKIPPED checks are excluded from scoring. The score maps to a letter grade: <strong>A</strong> (&ge;90), <strong>B</strong> (&ge;80), <strong>C</strong> (&ge;70), <strong>D</strong> (&ge;60), <strong>F</strong> (&lt;60).</p>
+
+        <h3>Platform Awareness</h3>
+        <p>infraudit detects the operating system, package manager, and init system at startup. Checks that are specific to a platform (e.g., <code>update-crypto-policies</code> on RHEL, <code>apport</code> on Ubuntu) are automatically <strong>SKIPPED</strong> on systems where they don't apply, eliminating false positives.</p>
+
+        <!-- ══ Limitations ══ -->
+        <h2>Limitations &amp; Scope</h2>
+        <p>infraudit is designed for Linux server hardening validation. It is <strong>not</strong>:</p>
+        <ul>
+            <li><strong>A vulnerability scanner</strong> — It does not scan for CVEs or perform port scanning. Use tools like Trivy, Nessus, or OpenVAS for that.</li>
+            <li><strong>A penetration testing tool</strong> — It does not attempt exploitation. Use tools like Metasploit or Burp Suite.</li>
+            <li><strong>A cloud configuration auditor</strong> — It does not check AWS IAM, S3 buckets, or GCP firewall rules. Use tools like Prowler, ScoutSuite, or Steampipe.</li>
+            <li><strong>A compliance certification</strong> — infraudit provides evidence to support compliance audits, but it is not a certification body. Compliance determination is made by qualified auditors.</li>
+        </ul>
+
+        <h2>References</h2>
+        <ul>
+            <li><a href="https://www.cisecurity.org/cis-benchmarks">CIS Benchmarks</a> — Center for Internet Security</li>
+            <li><a href="https://public.cyber.mil/stigs/">DISA STIGs</a> — Defense Information Systems Agency</li>
+            <li><a href="https://csf.tools/reference/nist-sp-800-53/r5/">NIST SP 800-53 Rev. 5</a> — National Institute of Standards and Technology</li>
+            <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html">OWASP Docker Security Cheat Sheet</a></li>
+            <li><a href="https://www.kernel.org/doc/html/latest/">Linux Kernel Documentation</a></li>
+            <li><a href="https://man7.org/linux/man-pages/">Linux man pages</a></li>
+        </ul>
+    </main>
+</body>
+</html>
