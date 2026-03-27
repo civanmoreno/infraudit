@@ -434,6 +434,45 @@
             </ul>
         </div>
 
+        <div class="phase-card">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 45: OS Annotations for All Checks</h2>
+                <span class="phase-status done">DONE</span>
+            </div>
+            <ul class="check-list">
+                <li>24 checks annotated with RequiredInit("systemd") across 14 files <span class="phase-status done">DONE</span></li>
+                <li>Backup, cron, filesystem, logging, NFS, packages, services checks now skip on non-systemd <span class="phase-status done">DONE</span></li>
+                <li>File-only checks (journald.conf, auditd.conf, rsyslog.conf) correctly left universal <span class="phase-status done">DONE</span></li>
+                <li>CRYPTO-001 (redhat) and SVC-052 (debian) SupportedOS verified <span class="phase-status done">DONE</span></li>
+            </ul>
+        </div>
+
+        <div class="phase-card">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 46: YAML Plugin System</h2>
+                <span class="phase-status done">DONE</span>
+            </div>
+            <ul class="check-list">
+                <li>Custom checks in /etc/infraudit/checks.d/*.yaml — no recompilation needed <span class="phase-status done">DONE</span></li>
+                <li>6 rule types: file_exists, file_missing, file_contains, file_not_contains, file_perms, command <span class="phase-status done">DONE</span></li>
+                <li>Plugin checks support OS, init system, and package manager annotations <span class="phase-status done">DONE</span></li>
+                <li>22 unit tests covering all rule types, validation, and loading <span class="phase-status done">DONE</span></li>
+            </ul>
+        </div>
+
+        <div class="phase-card">
+            <div class="phase-header">
+                <h2 style="border:none;margin:0;padding:0;">Phase 47: Baseline &amp; Regression Detection</h2>
+                <span class="phase-status done">DONE</span>
+            </div>
+            <ul class="check-list">
+                <li>infraudit baseline save — save audit snapshot as accepted baseline <span class="phase-status done">DONE</span></li>
+                <li>infraudit baseline check — compare against baseline, exit 1 on regressions <span class="phase-status done">DONE</span></li>
+                <li>infraudit baseline show/clear — view info or remove baseline <span class="phase-status done">DONE</span></li>
+                <li>Score delta, regression/improvement detection, CI-friendly exit codes <span class="phase-status done">DONE</span></li>
+            </ul>
+        </div>
+
         <h2>Standards Coverage</h2>
         <table>
             <thead>
