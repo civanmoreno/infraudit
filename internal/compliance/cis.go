@@ -125,6 +125,9 @@ var CISControls = []CISControl{
 	{CheckID: "SVC-010", Section: "2.2.3", SectionName: "Ensure MTA is not an open relay", Category: "2. Services", Level: L1},
 	{CheckID: "SVC-011", Section: "2.2.4", SectionName: "Ensure root mail is forwarded to a monitored account", Category: "2. Services", Level: L1},
 
+	// 2.2.6 Application-specific services
+	{CheckID: "SVC-057", Section: "2.2.6", SectionName: "Ensure Redis requires authentication", Category: "2. Services", Level: L1},
+
 	// 2.3 NFS/RPC
 	{CheckID: "NFS-001", Section: "2.3.1", SectionName: "Ensure NFS exports are properly configured", Category: "2. Services", Level: L1},
 	{CheckID: "NFS-002", Section: "2.3.2", SectionName: "Ensure NFSv3 is disabled if NFSv4 is available", Category: "2. Services", Level: L1},
