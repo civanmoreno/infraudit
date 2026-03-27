@@ -1,0 +1,98 @@
+name: Reporte de Bug
+description: Reportar un problema con infraudit
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por reportar este bug. Por favor completa la información para que podamos investigar.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción del Bug
+      description: Qué pasó y qué esperabas que pasara
+      placeholder: "infraudit reporta AUTH-001 como FAIL pero PermitRootLogin está configurado como 'no'"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para Reproducir
+      description: Comandos exactos para reproducir el problema
+      placeholder: |
+        1. sudo infraudit audit --check AUTH-001
+        2. Ver output
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento Esperado
+      description: Qué debería haber pasado
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamiento Actual
+      description: Qué pasó realmente (incluye output si es posible)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version de infraudit
+      description: "Ejecuta: infraudit --version"
+      placeholder: "v2.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Sistema Operativo
+      options:
+        - Ubuntu 24.04
+        - Ubuntu 22.04
+        - Debian 12
+        - Debian 11
+        - RHEL 9
+        - RHEL 8
+        - CentOS Stream 9
+        - Fedora 41
+        - AlmaLinux 9
+        - Rocky Linux 9
+        - Alpine Linux
+        - Otro (especificar abajo)
+    validations:
+      required: true
+
+  - type: input
+    id: os_other
+    attributes:
+      label: Otro Sistema Operativo
+      description: Si seleccionaste "Otro", especifica aquí
+      placeholder: "openSUSE Leap 15.6"
+
+  - type: dropdown
+    id: root
+    attributes:
+      label: Ejecutado como root
+      options:
+        - "Si (sudo)"
+        - "No"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto Adicional
+      description: Cualquier otra información relevante (doctor output, config file, etc.)

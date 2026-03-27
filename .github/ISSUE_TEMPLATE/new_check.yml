@@ -1,0 +1,104 @@
+name: Solicitud de Nuevo Check
+description: Proponer un nuevo check de seguridad
+title: "[Check]: "
+labels: ["enhancement", "new-check"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Proponer un nuevo check de seguridad para infraudit.
+
+  - type: input
+    id: name
+    attributes:
+      label: Nombre del Check
+      description: Nombre corto y descriptivo
+      placeholder: "Verificar que Redis no acepta conexiones sin autenticación"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Categoría
+      options:
+        - auth (Usuarios y Autenticación)
+        - pam (Políticas de Contraseñas)
+        - network (Red y Firewall)
+        - services (Servicios y Procesos)
+        - filesystem (Sistema de Archivos)
+        - logging (Logging y Auditoría)
+        - packages (Paquetes y Actualizaciones)
+        - hardening (Endurecimiento del Kernel)
+        - boot (Seguridad de Arranque)
+        - cron (Tareas Programadas)
+        - crypto (TLS/SSL y Criptografía)
+        - secrets (Secretos y Credenciales)
+        - container (Seguridad de Contenedores)
+        - rlimit (Límites de Recursos)
+        - nfs (Sistemas de Archivos de Red)
+        - malware (Rootkits y Malware)
+        - backup (Respaldos)
+        - Otra / Nueva categoría
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severidad Sugerida
+      options:
+        - CRITICAL — Vulnerabilidad directamente explotable
+        - HIGH — Riesgo significativo
+        - MEDIUM — Buena práctica no aplicada
+        - LOW — Mejora recomendada
+        - INFO — Informativo
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descripción
+      description: Qué debería validar este check y por qué es importante
+      placeholder: "Redis por defecto no requiere contraseña. Esto permite que cualquier proceso en la red acceda y modifique datos..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: pass_criteria
+    attributes:
+      label: Criterio de PASS
+      description: Bajo qué condiciones el check debería pasar
+      placeholder: "requirepass está configurado en /etc/redis/redis.conf con un valor no vacío"
+    validations:
+      required: true
+
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Remediación
+      description: Comando o pasos para arreglar el hallazgo
+      placeholder: |
+        Agregar en /etc/redis/redis.conf:
+        requirepass <contraseña-segura>
+      render: bash
+
+  - type: input
+    id: standard
+    attributes:
+      label: Estándar de Referencia
+      description: CIS section, STIG rule, NIST control (si aplica)
+      placeholder: "CIS 3.4.2.1, NIST SC-8"
+
+  - type: dropdown
+    id: os_specific
+    attributes:
+      label: Específico de un OS
+      description: Si este check solo aplica a ciertas distribuciones
+      options:
+        - Universal (todas las distros)
+        - Solo Debian/Ubuntu
+        - Solo RHEL/CentOS/Fedora
+        - Solo Alpine
+        - Solo sistemas con systemd
