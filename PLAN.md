@@ -555,6 +555,21 @@ Go CLI that runs directly on a Linux server to audit its security posture. Valid
 - [x] 15+ source files updated to use `check.P()` for FSRoot test isolation
 - [x] Total: 36% → 47.5% coverage
 
+### Phase 49: GitHub Action ✅
+
+- [x] `action/action.yml` — composite GitHub Action con dos modos de ejecución
+- [x] Modo `local` — ejecuta audit en el runner de GitHub Actions
+- [x] Modo `ssh` — conecta via SSH a servidor remoto, copia binario, ejecuta, recoge reporte
+- [x] Descarga automática del binario desde GitHub Releases (amd64/arm64)
+- [x] Detección de arquitectura remota para SSH
+- [x] Soporte para todos los flags de audit: category, profile, skip, severity-min, policy
+- [x] SARIF upload para GitHub Code Scanning
+- [x] `min-score` gate — falla el pipeline si el score está bajo el umbral
+- [x] Job Summary con tabla de métricas y hallazgos críticos
+- [x] Outputs: score, grade, total, passed, failures, warnings, report-path
+- [x] Limpieza automática de SSH keys (even on failure)
+- [x] `action/README.md` con ejemplos: local, SSH, fleet, SARIF, policy, multi-server matrix
+
 ## Check Categories
 
 | Category | Prefix | Description |
