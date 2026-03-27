@@ -246,6 +246,182 @@ infraudit completion fish &gt; ~/.config/fish/completions/infraudit.fish</code><
         <pre><code><span class="comment"># Profile + custom skip + JSON output</span>
 sudo infraudit audit --profile web-server --skip AUTH-008 --format json --output report.json</code></pre>
 
+        <h2>Custom Checks (Plugins)</h2>
+        <p>Define your own checks in <code>/etc/infraudit/checks.d/*.yaml</code> without recompiling infraudit. Plugin checks are loaded automatically during audits and appear in reports alongside the 287 built-in checks.</p>
+
+        <h3>Plugin Format</h3>
+        <pre><code>id: CUSTOM-001                       <span class="comment"># Unique check ID</span>
+name: App config has secure mode     <span class="comment"># Human-readable name</span>
+category: custom                     <span class="comment"># Category (new or existing)</span>
+severity: high                       <span class="comment"># critical, high, medium, low, info</span>
+description: Verify secure mode      <span class="comment"># What this check validates</span>
+remediation: Set secure_mode=true    <span class="comment"># How to fix if it fails</span>
+
+<span class="comment"># Optional: restrict to specific systems</span>
+os: [debian, redhat]                 <span class="comment"># Only run on these OS families</span>
+init: systemd                        <span class="comment"># Require systemd</span>
+pkg_manager: apt                     <span class="comment"># Require apt</span>
+
+rule:
+  type: file_contains                <span class="comment"># Rule type (see below)</span>
+  path: /etc/myapp/config            <span class="comment"># File to inspect</span>
+  pattern: "secure_mode=true"        <span class="comment"># Regex pattern to match</span></code></pre>
+
+        <h3>Rule Types</h3>
+        <table>
+            <thead><tr><th>Type</th><th>Description</th><th>PASS when</th><th>Required Fields</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><code>file_exists</code></td>
+                    <td>Verify a file exists</td>
+                    <td>File is present</td>
+                    <td><code>path</code></td>
+                </tr>
+                <tr>
+                    <td><code>file_missing</code></td>
+                    <td>Verify a file does NOT exist</td>
+                    <td>File is absent</td>
+                    <td><code>path</code></td>
+                </tr>
+                <tr>
+                    <td><code>file_contains</code></td>
+                    <td>Search for a regex pattern in file content</td>
+                    <td>Pattern matches a line</td>
+                    <td><code>path</code>, <code>pattern</code></td>
+                </tr>
+                <tr>
+                    <td><code>file_not_contains</code></td>
+                    <td>Verify a regex pattern is NOT in file content</td>
+                    <td>No line matches pattern</td>
+                    <td><code>path</code>, <code>pattern</code></td>
+                </tr>
+                <tr>
+                    <td><code>file_perms</code></td>
+                    <td>Verify file permissions don't exceed a maximum</td>
+                    <td>Permissions &le; max_perm</td>
+                    <td><code>path</code>, <code>max_perm</code> (octal, e.g. <code>"0600"</code>)</td>
+                </tr>
+                <tr>
+                    <td><code>command</code></td>
+                    <td>Execute a command and evaluate stdout</td>
+                    <td><code>expect</code> matches or <code>expect_fail</code> doesn't match</td>
+                    <td><code>command</code>, <code>expect</code> or <code>expect_fail</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Plugin Examples</h3>
+        <pre><code><span class="comment"># Verify nginx hides version information</span>
+id: CUSTOM-002
+name: Nginx hides server version
+category: hardening
+severity: medium
+remediation: Add "server_tokens off" to nginx.conf
+rule:
+  type: file_contains
+  path: /etc/nginx/nginx.conf
+  pattern: "server_tokens\\s+off"</code></pre>
+
+        <pre><code><span class="comment"># Verify no database dumps in /tmp</span>
+id: CUSTOM-003
+name: No database dump in /tmp
+category: secrets
+severity: critical
+remediation: Remove the dump file immediately
+rule:
+  type: file_missing
+  path: /tmp/production.sql</code></pre>
+
+        <pre><code><span class="comment"># Verify application secrets file permissions</span>
+id: CUSTOM-004
+name: App secrets file permissions
+category: secrets
+severity: high
+remediation: "chmod 600 /opt/myapp/.env"
+rule:
+  type: file_perms
+  path: /opt/myapp/.env
+  max_perm: "0600"</code></pre>
+
+        <pre><code><span class="comment"># Verify Docker uses overlay2 storage driver</span>
+id: CUSTOM-005
+name: Docker uses overlay2 storage
+category: container
+severity: medium
+init: systemd
+remediation: Configure overlay2 in /etc/docker/daemon.json
+rule:
+  type: command
+  command: docker
+  args:
+    - info
+    - --format
+    - "{{.Driver}}"
+  expect: "overlay2"</code></pre>
+
+        <h3>Multiple Checks per File</h3>
+        <p>Use the <code>checks:</code> key to define multiple checks in a single YAML file:</p>
+        <pre><code>checks:
+  - id: MYAPP-001
+    name: Config file exists
+    category: custom
+    severity: high
+    description: Application config must be present
+    rule:
+      type: file_exists
+      path: /etc/myapp/config
+
+  - id: MYAPP-002
+    name: Debug mode disabled
+    category: custom
+    severity: critical
+    description: Debug must be off in production
+    remediation: Set DEBUG=false in /etc/myapp/config
+    rule:
+      type: file_not_contains
+      path: /etc/myapp/config
+      pattern: "DEBUG=true"</code></pre>
+
+        <h3>Validation</h3>
+        <p>Each plugin is validated at load time. Required: <code>id</code>, <code>name</code>, <code>category</code>, <code>severity</code>, and a valid <code>rule.type</code> with its required fields. Invalid plugins are skipped with a warning — they don't break the audit.</p>
+
+        <h2>Baseline &amp; Regression Detection</h2>
+        <p>Save audit snapshots as baselines and compare future audits against them to detect regressions. Useful for CI/CD pipelines and change management.</p>
+
+        <h3>Commands</h3>
+        <table>
+            <thead><tr><th>Command</th><th>Description</th></tr></thead>
+            <tbody>
+                <tr><td><code>infraudit baseline save</code></td><td>Run a full audit and save the result as a baseline snapshot</td></tr>
+                <tr><td><code>infraudit baseline check</code></td><td>Run audit, compare against baseline, report regressions and improvements</td></tr>
+                <tr><td><code>infraudit baseline show</code></td><td>Display saved baseline info (score, date, host, OS)</td></tr>
+                <tr><td><code>infraudit baseline clear</code></td><td>Remove the saved baseline</td></tr>
+            </tbody>
+        </table>
+        <p>Default baseline path: <code>/etc/infraudit/baseline.json</code>. Override with <code>--file &lt;path&gt;</code>.</p>
+
+        <h3>Usage</h3>
+        <pre><code><span class="comment"># Save current state as baseline</span>
+sudo infraudit baseline save
+
+<span class="comment"># After changes, check for regressions</span>
+sudo infraudit baseline check
+
+<span class="comment"># View baseline details</span>
+infraudit baseline show
+
+<span class="comment"># Remove baseline</span>
+infraudit baseline clear</code></pre>
+
+        <h3>CI/CD Integration</h3>
+        <p><code>baseline check</code> exits with code <strong>1</strong> if any regressions are found (a check that was PASS is now FAIL/WARN). Use this in pipelines to block deployments that degrade security posture:</p>
+        <pre><code><span class="comment"># In CI pipeline</span>
+sudo infraudit baseline check
+if [ $? -eq 1 ]; then
+    echo "Security regression detected — blocking deployment"
+    exit 1
+fi</code></pre>
+
         <h2>Exit Codes</h2>
         <table>
             <thead><tr><th>Code</th><th>Meaning</th><th>CI/CD Action</th></tr></thead>
