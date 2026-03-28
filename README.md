@@ -12,7 +12,9 @@
 
 A single binary you drop on any Linux server to audit its security posture. No dependencies, no agents, no runtime — just copy and run. Validates **287 checks** across **17 categories** based on **CIS Benchmarks**, **DISA STIG**, and industry best practices.
 
-<br>
+<p align="center">
+  <img src="docs/assets/demo.gif" alt="infraudit demo" width="800">
+</p>
 
 📖 **[Full Documentation](https://civanmoreno.github.io/infraudit/)** · 📋 **[Checks Reference](https://civanmoreno.github.io/infraudit/checks.html)** · ⚙️ **[Configuration Guide](https://civanmoreno.github.io/infraudit/configuration.html)**
 
