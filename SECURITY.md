@@ -1,54 +1,54 @@
 # Security Policy
 
-## Versiones Soportadas
+## Supported Versions
 
-| Version | Soportada |
+| Version | Supported |
 |---------|-----------|
-| 2.x     | Si        |
+| 2.x     | Yes       |
 | < 2.0   | No        |
 
-## Reportar una Vulnerabilidad
+## Reporting a Vulnerability
 
-infraudit es una herramienta de auditoría de seguridad que se ejecuta con privilegios elevados e inspecciona configuraciones sensibles del sistema. Nos tomamos la seguridad muy en serio.
+infraudit is a security auditing tool that runs with elevated privileges and inspects sensitive system configurations. We take security very seriously.
 
-**No abras un issue público.** En su lugar:
+**Do not open a public issue.** Instead:
 
-1. Envía un email a **security@infraudit.com** con:
-   - Descripción de la vulnerabilidad
-   - Pasos para reproducir
-   - Versión(es) afectada(s)
-   - Impacto potencial
+1. Send an email to **security@infraudit.com** with:
+   - Description of the vulnerability
+   - Steps to reproduce
+   - Affected version(s)
+   - Potential impact
 
-2. Recibirás una respuesta dentro de **48 horas**.
+2. You will receive a response within **48 hours**.
 
-3. Trabajaremos contigo para:
-   - Confirmar la vulnerabilidad
-   - Desarrollar un fix
-   - Coordinar la divulgación
+3. We will work with you to:
+   - Confirm the vulnerability
+   - Develop a fix
+   - Coordinate disclosure
 
-## Proceso de Divulgación
+## Disclosure Process
 
-Seguimos una política de divulgación responsable:
+We follow a responsible disclosure policy:
 
-1. El reporte se recibe y se confirma (48h)
-2. Se desarrolla y testea un fix (1-7 días según severidad)
-3. Se publica un release con el fix
-4. Se publica un advisory de seguridad en GitHub
-5. Se da crédito al reportador (si lo desea)
+1. Report is received and confirmed (48h)
+2. A fix is developed and tested (1-7 days depending on severity)
+3. A release containing the fix is published
+4. A GitHub security advisory is published
+5. Credit is given to the reporter (if desired)
 
-## Alcance
+## Scope
 
-Los siguientes tipos de hallazgos son relevantes:
+The following types of findings are relevant:
 
-- Ejecución de comandos arbitrarios a través de inputs maliciosos (YAML plugins, config files)
-- Path traversal en la lectura de archivos
-- Inyección de comandos en checks que ejecutan comandos del sistema
-- Bypass de validaciones de seguridad
-- Exposición de información sensible en reportes o logs
-- Vulnerabilidades en dependencias
+- Arbitrary command execution through malicious inputs (YAML plugins, config files)
+- Path traversal in file reading
+- Command injection in checks that execute system commands
+- Security validation bypasses
+- Sensitive information exposure in reports or logs
+- Vulnerabilities in dependencies
 
-## Fuera de Alcance
+## Out of Scope
 
-- Hallazgos que requieren acceso root previo (infraudit ya se ejecuta como root)
-- Falsos positivos o falsos negativos en checks de auditoría (reportar como issue regular)
-- Vulnerabilidades en sistemas operativos o herramientas que infraudit inspecciona
+- Findings that require prior root access (infraudit already runs as root)
+- False positives or false negatives in audit checks (report as a regular issue)
+- Vulnerabilities in operating systems or tools that infraudit inspects
