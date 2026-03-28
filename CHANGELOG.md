@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.2.1] - 2026-03-27
+
+### Fixed
+- Restored man page (`docs/infraudit.1`) accidentally deleted in v2.0.0, updated to v2.2.0 with all new commands, flags, and examples
+- Go version references aligned to 1.25 across README, CONTRIBUTING, Dockerfile, and HTML docs
+- CIS Benchmark Level 2 coverage corrected from ~70% to ~90% in README and docs/index.html
+
+### Changed
+- Translated CHANGELOG.md, SECURITY.md, CONTRIBUTING.md, and action/README.md from Spanish to English
+- Added "Why infraudit?" comparison table to docs landing page (vs Lynis, CIS-CAT Pro, OpenSCAP)
+
 ## [2.2.0] - 2026-03-27
 
 ### Added
