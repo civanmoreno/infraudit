@@ -2,16 +2,16 @@
 
 Run infraudit security audits in your CI/CD pipeline — on the GitHub Actions runner or on remote servers via SSH.
 
-## Modos de Ejecución
+## Execution Modes
 
-| Modo | Uso | Cuándo usarlo |
-|------|-----|---------------|
-| `local` | Audita el runner de GitHub Actions | Testing de containers, validación de imágenes base, auditoría del entorno CI |
-| `ssh` | Audita un servidor remoto via SSH | Servidores de producción, staging, pre-deploy checks |
+| Mode | Usage | When to use |
+|------|-------|-------------|
+| `local` | Audits the GitHub Actions runner | Container testing, base image validation, CI environment auditing |
+| `ssh` | Audits a remote server via SSH | Production servers, staging, pre-deploy checks |
 
-## Uso Rápido
+## Quick Start
 
-### Modo Local (en el runner)
+### Local Mode (on the runner)
 
 ```yaml
 - name: Security Audit
@@ -20,7 +20,7 @@ Run infraudit security audits in your CI/CD pipeline — on the GitHub Actions r
     min-score: 70
 ```
 
-### Modo SSH (servidor remoto)
+### SSH Mode (remote server)
 
 ```yaml
 - name: Security Audit (Production)
@@ -32,9 +32,9 @@ Run infraudit security audits in your CI/CD pipeline — on the GitHub Actions r
     min-score: 80
 ```
 
-## Ejemplos Completos
+## Full Examples
 
-### Auditoría básica con gate de score
+### Basic audit with score gate
 
 ```yaml
 name: Security Audit
@@ -60,13 +60,13 @@ jobs:
           echo "Passed: ${{ steps.audit.outputs.passed }}/${{ steps.audit.outputs.total }}"
 ```
 
-### Auditoría de servidor de producción via SSH
+### Production server audit via SSH
 
 ```yaml
 name: Production Security Check
 on:
   schedule:
-    - cron: '0 6 * * 1'  # Cada lunes a las 6am
+    - cron: '0 6 * * 1'  # Every Monday at 6am
 
 jobs:
   audit-prod:
@@ -88,13 +88,13 @@ jobs:
         run: echo "::warning::Production score dropped below 75!"
 ```
 
-### Auditoría de múltiples servidores
+### Multi-server audit
 
 ```yaml
 name: Fleet Security Audit
 on:
   schedule:
-    - cron: '0 2 * * *'  # Diario a las 2am
+    - cron: '0 2 * * *'  # Daily at 2am
 
 jobs:
   audit:
@@ -118,7 +118,7 @@ jobs:
           min-score: 70
 ```
 
-### Con SARIF para GitHub Code Scanning
+### With SARIF for GitHub Code Scanning
 
 ```yaml
 - name: Security Audit
@@ -128,9 +128,9 @@ jobs:
     category: auth,network,crypto
 ```
 
-Los resultados aparecen en la pestaña **Security > Code Scanning** del repositorio.
+Results appear in the **Security > Code Scanning** tab of the repository.
 
-### Con policy enforcement
+### With policy enforcement
 
 ```yaml
 - name: Security Audit
@@ -142,7 +142,7 @@ Los resultados aparecen en la pestaña **Security > Code Scanning** del reposito
     policy: .infraudit-policy.json
 ```
 
-### Solo categorías específicas
+### Specific categories only
 
 ```yaml
 - name: SSH & Auth Audit
@@ -155,45 +155,45 @@ Los resultados aparecen en la pestaña **Security > Code Scanning** del reposito
 
 ## Inputs
 
-| Input | Default | Descripción |
+| Input | Default | Description |
 |-------|---------|-------------|
-| `mode` | `local` | `local` (runner GHA) o `ssh` (servidor remoto) |
-| `host` | — | Host SSH: `user@hostname` o `user@hostname:port` |
-| `ssh-key` | — | Llave privada SSH para autenticación |
-| `ssh-password` | — | Password SSH (si no usa key) |
-| `ssh-known-hosts` | — | Contenido de known_hosts (si vacío, desactiva verificación) |
-| `category` | — | Filtrar por categoría (comma-separated) |
-| `profile` | — | Perfil de servidor: `web-server`, `db-server`, `container-host`, `minimal` |
-| `skip` | — | Check IDs a saltar (comma-separated) |
-| `severity-min` | — | Severidad mínima: `low`, `medium`, `high`, `critical` |
-| `format` | `sarif` | Formato: `console`, `json`, `sarif` |
-| `args` | — | Argumentos adicionales para `infraudit audit` |
-| `policy` | — | Ruta al archivo de policy |
-| `min-score` | — | Score mínimo (0-100). Falla si está por debajo |
-| `version` | `latest` | Versión de infraudit a usar |
+| `mode` | `local` | `local` (GHA runner) or `ssh` (remote server) |
+| `host` | — | SSH host: `user@hostname` or `user@hostname:port` |
+| `ssh-key` | — | SSH private key for authentication |
+| `ssh-password` | — | SSH password (if not using key) |
+| `ssh-known-hosts` | — | known_hosts content (if empty, disables verification) |
+| `category` | — | Filter by category (comma-separated) |
+| `profile` | — | Server profile: `web-server`, `db-server`, `container-host`, `minimal` |
+| `skip` | — | Check IDs to skip (comma-separated) |
+| `severity-min` | — | Minimum severity: `low`, `medium`, `high`, `critical` |
+| `format` | `sarif` | Format: `console`, `json`, `sarif` |
+| `args` | — | Additional arguments for `infraudit audit` |
+| `policy` | — | Path to policy file |
+| `min-score` | — | Minimum score (0-100). Fails if below threshold |
+| `version` | `latest` | infraudit version to use |
 
 ## Outputs
 
-| Output | Descripción |
+| Output | Description |
 |--------|-------------|
 | `score` | Hardening Index (0-100) |
-| `grade` | Letra (A-F) |
-| `total` | Total de checks ejecutados |
-| `passed` | Checks que pasaron |
-| `failures` | Checks que fallaron |
+| `grade` | Letter grade (A-F) |
+| `total` | Total checks executed |
+| `passed` | Checks that passed |
+| `failures` | Checks that failed |
 | `warnings` | Warnings |
-| `report-path` | Ruta al reporte JSON generado |
+| `report-path` | Path to the generated JSON report |
 
 ## Job Summary
 
-La action genera automáticamente un resumen en el tab **Summary** del workflow con:
-- Score y grade
-- Conteo de checks por status
-- Tabla de hallazgos CRITICAL y HIGH
+The action automatically generates a summary in the workflow's **Summary** tab with:
+- Score and grade
+- Check count by status
+- Table of CRITICAL and HIGH findings
 
-## Seguridad
+## Security
 
-- Las llaves SSH se eliminan automáticamente al finalizar (even on failure)
-- Si no se provee `ssh-known-hosts`, se desactiva `StrictHostKeyChecking` (no recomendado para producción)
-- Para producción, siempre provee `ssh-known-hosts` con el fingerprint del servidor
-- Los secrets deben almacenarse como [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+- SSH keys are automatically cleaned up on completion (even on failure)
+- If `ssh-known-hosts` is not provided, `StrictHostKeyChecking` is disabled (not recommended for production)
+- For production, always provide `ssh-known-hosts` with the server's fingerprint
+- Secrets should be stored as [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)

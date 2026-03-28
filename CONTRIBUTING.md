@@ -1,64 +1,64 @@
-# Contribuir a infraudit
+# Contributing to infraudit
 
-Gracias por tu interés en contribuir. Este documento explica cómo hacerlo.
+Thank you for your interest in contributing. This document explains how to do it.
 
-## Formas de Contribuir
+## Ways to Contribute
 
-- **Reportar bugs** — Abre un issue usando la plantilla de bug report
-- **Proponer checks nuevos** — Abre un issue usando la plantilla de nuevo check
-- **Crear plugins YAML** — Comparte tus checks personalizados
-- **Mejorar documentación** — Correcciones, traducciones, ejemplos
-- **Enviar código** — Bug fixes, nuevos checks, mejoras
+- **Report bugs** — Open an issue using the bug report template
+- **Propose new checks** — Open an issue using the new check template
+- **Create YAML plugins** — Share your custom checks
+- **Improve documentation** — Corrections, translations, examples
+- **Submit code** — Bug fixes, new checks, improvements
 
-## Requisitos Previos
+## Prerequisites
 
 - Go 1.25+
 - golangci-lint v2
-- Familiaridad con CIS Benchmarks o estándares de seguridad Linux
+- Familiarity with CIS Benchmarks or Linux security standards
 
-## Configuración del Entorno
+## Environment Setup
 
 ```bash
 git clone https://github.com/civanmoreno/infraudit.git
 cd infraudit
-make build    # Compilar
-make test     # Ejecutar tests
-make lint     # Ejecutar linter
+make build    # Build
+make test     # Run tests
+make lint     # Run linter
 ```
 
-## Proceso para Pull Requests
+## Pull Request Process
 
-1. **Fork** el repositorio
-2. **Crea un branch** desde `main`: `git checkout -b feature/mi-cambio`
-3. **Haz tus cambios** siguiendo las convenciones de código
-4. **Ejecuta tests y lint:**
+1. **Fork** the repository
+2. **Create a branch** from `main`: `git checkout -b feature/my-change`
+3. **Make your changes** following the code conventions
+4. **Run tests and lint:**
    ```bash
    make test
    make lint
    ```
-5. **Commit** con un mensaje descriptivo (ver convenciones abajo)
-6. **Push** a tu fork y abre un Pull Request
+5. **Commit** with a descriptive message (see conventions below)
+6. **Push** to your fork and open a Pull Request
 
-### Convenciones de Commits
+### Commit Conventions
 
-Usamos commits convencionales:
+We use conventional commits:
 
 ```
-feat: agregar check para validar configuración de Redis
-fix: corregir falso positivo en AUTH-007 cuando shadow no existe
-docs: actualizar documentación de plugins
-test: agregar tests para checks de logging
-refactor: consolidar parsers de sysctl
+feat: add check to validate Redis configuration
+fix: fix false positive in AUTH-007 when shadow doesn't exist
+docs: update plugin documentation
+test: add tests for logging checks
+refactor: consolidate sysctl parsers
 ```
 
-Prefijos válidos: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`
+Valid prefixes: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`
 
-## Agregar un Check Nuevo
+## Adding a New Check
 
-### Check Built-in (Go)
+### Built-in Check (Go)
 
-1. Crea un archivo en `internal/checks/<categoría>/`
-2. Implementa la interfaz `check.Check`:
+1. Create a file in `internal/checks/<category>/`
+2. Implement the `check.Check` interface:
 
 ```go
 package auth
@@ -72,66 +72,66 @@ func init() {
 type myCheck struct{}
 
 func (c *myCheck) ID() string               { return "AUTH-XXX" }
-func (c *myCheck) Name() string             { return "Descripción corta" }
+func (c *myCheck) Name() string             { return "Short description" }
 func (c *myCheck) Category() string         { return "auth" }
 func (c *myCheck) Severity() check.Severity { return check.High }
-func (c *myCheck) Description() string      { return "Qué valida este check" }
+func (c *myCheck) Description() string      { return "What this check validates" }
 
 func (c *myCheck) Run() check.Result {
-    // Lógica del check
+    // Check logic
     return check.Result{
         Status:      check.Pass,
-        Message:     "Todo bien",
+        Message:     "All good",
     }
 }
 ```
 
-3. Si el check depende de systemd, agrega:
+3. If the check depends on systemd, add:
 ```go
 func (c *myCheck) RequiredInit() string { return "systemd" }
 ```
 
-4. Si el check es específico de una distro:
+4. If the check is distro-specific:
 ```go
 func (c *myCheck) SupportedOS() []string { return []string{"debian"} }
 ```
 
-5. Usa `check.P(path)` para resolver rutas de archivos (permite testing con FSRoot)
-6. Agrega tests en `<categoría>/<categoría>_test.go`
-7. Agrega el mapeo CIS en `internal/compliance/cis.go` si aplica
+5. Use `check.P(path)` to resolve file paths (enables testing with FSRoot)
+6. Add tests in `<category>/<category>_test.go`
+7. Add the CIS mapping in `internal/compliance/cis.go` if applicable
 
-### Check como Plugin (YAML)
+### Plugin Check (YAML)
 
-Crea un archivo en `/etc/infraudit/checks.d/`:
+Create a file in `/etc/infraudit/checks.d/`:
 
 ```yaml
 id: CUSTOM-001
-name: Mi check personalizado
+name: My custom check
 category: custom
 severity: medium
-description: Qué valida
-remediation: Cómo arreglarlo
+description: What it validates
+remediation: How to fix it
 rule:
   type: file_contains
-  path: /etc/mi-app/config
+  path: /etc/my-app/config
   pattern: "secure=true"
 ```
 
-Ver [documentación de plugins](https://civanmoreno.github.io/infraudit/configuration.html) para todos los tipos de regla.
+See the [plugin documentation](https://civanmoreno.github.io/infraudit/configuration.html) for all rule types.
 
-## Convenciones de Código
+## Code Conventions
 
-- **Formato:** `gofmt` (se valida en CI)
-- **Linting:** `golangci-lint` con la configuración del proyecto (`.golangci.yml`)
-- **Tests:** Ejecutar con `-race` flag. Usar `check.FSRoot` para tests de checks que leen archivos.
-- **Errores:** Retornar `check.Error` con mensaje claro cuando un check no puede ejecutarse. No usar `panic`.
-- **Permisos en tests:** Usar `//nolint:gosec` cuando se necesiten permisos amplios en archivos de test.
-- **Sin dependencias nuevas** a menos que sea estrictamente necesario. infraudit es deliberadamente minimal.
+- **Formatting:** `gofmt` (enforced in CI)
+- **Linting:** `golangci-lint` with the project config (`.golangci.yml`)
+- **Tests:** Run with `-race` flag. Use `check.FSRoot` for tests of checks that read files.
+- **Errors:** Return `check.Error` with a clear message when a check cannot execute. Do not use `panic`.
+- **Test permissions:** Use `//nolint:gosec` when broad file permissions are needed in test files.
+- **No new dependencies** unless strictly necessary. infraudit is deliberately minimal.
 
-## IDs de Checks
+## Check IDs
 
-| Categoría | Prefijo | Rango actual |
-|-----------|---------|-------------|
+| Category | Prefix | Current Range |
+|----------|--------|---------------|
 | auth | AUTH- | 001-022 |
 | pam | PAM- | 001-013 |
 | network | NET- | 001-035 |
@@ -150,12 +150,12 @@ Ver [documentación de plugins](https://civanmoreno.github.io/infraudit/configur
 | malware | MAL- | 001-004 |
 | backup | BAK- | 001-004 |
 
-Al agregar un check nuevo, usa el siguiente número disponible en la categoría correspondiente.
+When adding a new check, use the next available number in the corresponding category.
 
-## Reportar Vulnerabilidades
+## Reporting Vulnerabilities
 
-Ver [SECURITY.md](SECURITY.md) para el proceso de reporte de vulnerabilidades. **No abras issues públicos para vulnerabilidades.**
+See [SECURITY.md](SECURITY.md) for the vulnerability reporting process. **Do not open public issues for vulnerabilities.**
 
-## Licencia
+## License
 
-Al contribuir, aceptas que tus contribuciones se licencian bajo los mismos términos que el proyecto ([BSL 1.1](LICENSE)).
+By contributing, you agree that your contributions are licensed under the same terms as the project ([BSL 1.1](LICENSE)).
