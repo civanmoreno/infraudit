@@ -1,16 +1,16 @@
-# Proceso de Release
+# Release Process
 
-## Versionado
+## Versioning
 
-infraudit sigue [Semantic Versioning](https://semver.org/lang/es/):
+infraudit follows [Semantic Versioning](https://semver.org/):
 
-- **MAJOR** (X.0.0): Cambios incompatibles (nuevo formato de config, checks renombrados)
-- **MINOR** (x.Y.0): Nuevas funcionalidades (nuevos checks, nuevos comandos, nuevos formatos)
-- **PATCH** (x.y.Z): Bug fixes, mejoras de documentación, correcciones de falsos positivos
+- **MAJOR** (X.0.0): Breaking changes (new config format, renamed checks)
+- **MINOR** (x.Y.0): New features (new checks, new commands, new formats)
+- **PATCH** (x.y.Z): Bug fixes, documentation improvements, false positive corrections
 
-## Antes del Release
+## Before the Release
 
-### 1. Verificar que main está limpio
+### 1. Verify that main is clean
 
 ```bash
 git checkout main
@@ -20,82 +20,82 @@ go test -race -count=1 ./...
 golangci-lint run
 ```
 
-### 2. Actualizar la versión
+### 2. Update the version
 
-Editar `internal/version/version.go`:
+Edit `internal/version/version.go`:
 
 ```go
 const (
-    Version = "X.Y.Z"  // <-- nueva versión
+    Version = "X.Y.Z"  // <-- new version
     Name    = "infraudit"
 )
 ```
 
-### 3. Actualizar CHANGELOG.md
+### 3. Update CHANGELOG.md
 
-Agregar la nueva sección al inicio del archivo siguiendo el formato [Keep a Changelog](https://keepachangelog.com/):
+Add the new section at the top of the file following the [Keep a Changelog](https://keepachangelog.com/) format:
 
 ```markdown
 ## [X.Y.Z] - YYYY-MM-DD
 
-### Agregado
+### Added
 - ...
 
-### Corregido
+### Fixed
 - ...
 
-### Cambiado
+### Changed
 - ...
 ```
 
-### 4. Actualizar RELEASE_NOTES.md
+### 4. Update RELEASE_NOTES.md
 
-Reemplazar el contenido con las notas para esta versión. Este archivo es usado por el CI para el body del GitHub Release.
+Replace the content with the notes for this version. This file is used by CI for the GitHub Release body.
 
-### 5. Actualizar versión en documentación
+### 5. Update version in documentation
 
-Verificar que la versión esté actualizada en:
+Verify the version is updated in:
 - `docs/*.html` (sidebar version badge)
-- `README.md` (sample output, si referencia versión)
+- `README.md` (sample output, if it references the version)
 
-### 6. Crear PR de release
+### 6. Create the release PR
 
 ```bash
 git checkout -b release/vX.Y.Z
 git add -A
 git commit -m "release: vX.Y.Z"
 git push -u origin release/vX.Y.Z
-gh pr create --title "release: vX.Y.Z" --body "Release X.Y.Z — ver CHANGELOG.md"
+gh pr create --title "release: vX.Y.Z" --body "Release X.Y.Z — see CHANGELOG.md"
 ```
 
-### 7. Merge y verificar
+### 7. Merge and verify
 
-1. Merge el PR a main
-2. CI automáticamente:
-   - Ejecuta tests + lint
-   - Compila binarios (linux/amd64 + linux/arm64)
-   - Genera checksums SHA256
-   - Genera SBOM (SPDX)
-   - Firma binarios con cosign (Sigstore)
-   - Crea GitHub Release con tag `vX.Y.Z`
-   - Adjunta: binarios, firmas, checksums, SBOM
+1. Merge the PR to main
+2. CI automatically:
+   - Runs tests + lint
+   - Compiles binaries (linux/amd64 + linux/arm64)
+   - Generates SHA256 checksums
+   - Generates SBOM (SPDX)
+   - Signs binaries with cosign (Sigstore)
+   - Creates GitHub Release with tag `vX.Y.Z`
+   - Attaches: binaries, signatures, checksums, SBOM
 
-### 8. Verificar el release
+### 8. Verify the release
 
 ```bash
-# Verificar que el tag existe
+# Verify the tag exists
 git pull --tags
 git tag -l | grep vX.Y.Z
 
-# Verificar el release en GitHub
+# Verify the release on GitHub
 gh release view vX.Y.Z
 
-# Verificar la descarga
+# Verify the download
 curl -sL https://github.com/civanmoreno/infraudit/releases/download/vX.Y.Z/infraudit-linux-amd64 -o /tmp/infraudit
 chmod +x /tmp/infraudit
 /tmp/infraudit --version
 
-# Verificar firma
+# Verify signature
 cosign verify-blob \
   --signature https://github.com/civanmoreno/infraudit/releases/download/vX.Y.Z/infraudit-linux-amd64.sig \
   --certificate-identity-regexp ".*" \
@@ -103,41 +103,41 @@ cosign verify-blob \
   /tmp/infraudit
 ```
 
-### 9. Actualizar Homebrew formula
+### 9. Update Homebrew formula
 
 ```bash
-# Actualizar SHA256 y versión en la formula
+# Update SHA256 and version in the formula
 ./scripts/update-formula.sh X.Y.Z
 
-# Verificar la formula
+# Verify the formula
 cat Formula/infraudit.rb
 
-# Commit y push
+# Commit and push
 git add Formula/infraudit.rb
 git commit -m "chore: update Homebrew formula to vX.Y.Z"
 git push
 ```
 
-Los usuarios pueden instalar via:
+Users can install via:
 ```bash
 brew tap civanmoreno/tap https://github.com/civanmoreno/infraudit.git
 brew install infraudit
 ```
 
-## Qué incluye cada release
+## What each release includes
 
-| Archivo | Descripción |
-|---------|-------------|
-| `infraudit-linux-amd64` | Binario estático para x86_64 |
-| `infraudit-linux-arm64` | Binario estático para ARM64 (Graviton, Ampere) |
-| `infraudit-linux-amd64.sig` | Firma cosign (Sigstore) |
-| `infraudit-linux-arm64.sig` | Firma cosign (Sigstore) |
-| `checksums.txt` | SHA256 de todos los binarios |
+| File | Description |
+|------|-------------|
+| `infraudit-linux-amd64` | Static binary for x86_64 |
+| `infraudit-linux-arm64` | Static binary for ARM64 (Graviton, Ampere) |
+| `infraudit-linux-amd64.sig` | cosign signature (Sigstore) |
+| `infraudit-linux-arm64.sig` | cosign signature (Sigstore) |
+| `checksums.txt` | SHA256 of all binaries |
 | `sbom.spdx.json` | Software Bill of Materials (SPDX) |
 
-## Notas
+## Notes
 
-- El CI solo crea un release si el tag `vX.Y.Z` no existe. Si necesitas re-publicar, elimina el tag y release primero.
-- La versión fuente de verdad es `internal/version/version.go`. El CI la lee de ahí.
-- No crear tags manualmente — el CI crea el tag automáticamente al crear el release.
-- Los release notes vienen de `RELEASE_NOTES.md`, no de auto-generated.
+- CI only creates a release if the tag `vX.Y.Z` doesn't exist. If you need to re-publish, delete the tag and release first.
+- The version source of truth is `internal/version/version.go`. CI reads it from there.
+- Do not create tags manually — CI creates the tag automatically when creating the release.
+- Release notes come from `RELEASE_NOTES.md`, not auto-generated.

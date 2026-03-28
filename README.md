@@ -390,6 +390,16 @@ Full documentation: **[civanmoreno.github.io/infraudit](https://civanmoreno.gith
 
 ---
 
+## Community & Support
+
+- **[GitHub Discussions](https://github.com/civanmoreno/infraudit/discussions)** — Questions, ideas, and general discussion
+- **[Bug Reports](https://github.com/civanmoreno/infraudit/issues/new?template=bug_report.md)** — Report bugs using the issue template
+- **[Feature Requests](https://github.com/civanmoreno/infraudit/issues/new?template=feature_request.md)** — Propose new features or checks
+- **[Contributing Guide](CONTRIBUTING.md)** — How to contribute code, checks, or plugins
+- **[Security Policy](SECURITY.md)** — Report vulnerabilities to security@infraudit.com
+
+---
+
 ## License
 
 [Business Source License 1.1](LICENSE)
