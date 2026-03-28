@@ -10,7 +10,7 @@
     <nav class="sidebar">
         <div class="sidebar-header">
             <h1>infraudit</h1>
-            <span class="version">v2.2.0</span>
+            <span class="version">v2.2.1</span>
         </div>
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
@@ -149,7 +149,7 @@
         <p>The console format is designed for interactive use. It groups checks by category, sorts failures first, uses ANSI colors for instant visual scanning, and includes a progress bar summary.</p>
         <pre><code>$ sudo infraudit audit --category auth
 
-  <span style="color:#3fb950;font-weight:bold">infraudit v2.2.0 — Security Audit Report</span>
+  <span style="color:#3fb950;font-weight:bold">infraudit v2.2.1 — Security Audit Report</span>
   <span style="color:#8b949e">────────────────────────────────────────────────────</span>
 
   <span style="color:#58a6ff;font-weight:bold">AUTH</span> — <span style="font-weight:bold">Users &amp; Authentication</span>   <span style="color:#3fb950">5 passed</span>  <span style="color:#d29922">2 warn</span>  <span style="color:#f85149">1 fail</span>
@@ -311,7 +311,7 @@ sudo infraudit audit --format html --output /var/log/infraudit/audit-$(date +%F)
 sudo infraudit audit --output /tmp/audit.txt</code></pre>
 
         <h2>SARIF Output (GitHub / GitLab Integration)</h2>
-        <p><a href="https://docs.oasis-open.org/sarif/sarif/v2.2.0/sarif-v2.2.0.html">SARIF</a> (Static Analysis Results Interchange Format) is the standard format for security tools used by GitHub Code Scanning, GitLab SAST, and VS Code. Use <code>--format sarif</code> to generate it.</p>
+        <p><a href="https://docs.oasis-open.org/sarif/sarif/v2.2.1/sarif-v2.2.1.html">SARIF</a> (Static Analysis Results Interchange Format) is the standard format for security tools used by GitHub Code Scanning, GitLab SAST, and VS Code. Use <code>--format sarif</code> to generate it.</p>
         <pre><code>$ sudo infraudit audit --format sarif --output results.sarif</code></pre>
 
         <h3>GitHub Action</h3>

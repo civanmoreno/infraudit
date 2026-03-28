@@ -109,7 +109,7 @@ infraudit categories
 ## 📊 Sample Output
 
 ```
-  infraudit v2.0.0 — Security Audit Report
+  infraudit v2.2.1 — Security Audit Report
   ────────────────────────────────────────────────────
 
   AUTH — Users & Authentication   5 passed  2 warn  1 fail
