@@ -1,46 +1,33 @@
 ## Highlights
 
-### GitHub Action
-Official GitHub Action for CI/CD security audits with two execution modes:
+### Man Page Restored
+The man page (`docs/infraudit.1`) was accidentally deleted in v2.0.0. It has been restored and fully updated to v2.2.0 with documentation for all 12 commands, new flags (`--enforce-policy`, `--format sarif`), YAML plugin system, scan flags, and 15+ usage examples.
 
-```yaml
-# Audit the GHA runner
-- uses: civanmoreno/infraudit/action@v2
-  with:
-    min-score: 70
+After installing via `install.sh`, run `man infraudit` for the full reference.
 
-# Or audit a remote server via SSH
-- uses: civanmoreno/infraudit/action@v2
-  with:
-    mode: ssh
-    host: deploy@prod.example.com
-    ssh-key: ${{ secrets.SSH_KEY }}
-    min-score: 80
-```
+### Documentation Fully in English
+All remaining Spanish-language files have been translated to English:
+- `CHANGELOG.md`, `SECURITY.md`, `CONTRIBUTING.md`, `action/README.md`
 
-Features: auto-download binary, remote arch detection, SARIF upload for GitHub Code Scanning, min-score gate, job summary, fleet audits via matrix strategy.
+### Comparison Table
+The [docs landing page](https://civanmoreno.github.io/infraudit/) now includes a "Why infraudit?" feature comparison table against Lynis, CIS-CAT Pro, and OpenSCAP.
 
-### Homebrew Formula
-
-```bash
-brew tap civanmoreno/tap https://github.com/civanmoreno/infraudit.git
-brew install infraudit
-```
-
-### Test Coverage: 36% to 47%
-~110 new tests across 9 packages. All 17 check categories now have test coverage — zero packages at 0%.
+### Consistency Fixes
+- Go version references aligned to 1.25 across all files (matching `go.mod`)
+- CIS Benchmark Level 2 coverage corrected to ~90% across all docs
 
 ## What's Changed
 
-**New:**
-- GitHub Action with local and SSH modes (`action/action.yml`)
-- Homebrew formula (`Formula/infraudit.rb`)
-- Auto-update script for formula SHA256 (`scripts/update-formula.sh`)
-- ~110 new tests for boot, backup, malware, nfs, container, rlimit, packages, network, services
+**Fixed:**
+- Restored man page deleted in v2.0.0, updated for v2.2.0
+- Go version inconsistency (1.24 → 1.25) in README, CONTRIBUTING, Dockerfile, HTML docs
+- CIS Level 2 coverage inconsistency (~70% → ~90%) in README, docs/index.html
 
-**Improved:**
-- 15+ source files updated to use `check.P()` for test isolation
-- Network tests: 9% to 53% (SNMP, DNS, IPv6, DNSSEC, DoT)
-- Services tests: 23% to 32% (XDMCP, MTA, sudo, SSH)
+**Changed:**
+- CHANGELOG.md translated to English
+- SECURITY.md translated to English
+- CONTRIBUTING.md translated to English
+- action/README.md translated to English
+- Comparison table added to docs/index.html
 
-**Full Changelog**: https://github.com/civanmoreno/infraudit/compare/v2.1.0...v2.2.0
+**Full Changelog**: https://github.com/civanmoreno/infraudit/compare/v2.2.0...v2.2.1
