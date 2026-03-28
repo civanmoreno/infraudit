@@ -10,8 +10,17 @@
 <body>
     <nav class="sidebar">
         <div class="sidebar-header">
-            <h1>infraudit</h1>
-            <span class="version">v2.2.1</span>
+            <div style="display:flex;align-items:center;gap:.6rem">
+                <h1>infraudit</h1>
+                <span class="version">v2.2.1</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.4rem">
+                <button class="theme-toggle" aria-label="Toggle theme">
+                    <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+                    <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+                <button class="mobile-toggle" aria-label="Menu"><span></span></button>
+            </div>
         </div>
         <ul class="nav-links">
             <li><a href="index.html" class="active">Home</a></li>
@@ -24,7 +33,11 @@
             <li><a href="roadmap.html">Roadmap</a></li>
         </ul>
         <div class="sidebar-footer">
-            <a href="https://github.com/civanmoreno/infraudit">GitHub</a> · <a href="https://github.com/civanmoreno/infraudit/discussions">Discussions</a>
+            <a href="https://github.com/civanmoreno/infraudit" class="github-btn">
+                <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                GitHub
+            </a>
+            <a href="https://github.com/civanmoreno/infraudit/discussions">Discussions</a>
         </div>
     </nav>
 
@@ -38,6 +51,10 @@
                 <strong>287 checks</strong> across <strong>17 categories</strong> based on
                 CIS Benchmarks, DISA STIG, and industry best practices.
             </p>
+            <div class="hero-actions">
+                <a href="getting-started.html" class="btn btn-primary">Get Started</a>
+                <a href="checks.html" class="btn btn-secondary">View All Checks</a>
+            </div>
             <p style="margin-top: 1.5rem;">
                 <img src="assets/demo.gif" alt="infraudit demo" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border);">
             </p>
@@ -428,6 +445,18 @@ man infraudit</code></pre>
                 </tbody>
             </table>
         </section>
+        <footer class="footer">
+            <div class="footer-left"><span>infraudit</span> &mdash; Linux server security auditing</div>
+            <div class="footer-links">
+                <a href="https://github.com/civanmoreno/infraudit">GitHub</a>
+                <a href="https://github.com/civanmoreno/infraudit/discussions">Discussions</a>
+                <a href="https://github.com/civanmoreno/infraudit/issues">Issues</a>
+            </div>
+        </footer>
     </main>
+
+    <div class="scroll-progress"></div>
+    <a href="#" class="back-to-top" aria-label="Back to top">&uarr;</a>
+    <script src="assets/app.js"></script>
 </body>
 </html>
